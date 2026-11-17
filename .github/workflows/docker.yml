@@ -1,0 +1,117 @@
+name: CareOn Docker Build & Container Verification
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  docker-validation:
+    name: Docker Build & Persistence Verification
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker Images with Docker Compose
+        run: |
+          docker compose build --progress=plain
+
+      - name: Inspect Built Docker Images
+        run: |
+          echo "=== CareOn Docker Images ==="
+          docker images | grep careon
+
+      - name: Start Multi-Container Stack (Detached Mode)
+        run: |
+          docker compose up -d
+
+      - name: Wait for Containers to Become Healthy
+        run: |
+          echo "Waiting for services to become healthy..."
+          for i in {1..30}; do
+            BACKEND_HEALTH=$(docker inspect --format='{{json .State.Health.Status}}' careon-backend 2>/dev/null || echo "starting")
+            FRONTEND_HEALTH=$(docker inspect --format='{{json .State.Health.Status}}' careon-frontend 2>/dev/null || echo "starting")
+            echo "Attempt $i: Backend=$BACKEND_HEALTH, Frontend=$FRONTEND_HEALTH"
+            if [ "$BACKEND_HEALTH" = "\"healthy\"" ] && [ "$FRONTEND_HEALTH" = "\"healthy\"" ]; then
+              echo "All containers are healthy!"
+              break
+            fi
+            sleep 2
+          done
+
+      - name: Verify Running Containers
+        run: |
+          echo "=== Running Docker Containers ==="
+          docker compose ps
+
+      - name: Verify Backend Health API Directly
+        run: |
+          curl -f http://localhost:8000/api/health
+          echo ""
+
+      - name: Verify Frontend Web Application and API Proxy
+        run: |
+          echo "Checking Frontend HTML response:"
+          curl -f http://localhost:3000/ | grep -q "CareOn"
+          echo "Checking Frontend Reverse Proxy to Backend API:"
+          curl -f http://localhost:3000/api/health
+
+      - name: Submit Test Emergency Incident
+        id: test_incident
+        run: |
+          RESPONSE=$(curl -s -X POST http://localhost:8000/api/emergencies \
+            -H "Content-Type: application/json" \
+            -d '{"patient_name":"CI Validation Subject","room_number":"ICU-CI-1","emergency_type":"Cardiac","priority":"Critical","description":"Automated CI Docker validation incident"}')
+          echo "Response: $RESPONSE"
+          INCIDENT_ID=$(echo "$RESPONSE" | grep -o '"id":[0-9]*' | cut -d: -f2)
+          echo "Created Incident ID: $INCIDENT_ID"
+          echo "incident_id=$INCIDENT_ID" >> $GITHUB_ENV
+          if [ -z "$INCIDENT_ID" ]; then
+            echo "Failed to create test incident!"
+            exit 1
+          fi
+
+      - name: Test Container Restart and Database Persistence
+        run: |
+          echo "Stopping and recreating containers with docker compose down and up..."
+          docker compose down
+          docker compose up -d
+          
+          # Wait for backend to be healthy again
+          for i in {1..20}; do
+            BACKEND_HEALTH=$(docker inspect --format='{{json .State.Health.Status}}' careon-backend 2>/dev/null || echo "starting")
+            if [ "$BACKEND_HEALTH" = "\"healthy\"" ]; then
+              break
+            fi
+            sleep 2
+          done
+
+          echo "Verifying test emergency survived container restart:"
+          PERSISTED=$(curl -s http://localhost:8000/api/emergencies/${{ env.incident_id }})
+          echo "Retrieved record: $PERSISTED"
+          echo "$PERSISTED" | grep -q "CI Validation Subject" || (echo "Data did not persist!" && exit 1)
+          echo "SUCCESS: Database persistence across container restarts verified."
+
+      - name: Inspect Container Logs
+        if: always()
+        run: |
+          echo "=== CareOn Backend Logs ==="
+          docker compose logs backend --tail=50
+          echo "=== CareOn Frontend Logs ==="
+          docker compose logs frontend --tail=50
+
+      - name: Clean Up Docker Environment
+        if: always()
+        run: |
+          docker compose down -v
