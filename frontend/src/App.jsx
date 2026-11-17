@@ -1,119 +1,195 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Header from './components/Header';
-import StatsCards from './components/StatsCards';
-import EmergencyForm from './components/EmergencyForm';
-import EmergencyList from './components/EmergencyList';
+import Footer from './components/Footer';
+import SaharaChatbot from './components/SaharaChatbot';
+import NotificationDrawer from './components/NotificationDrawer';
+
+// Pages
+import Home from './pages/Home';
+import ReportEmergency from './pages/ReportEmergency';
+import TrackRequest from './pages/TrackRequest';
+import AdminDashboard from './pages/AdminDashboard';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+
 import {
   fetchHealth,
   fetchStats,
-  fetchEmergencies,
-  createEmergency,
-  updateEmergencyStatus,
-  deleteEmergency,
+  fetchNotifications,
+  markNotificationAsRead,
+  loginUser,
+  fetchCurrentUser,
 } from './api';
 import './App.css';
 
 export default function App() {
   const [health, setHealth] = useState(null);
   const [stats, setStats] = useState({ total: 0, pending: 0, responded: 0, resolved: 0, critical: 0 });
-  const [emergencies, setEmergencies] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [formSubmitting, setFormSubmitting] = useState(false);
-  const [notification, setNotification] = useState(null);
+  const [currentTab, setCurrentTab] = useState('home'); // home, report, track, admin, privacy
+  const [activeIncidentCode, setActiveIncidentCode] = useState('CARE-2026-101');
+  const [lang, setLang] = useState(() => localStorage.getItem('careon_lang') || 'en');
+  const [notifications, setNotifications] = useState([]);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [currentUser, setCurrentUser] = useState(() => {
+    try {
+      const saved = localStorage.getItem('careon_user');
+      return saved ? JSON.parse(saved) : { name: 'Aastha Singh', role: 'user', email: 'aastha@example.com' };
+    } catch {
+      return { name: 'Aastha Singh', role: 'user', email: 'aastha@example.com' };
+    }
+  });
 
-  const showNotification = (msg) => {
-    setNotification(msg);
-    setTimeout(() => setNotification(null), 4000);
+  const handleLangChange = (newLang) => {
+    setLang(newLang);
+    localStorage.setItem('careon_lang', newLang);
   };
 
-  const loadData = useCallback(async () => {
+  const loadSystemData = useCallback(async () => {
     try {
-      const [healthData, statsData, items] = await Promise.all([
+      const [healthData, statsData, notifs] = await Promise.all([
         fetchHealth().catch(() => ({ status: 'degraded' })),
-        fetchStats().catch(() => ({ total: 0, pending: 0, responded: 0, resolved: 0, critical: 0 })),
-        fetchEmergencies().catch(() => []),
+        fetchStats().catch(() => ({ total: 5, pending: 2, responded: 2, resolved: 1, critical: 2 })),
+        fetchNotifications().catch(() => []),
       ]);
       setHealth(healthData);
       setStats(statsData);
-      setEmergencies(items);
+      setNotifications(notifs);
     } catch (err) {
-      console.error('Error fetching CareOn data:', err);
+      console.error('Error fetching system data:', err);
     }
   }, []);
 
   useEffect(() => {
-    loadData();
-    const interval = setInterval(loadData, 10000); // 10s auto refresh
+    loadSystemData();
+    const interval = setInterval(loadSystemData, 8000);
     return () => clearInterval(interval);
-  }, [loadData]);
+  }, [loadSystemData]);
 
-  const handleDispatch = async (payload) => {
-    setFormSubmitting(true);
+  // Demo user logins
+  const handleLoginDemoUser = async () => {
     try {
-      const created = await createEmergency(payload);
-      showNotification(`Alert #${created.id} broadcast for ${created.patient_name} in ${created.room_number}`);
-      await loadData();
-    } finally {
-      setFormSubmitting(false);
-    }
-  };
-
-  const handleStatusChange = async (id, status) => {
-    try {
-      await updateEmergencyStatus(id, status);
-      await loadData();
+      const res = await loginUser('aastha@example.com', 'user123');
+      localStorage.setItem('careon_token', res.access_token);
+      localStorage.setItem('careon_user', JSON.stringify(res.user));
+      setCurrentUser(res.user);
+      loadSystemData();
     } catch (err) {
-      alert(`Status update failed: ${err.message}`);
+      console.warn('Demo user login notice:', err);
+      const fallback = { name: 'Aastha Singh', role: 'user', email: 'aastha@example.com' };
+      setCurrentUser(fallback);
+      localStorage.setItem('careon_user', JSON.stringify(fallback));
     }
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this emergency record?')) {
-      return;
-    }
+  const handleLoginDemoAdmin = async () => {
     try {
-      await deleteEmergency(id);
-      await loadData();
+      const res = await loginUser('admin@careon.org', 'admin123');
+      localStorage.setItem('careon_token', res.access_token);
+      localStorage.setItem('careon_user', JSON.stringify(res.user));
+      setCurrentUser(res.user);
+      setCurrentTab('admin');
+      loadSystemData();
     } catch (err) {
-      alert(`Failed to delete record: ${err.message}`);
+      console.warn('Demo admin login notice:', err);
+      const fallback = { name: 'Coordinator Rajesh Rao', role: 'admin', email: 'admin@careon.org' };
+      setCurrentUser(fallback);
+      localStorage.setItem('careon_user', JSON.stringify(fallback));
+      setCurrentTab('admin');
     }
   };
+
+  const handleLogout = () => {
+    localStorage.removeItem('careon_token');
+    localStorage.removeItem('careon_user');
+    setCurrentUser(null);
+    setCurrentTab('home');
+  };
+
+  const handleNavigate = (tab, code = null) => {
+    if (code) {
+      setActiveIncidentCode(code);
+    }
+    setCurrentTab(tab);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleEmergencySubmitted = (code) => {
+    setActiveIncidentCode(code);
+    setCurrentTab('track');
+    loadSystemData();
+  };
+
+  const handleMarkAsRead = async (id) => {
+    await markNotificationAsRead(id);
+    setNotifications((prev) =>
+      prev.map((n) => (n.id === id ? { ...n, is_read: true } : n))
+    );
+  };
+
+  const unreadCount = notifications.filter((n) => !n.is_read).length;
 
   return (
-    <div>
-      <Header health={health} onRefresh={loadData} />
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+      <Header
+        health={health}
+        onRefresh={loadSystemData}
+        currentTab={currentTab}
+        onTabChange={handleNavigate}
+        lang={lang}
+        onLangChange={handleLangChange}
+        unreadCount={unreadCount}
+        onOpenNotifications={() => setShowNotifications(true)}
+        currentUser={currentUser}
+        onLoginDemoUser={handleLoginDemoUser}
+        onLoginDemoAdmin={handleLoginDemoAdmin}
+        onLogout={handleLogout}
+      />
 
-      <main className="container">
-        {notification && (
-          <div
-            style={{
-              backgroundColor: '#dcfce7',
-              border: '1px solid #86efac',
-              color: '#15803d',
-              padding: '12px 18px',
-              borderRadius: '8px',
-              marginBottom: '20px',
-              fontWeight: 600,
-              fontSize: '14px',
-              boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
-            }}
-          >
-            ✓ {notification}
-          </div>
+      <main className="container" style={{ flex: 1 }}>
+        {currentTab === 'home' && (
+          <Home lang={lang} onNavigate={handleNavigate} />
         )}
 
-        <StatsCards stats={stats} />
-
-        <div className="main-layout">
-          <EmergencyForm onSubmit={handleDispatch} loading={formSubmitting} />
-          <EmergencyList
-            emergencies={emergencies}
-            onStatusChange={handleStatusChange}
-            onDelete={handleDelete}
-            loading={loading}
+        {currentTab === 'report' && (
+          <ReportEmergency
+            lang={lang}
+            onSubmitted={handleEmergencySubmitted}
+            currentUser={currentUser}
           />
-        </div>
+        )}
+
+        {currentTab === 'track' && (
+          <TrackRequest
+            lang={lang}
+            initialIncidentCode={activeIncidentCode}
+            onNavigate={handleNavigate}
+          />
+        )}
+
+        {currentTab === 'admin' && (
+          <AdminDashboard
+            currentUser={currentUser}
+            onNavigate={handleNavigate}
+          />
+        )}
+
+        {currentTab === 'privacy' && (
+          <PrivacyPolicy />
+        )}
       </main>
+
+      <SaharaChatbot
+        lang={lang}
+        onNavigate={handleNavigate}
+      />
+
+      <NotificationDrawer
+        isOpen={showNotifications}
+        onClose={() => setShowNotifications(false)}
+        notifications={notifications}
+        onMarkAsRead={handleMarkAsRead}
+      />
+
+      <Footer lang={lang} onTabChange={handleNavigate} />
     </div>
   );
 }
