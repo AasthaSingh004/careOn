@@ -1,10 +1,12 @@
-// Dynamic API base resolution for multi-device network support (Mac, Android phone, other laptops)
+// Dynamic API base resolution for cloud deployment (Vercel) and multi-device network support
 export const getApiBase = () => {
-  if (import.meta.env.VITE_API_URL) {
-    return import.meta.env.VITE_API_URL;
+  const envUrl = import.meta.env.VITE_API_URL;
+  if (envUrl && typeof envUrl === 'string' && envUrl.trim() !== '') {
+    const cleaned = envUrl.trim().replace(/\/+$/, '');
+    return cleaned.endsWith('/api') ? cleaned : `${cleaned}/api`;
   }
   if (typeof window !== 'undefined' && window.location) {
-    // When served via Nginx (port 3000 or 80), use same-origin '/api' to avoid CORS and port mismatches
+    // When served via Nginx (port 3000 or 80), or reverse-proxied without port, use same-origin '/api'
     if (window.location.port === '3000' || window.location.port === '80' || !window.location.port) {
       return '/api';
     }

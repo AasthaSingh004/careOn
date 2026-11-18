@@ -493,3 +493,176 @@ def test_private_user_incident_access_restriction(client):
     )
     assert res_admin.status_code == 200
     assert res_admin.json()["incident_code"] == inc_code
+
+
+def test_demo_resource_seeding_in_development(monkeypatch):
+    """Verify that development mode seeds all Mysuru demo fleet resources."""
+    from app.database import Base
+    from app.models import Resource, User, ExternalProvider
+    from app import crud
+    from sqlalchemy import create_engine
+    from sqlalchemy.orm import sessionmaker
+
+    monkeypatch.setenv("ENVIRONMENT", "development")
+    monkeypatch.delenv("SEED_DEMO_DATA", raising=False)
+
+    engine = create_engine("sqlite:///:memory:")
+    Base.metadata.create_all(bind=engine)
+    Session = sessionmaker(bind=engine)
+    db = Session()
+    try:
+        crud.seed_demo_data(db)
+        resources = db.query(Resource).all()
+        resource_codes = {r.resource_code for r in resources}
+        expected_codes = {
+            "AMB-01", "AMB-02", "AMB-03", "MED-01",
+            "FIRE-01", "RES-01", "REL-01", "SHELTER-01"
+        }
+        assert expected_codes.issubset(resource_codes)
+        assert len(resources) == 8
+
+        # Ensure demo users and external providers are present in dev
+        assert db.query(User).filter(User.email == "admin@careon.org").first() is not None
+        assert db.query(ExternalProvider).count() > 0
+    finally:
+        db.close()
+
+
+def test_demo_resource_seeding_suppressed_in_production(monkeypatch):
+    """Verify that production mode with SEED_DEMO_DATA=false does not seed demo resources."""
+    from app.database import Base
+    from app.models import Resource, User, Incident, ExternalProvider, Emergency
+    from app import crud
+    from sqlalchemy import create_engine
+    from sqlalchemy.orm import sessionmaker
+
+    monkeypatch.setenv("ENVIRONMENT", "production")
+    monkeypatch.setenv("SEED_DEMO_DATA", "false")
+    monkeypatch.setenv("ADMIN_EMAIL", "prodadmin@careon.org")
+    monkeypatch.setenv("ADMIN_PASSWORD", "SuperSecurePassword123!")
+    monkeypatch.setenv("CAREON_SECRET_KEY", "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef")
+
+    engine = create_engine("sqlite:///:memory:")
+    Base.metadata.create_all(bind=engine)
+    Session = sessionmaker(bind=engine)
+    db = Session()
+    try:
+        crud.seed_demo_data(db)
+
+        # Verify zero demo fleet resources in production
+        assert db.query(Resource).count() == 0
+
+        # Verify zero demo external providers
+        assert db.query(ExternalProvider).count() == 0
+
+        # Verify zero demo incidents or legacy emergencies
+        assert db.query(Incident).count() == 0
+        assert db.query(Emergency).count() == 0
+
+        # Verify demo accounts are NOT created
+        assert db.query(User).filter(User.email == "admin@careon.org").first() is None
+        assert db.query(User).filter(User.email == "aastha@example.com").first() is None
+        assert db.query(User).filter(User.email == "rahul@example.com").first() is None
+
+        # Verify production admin was bootstrapped
+        prod_admin = db.query(User).filter(User.email == "prodadmin@careon.org").first()
+        assert prod_admin is not None
+        assert prod_admin.role == "admin"
+        assert prod_admin.name == "Command Centre Administrator"
+    finally:
+        db.close()
+
+
+def test_production_forbids_demo_seeding_even_with_flag(monkeypatch):
+    """Verify that ENVIRONMENT=production strictly ignores SEED_DEMO_DATA=true and creates only configured admin."""
+    from app.database import Base
+    from app.models import Resource, User, Incident, ExternalProvider, Emergency
+    from app import crud
+    from sqlalchemy import create_engine
+    from sqlalchemy.orm import sessionmaker
+
+    monkeypatch.setenv("ENVIRONMENT", "production")
+    monkeypatch.setenv("SEED_DEMO_DATA", "true")  # Explicit true should be ignored in production
+    monkeypatch.setenv("ADMIN_EMAIL", "prodadmin@careon.org")
+    monkeypatch.setenv("ADMIN_PASSWORD", "SuperSecurePassword123!")
+    monkeypatch.setenv("CAREON_SECRET_KEY", "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef")
+
+    engine = create_engine("sqlite:///:memory:")
+    Base.metadata.create_all(bind=engine)
+    Session = sessionmaker(bind=engine)
+    db = Session()
+    try:
+        crud.seed_demo_data(db)
+
+        # Zero demo fleet resources and zero demo providers in production
+        assert db.query(Resource).count() == 0
+        assert db.query(ExternalProvider).count() == 0
+
+        # Zero demo incidents and zero legacy emergencies
+        assert db.query(Incident).count() == 0
+        assert db.query(Emergency).count() == 0
+
+        # Assert demo admin, aastha@example.com and rahul@example.com are NOT created
+        assert db.query(User).filter(User.email == "admin@careon.org").first() is None
+        assert db.query(User).filter(User.email == "aastha@example.com").first() is None
+        assert db.query(User).filter(User.email == "rahul@example.com").first() is None
+
+        # Assert configured production admin IS created
+        prod_admin = db.query(User).filter(User.email == "prodadmin@careon.org").first()
+        assert prod_admin is not None
+        assert prod_admin.role == "admin"
+        assert prod_admin.name == "Command Centre Administrator"
+    finally:
+        db.close()
+
+
+def test_production_admin_collision_preserves_citizen(monkeypatch, capsys):
+    """Verify that admin bootstrap does not modify an existing citizen user's role or password."""
+    from app.database import Base
+    from app.models import User
+    from app import crud, auth
+    from sqlalchemy import create_engine
+    from sqlalchemy.orm import sessionmaker
+
+    monkeypatch.setenv("ENVIRONMENT", "production")
+    monkeypatch.setenv("ADMIN_EMAIL", "resident@example.com")
+    monkeypatch.setenv("ADMIN_PASSWORD", "AttemptedAdminPass123!")
+    monkeypatch.setenv("CAREON_SECRET_KEY", "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef")
+
+    engine = create_engine("sqlite:///:memory:")
+    Base.metadata.create_all(bind=engine)
+    Session = sessionmaker(bind=engine)
+    db = Session()
+    try:
+        # Pre-register ordinary citizen
+        citizen = User(
+            email="resident@example.com",
+            name="Resident Reporter",
+            phone="+91 99999 11111",
+            hashed_password=auth.hash_password("CitizenSecretPass!"),
+            role="user",
+            trust_score="Confirmed Genuine",
+            trust_notes="Verified resident reporter",
+        )
+        db.add(citizen)
+        db.commit()
+
+        # Run startup seeding
+        crud.seed_demo_data(db)
+
+        # Assert citizen account role, password, and details remain completely unchanged
+        user = db.query(User).filter(User.email == "resident@example.com").first()
+        assert user is not None
+        assert user.role == "user"
+        assert auth.verify_password("CitizenSecretPass!", user.hashed_password) is True
+        assert auth.verify_password("AttemptedAdminPass123!", user.hashed_password) is False
+        assert user.name == "Resident Reporter"
+        assert user.phone == "+91 99999 11111"
+        assert db.query(User).filter(User.email == "resident@example.com").count() == 1
+
+        # Check security warning printed
+        captured = capsys.readouterr()
+        assert "[CareOn Security Warning]" in captured.out
+        assert "resident@example.com" in captured.out
+    finally:
+        db.close()

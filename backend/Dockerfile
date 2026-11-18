@@ -18,19 +18,19 @@ WORKDIR /app
 RUN mkdir -p /data
 
 # Install dependencies first for optimal Docker layer caching
-COPY requirements.txt /app/requirements.txt
+COPY backend/requirements.txt /app/requirements.txt
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
 # Copy backend application source and tests
-COPY . /app/
+COPY backend/ /app/
 
 # Expose backend service port
 EXPOSE 8000
 
 # Container healthcheck
 HEALTHCHECK --interval=15s --timeout=5s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:8000/api/health || exit 1
+    CMD sh -c "curl -f http://localhost:${PORT:-8000}/api/health || exit 1"
 
-# Start Uvicorn ASGI server
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Start Uvicorn ASGI server respecting dynamic $PORT
+CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]

@@ -1,3 +1,4 @@
+import os
 import re
 from datetime import datetime, timezone
 from typing import List, Optional, Dict, Any
@@ -37,58 +38,95 @@ def utc_now():
 # Seed Demo Data
 # ==============================================================================
 def seed_demo_data(db: Session):
-    """Seed comprehensive, realistic demo data for the CareOn platform."""
+    """Seed comprehensive, realistic demo data or initialize production admin for CareOn."""
+    environment = os.getenv("ENVIRONMENT", os.getenv("NODE_ENV", "development")).lower().strip()
+    is_production = environment in ("production", "prod") or bool(os.getenv("RENDER"))
+    if is_production:
+        seed_demo_enabled = False
+    else:
+        seed_demo_enabled = os.getenv("SEED_DEMO_DATA", "true").lower().strip() in ("true", "1", "yes")
+
     # 1. Admin & Normal Users
-    admin_user = db.query(User).filter(User.email == "admin@careon.org").first()
-    if not admin_user:
-        admin_user = User(
-            email="admin@careon.org",
-            name="Aastha Singh",
-            phone="+91 821 244 5566",
-            hashed_password=hash_password("admin123"),
-            role="admin",
-            trust_score="Confirmed Genuine",
-            trust_notes="Primary Command Centre Administrator",
-            is_flagged=False,
-        )
-        db.add(admin_user)
+    if not seed_demo_enabled:
+        # In production or when demo seed is disabled: do NOT seed demo credentials (admin123 / user123).
+        # Secure bootstrap of production admin via environment variables if provided:
+        admin_email = os.getenv("ADMIN_EMAIL", "").strip().lower()
+        admin_password = os.getenv("ADMIN_PASSWORD", "")
+        if admin_email and admin_password:
+            existing_user = db.query(User).filter(User.email == admin_email).first()
+            if not existing_user:
+                admin_name = os.getenv("ADMIN_NAME", "Command Centre Administrator").strip()
+                admin_phone = os.getenv("ADMIN_PHONE", "+91 80000 00000").strip()
+                new_admin = User(
+                    email=admin_email,
+                    name=admin_name,
+                    phone=admin_phone,
+                    hashed_password=hash_password(admin_password),
+                    role="admin",
+                    trust_score="Confirmed Genuine",
+                    trust_notes="Production Administrator initialized via environment",
+                    is_flagged=False,
+                )
+                db.add(new_admin)
+                db.commit()
+            elif existing_user.role != "admin":
+                print(
+                    f"[CareOn Security Warning] Production admin bootstrap skipped: "
+                    f"ADMIN_EMAIL '{admin_email}' already belongs to a non-admin account (role='{existing_user.role}'). "
+                    f"Existing account role and credentials were left unchanged."
+                )
     else:
-        admin_user.name = "Aastha Singh"
+        # Development mode or explicit SEED_DEMO_DATA=true
+        admin_user = db.query(User).filter(User.email == "admin@careon.org").first()
+        if not admin_user:
+            admin_user = User(
+                email="admin@careon.org",
+                name="Aastha Singh",
+                phone="+91 821 244 5566",
+                hashed_password=hash_password("admin123"),
+                role="admin",
+                trust_score="Confirmed Genuine",
+                trust_notes="Primary Command Centre Administrator",
+                is_flagged=False,
+            )
+            db.add(admin_user)
+        else:
+            admin_user.name = "Aastha Singh"
 
-    demo_user = db.query(User).filter(User.email == "aastha@example.com").first()
-    if not demo_user:
-        demo_user = User(
-            email="aastha@example.com",
-            name="Demo User",
-            phone="+91 98765 43210",
-            hashed_password=hash_password("user123"),
-            role="user",
-            trust_score="Confirmed Genuine",
-            trust_notes="Verified resident reporter",
-            is_flagged=False,
-        )
-        db.add(demo_user)
-    else:
-        demo_user.name = "Demo User"
+        demo_user = db.query(User).filter(User.email == "aastha@example.com").first()
+        if not demo_user:
+            demo_user = User(
+                email="aastha@example.com",
+                name="Demo User",
+                phone="+91 98765 43210",
+                hashed_password=hash_password("user123"),
+                role="user",
+                trust_score="Confirmed Genuine",
+                trust_notes="Verified resident reporter",
+                is_flagged=False,
+            )
+            db.add(demo_user)
+        else:
+            demo_user.name = "Demo User"
 
-    user_rahul = db.query(User).filter(User.email == "rahul@example.com").first()
-    if not user_rahul:
-        user_rahul = User(
-            email="rahul@example.com",
-            name="Rahul Sharma",
-            phone="+91 98450 11223",
-            hashed_password=hash_password("user123"),
-            role="user",
-            trust_score="Unverified",
-            trust_notes="New user report",
-            is_flagged=False,
-        )
-        db.add(user_rahul)
+        user_rahul = db.query(User).filter(User.email == "rahul@example.com").first()
+        if not user_rahul:
+            user_rahul = User(
+                email="rahul@example.com",
+                name="Rahul Sharma",
+                phone="+91 98450 11223",
+                hashed_password=hash_password("user123"),
+                role="user",
+                trust_score="Unverified",
+                trust_notes="New user report",
+                is_flagged=False,
+            )
+            db.add(user_rahul)
 
-    db.commit()
+        db.commit()
 
-    # 2. Resources (Fleet) - Mysuru Default Fleet Locations
-    if db.query(Resource).count() == 0:
+    # 2. Resources (Fleet) - Mysuru Default Fleet Locations (demo only)
+    if seed_demo_enabled and db.query(Resource).count() == 0:
         resources = [
             Resource(
                 resource_code="AMB-01",
@@ -190,8 +228,8 @@ def seed_demo_data(db: Session):
         db.add_all(resources)
         db.commit()
 
-    # 3. External Providers (Partners and Fallback Directory - Mysuru)
-    if db.query(ExternalProvider).count() == 0:
+    # 3. External Providers (Partners and Fallback Directory - Mysuru) (demo only)
+    if seed_demo_enabled and db.query(ExternalProvider).count() == 0:
         providers = [
             ExternalProvider(
                 name="Mission Hospital & Trauma Centre Network",
@@ -249,15 +287,19 @@ def seed_demo_data(db: Session):
         db.add_all(providers)
         db.commit()
 
-    # 4. Pre-seeded Incidents across Mysuru
-    if db.query(Incident).count() == 0:
+    # 4. Pre-seeded Incidents across Mysuru (demo only)
+    if seed_demo_enabled and db.query(Incident).count() == 0:
         amb01 = db.query(Resource).filter(Resource.resource_code == "AMB-01").first()
+        demo_user_reporter = db.query(User).filter(User.email == "aastha@example.com").first()
+        demo_reporter_id = demo_user_reporter.id if demo_user_reporter else None
+        user_rahul_obj = db.query(User).filter(User.email == "rahul@example.com").first()
+        rahul_reporter_id = user_rahul_obj.id if user_rahul_obj else demo_reporter_id
 
         incidents = [
             # 1. Critical Medical Incident (Active Dispatch)
             Incident(
                 incident_code="CARE-2026-101",
-                user_id=demo_user.id,
+                user_id=demo_reporter_id,
                 category="Medical",
                 title="Acute Cardiac Arrest Emergency",
                 description="Elderly gentleman collapsed on pavement, unresponsive with shallow breathing. Bystanders started chest compressions.",
@@ -277,7 +319,7 @@ def seed_demo_data(db: Session):
             # 2. Road Accident Incident (Pending Verification)
             Incident(
                 incident_code="CARE-2026-102",
-                user_id=demo_user.id,
+                user_id=rahul_reporter_id,
                 category="Road accident",
                 title="Two-Wheeler & Auto Collision",
                 description="Motorcycle skidded and collided with auto-rickshaw. Two riders injured with road rash and suspected arm fracture.",
@@ -339,7 +381,7 @@ def seed_demo_data(db: Session):
             # 5. Resolved Incident with Feedback
             Incident(
                 incident_code="CARE-2026-105",
-                user_id=demo_user.id,
+                user_id=demo_reporter_id,
                 category="Medical",
                 title="Heat Exhaustion Collapse in Public Park",
                 description="Morning jogger experienced severe dehydration and collapsed near North Gate. Stable after IV fluids.",
@@ -398,14 +440,15 @@ def seed_demo_data(db: Session):
                 actor="Coordinator Aastha Singh",
             ))
 
-            db.add(Notification(
-                user_id=demo_user.id,
-                incident_id=inc101.id,
-                title="Team Dispatched for CARE-2026-101",
-                message="Demo User, Rapid LifeSupport Ambulance 01 has been dispatched to KR Hospital Circle, Mysuru.",
-                type="alert",
-                is_read=False,
-            ))
+            if demo_reporter_id:
+                db.add(Notification(
+                    user_id=demo_reporter_id,
+                    incident_id=inc101.id,
+                    title="Team Dispatched for CARE-2026-101",
+                    message="Demo User, Rapid LifeSupport Ambulance 01 has been dispatched to KR Hospital Circle, Mysuru.",
+                    type="alert",
+                    is_read=False,
+                ))
 
         # Add sample feedback for resolved CARE-2026-105
         inc105 = db.query(Incident).filter(Incident.incident_code == "CARE-2026-105").first()
@@ -416,18 +459,19 @@ def seed_demo_data(db: Session):
                 message="Paramedics stabilized jogger and safely discharged onsite.",
                 actor="Coordinator Aastha Singh",
             ))
-            db.add(Feedback(
-                incident_id=inc105.id,
-                user_id=demo_user.id,
-                rating=5,
-                tags="Easy to use,Clear updates,Helpful coordination",
-                comments="Paramedics arrived very quickly and were extremely reassuring. Sahara guided me while waiting.",
-            ))
+            if demo_reporter_id:
+                db.add(Feedback(
+                    incident_id=inc105.id,
+                    user_id=demo_reporter_id,
+                    rating=5,
+                    tags="Easy to use,Clear updates,Helpful coordination",
+                    comments="Paramedics arrived very quickly and were extremely reassuring. Sahara guided me while waiting.",
+                ))
 
         db.commit()
 
     # 5. Seed legacy Emergency table for backward compatibility with existing tests
-    if db.query(Emergency).count() == 0:
+    if seed_demo_enabled and db.query(Emergency).count() == 0:
         legacy_records = [
             Emergency(
                 patient_name="John Doe",

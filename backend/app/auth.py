@@ -11,7 +11,21 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models import User
 
-SECRET_KEY = os.getenv("CAREON_SECRET_KEY", "careon-super-secret-key-2026-demo")
+ENVIRONMENT = os.getenv("ENVIRONMENT", os.getenv("NODE_ENV", "development")).lower()
+IS_PRODUCTION = ENVIRONMENT in ("production", "prod") or bool(os.getenv("RENDER"))
+
+raw_secret = os.getenv("CAREON_SECRET_KEY", "").strip()
+if IS_PRODUCTION:
+    if not raw_secret or len(raw_secret) < 32 or raw_secret in ("careon-super-secret-key-2026-demo", "careon-dev-secret-key-local-only-2026"):
+        raise RuntimeError(
+            "CRITICAL SECURITY CONFIGURATION ERROR: CAREON_SECRET_KEY must be set to a strong, "
+            "randomly generated secret key of at least 32 characters in production environments. "
+            "Generate one using: openssl rand -hex 32"
+        )
+    SECRET_KEY = raw_secret
+else:
+    SECRET_KEY = raw_secret or "careon-dev-secret-key-local-only-2026"
+
 TOKEN_EXPIRY_SECONDS = 86400 * 7  # 7 days
 
 security = HTTPBearer(auto_error=False)
