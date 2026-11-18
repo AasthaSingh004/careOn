@@ -386,3 +386,110 @@ def test_sahara_chatbot_intent_matching(client):
     res4 = client.post("/api/chatbot/message", json={"message": "What is status of CARE-2026-101?"})
     assert res4.status_code == 200
     assert "CARE-2026-101" in res4.json()["reply"]
+
+
+# ==============================================================================
+# Security, Role Enforcement & Privacy Tests
+# ==============================================================================
+def test_public_registration_cannot_create_admin(client):
+    # Attacker tries to register with role="admin"
+    res = client.post("/api/auth/register", json={
+        "name": "Malicious User",
+        "email": "hacker@example.com",
+        "phone": "+91 99999 88888",
+        "password": "attackpassword123",
+        "role": "admin",
+    })
+    assert res.status_code == 201
+    data = res.json()
+    # Backend security must force role to 'user'
+    assert data["user"]["role"] == "user"
+
+    # Verify they cannot access admin endpoints
+    token = data["access_token"]
+    admin_probe = client.get("/api/admin/analytics", headers={"Authorization": f"Bearer {token}"})
+    assert admin_probe.status_code == 403
+
+
+def test_password_mismatch_registration_fails(client):
+    res = client.post("/api/auth/register", json={
+        "name": "Mismatch User",
+        "email": "mismatch@example.com",
+        "phone": "+91 98888 77777",
+        "password": "passwordA123",
+        "confirm_password": "passwordB999",
+    })
+    assert res.status_code == 400
+    assert "Passwords do not match" in res.json()["detail"]
+
+
+def test_demo_account_names_verification(client):
+    # Verify Admin account is Aastha Singh
+    admin_login = client.post("/api/auth/login", json={
+        "email": "admin@careon.org",
+        "password": "admin123",
+    })
+    assert admin_login.status_code == 200
+    assert admin_login.json()["user"]["name"] == "Aastha Singh"
+    assert admin_login.json()["user"]["role"] == "admin"
+
+    # Verify Demo User account is Demo User
+    user_login = client.post("/api/auth/login", json={
+        "email": "aastha@example.com",
+        "password": "user123",
+    })
+    assert user_login.status_code == 200
+    assert user_login.json()["user"]["name"] == "Demo User"
+    assert user_login.json()["user"]["role"] == "user"
+
+
+def test_private_user_incident_access_restriction(client):
+    # User A reports an incident
+    user_a = client.post("/api/auth/register", json={
+        "name": "User Alpha",
+        "email": "alpha@example.com",
+        "phone": "+91 98765 11111",
+        "password": "alphapassword123",
+    }).json()
+    token_a = user_a["access_token"]
+
+    inc = client.post(
+        "/api/incidents",
+        json={
+            "category": "Medical",
+            "description": "Confidential patient condition.",
+            "location_name": "Mysuru Palace West Gate",
+            "affected_people": 1,
+            "help_required": "First Aid",
+            "contact_name": "User Alpha",
+            "contact_phone": "+91 98765 11111",
+        },
+        headers={"Authorization": f"Bearer {token_a}"},
+    ).json()
+    inc_code = inc["incident_code"]
+
+    # User B registers
+    user_b = client.post("/api/auth/register", json={
+        "name": "User Beta",
+        "email": "beta@example.com",
+        "phone": "+91 98765 22222",
+        "password": "betapassword123",
+    }).json()
+    token_b = user_b["access_token"]
+
+    # User B attempts to access User A's private incident -> HTTP 403 Forbidden
+    res_b = client.get(
+        f"/api/incidents/{inc_code}",
+        headers={"Authorization": f"Bearer {token_b}"},
+    )
+    assert res_b.status_code == 403
+    assert "Access denied" in res_b.json()["detail"]
+
+    # Admin CAN access User A's incident -> HTTP 200 OK
+    admin_login = client.post("/api/auth/login", json={"email": "admin@careon.org", "password": "admin123"}).json()
+    res_admin = client.get(
+        f"/api/incidents/{inc_code}",
+        headers={"Authorization": f"Bearer {admin_login['access_token']}"},
+    )
+    assert res_admin.status_code == 200
+    assert res_admin.json()["incident_code"] == inc_code

@@ -1,0 +1,43 @@
+import React from 'react';
+
+/**
+ * CareOn Brand Logo
+ * A minimal, modern, professional SVG logo featuring a teal shield
+ * containing a clean white location pin with a medical cross at its centre.
+ */
+export default function CareOnLogo({ size = 36, className = '', color = '#0d9488' }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 100 100"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+      aria-label="CareOn Logo"
+      style={{ display: 'inline-block', verticalAlign: 'middle', flexShrink: 0 }}
+    >
+      {/* Primary Teal Shield */}
+      <path
+        d="M50 8C68 18 86 16 88 38C90 62 68 84 50 94C32 84 10 62 12 38C14 16 32 18 50 8Z"
+        fill={color}
+      />
+      {/* Subtle Inner Contour for depth */}
+      <path
+        d="M50 12C66 21 82 19 84 39C86 60 66 80 50 89C34 80 14 60 16 39C18 19 34 21 50 12Z"
+        stroke="rgba(255,255,255,0.2)"
+        strokeWidth="2"
+      />
+      {/* Crisp White Location Pin */}
+      <path
+        d="M50 23C41.7 23 35 29.7 35 38C35 49.5 50 67 50 67C50 67 65 49.5 65 38C65 29.7 58.3 23 50 23Z"
+        fill="#ffffff"
+      />
+      {/* Centered Medical Cross Inside Location Pin */}
+      <path
+        d="M47 31H53V35H57V41H53V45H47V41H43V35H47V31Z"
+        fill={color}
+      />
+    </svg>
+  );
+}

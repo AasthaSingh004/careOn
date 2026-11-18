@@ -1,36 +1,52 @@
 import React, { useState } from 'react';
 import { reportIncident } from '../api';
-import { translations } from '../translations';
-
-const CATEGORIES = [
-  { id: 'Medical', title: 'Medical', icon: '🚑', desc: 'Cardiac, breathing, trauma, unconsciousness' },
-  { id: 'Road accident', title: 'Road Accident', icon: '🚗', desc: 'Vehicular collision, trapped passengers' },
-  { id: 'Fire', title: 'Fire Outbreak', icon: '🔥', desc: 'Structural fire, smoke, hazardous gas leak' },
-  { id: 'Rescue', title: 'Rescue Needed', icon: '🦺', desc: 'Building collapse, drowning, trapped person' },
-  { id: 'Disaster / Multiple affected people', title: 'Disaster / Mass Event', icon: '🌊', desc: 'Flood, storm, mass casualty disaster' },
-  { id: 'Safety / Other', title: 'Safety / Other', icon: '🛡️', desc: 'Public safety distress, crowd hazard, first-aid' },
-];
+import { useTranslation } from '../translations';
+import LeafletMap from '../components/LeafletMap';
+import {
+  AlertTriangle,
+  MapPin,
+  Users,
+  Heart,
+  Phone,
+  User,
+  ShieldAlert,
+  CheckCircle2,
+  Send,
+  Loader2,
+  Flame,
+  Car,
+  Stethoscope,
+  LifeBuoy,
+  Waves,
+  Shield
+} from 'lucide-react';
 
 export default function ReportEmergency({ lang = 'en', onSubmitted, currentUser }) {
-  const t = translations[lang] || translations.en;
+  const { t } = useTranslation(lang);
+
+  const CATEGORIES = [
+    { id: 'Medical', title: t('cat_medical'), icon: <Stethoscope size={22} />, desc: t('cat_desc_medical') || 'Cardiac, breathing, trauma, severe injury' },
+    { id: 'Road accident', title: t('cat_road_accident'), icon: <Car size={22} />, desc: t('cat_desc_road') || 'Vehicular collision, trapped passengers' },
+    { id: 'Fire', title: t('cat_fire'), icon: <Flame size={22} />, desc: t('cat_desc_fire') || 'Building fire, smoke, gas cylinder leak' },
+    { id: 'Rescue', title: t('cat_rescue'), icon: <LifeBuoy size={22} />, desc: t('cat_desc_rescue') || 'Building collapse, lake drowning, trapped victim' },
+    { id: 'Disaster / Multiple affected people', title: t('cat_disaster'), icon: <Waves size={22} />, desc: t('cat_desc_disaster') || 'Heavy flood, storm, mass casualty event' },
+    { id: 'Safety / Other', title: t('cat_safety'), icon: <Shield size={22} />, desc: t('cat_desc_safety') || 'Public safety distress, crowd hazard, first-aid' },
+  ];
 
   const [category, setCategory] = useState('Medical');
   const [description, setDescription] = useState('');
   const [locationName, setLocationName] = useState('');
-  const [latitude, setLatitude] = useState(12.9716);
-  const [longitude, setLongitude] = useState(77.5946);
+  // Mysuru, Karnataka default coordinates
+  const [latitude, setLatitude] = useState(12.3052);
+  const [longitude, setLongitude] = useState(76.6552);
   const [isLocating, setIsLocating] = useState(false);
   const [affectedPeople, setAffectedPeople] = useState(1);
   const [helpRequired, setHelpRequired] = useState('');
-  const [contactName, setContactName] = useState(currentUser?.name || 'Aastha Singh');
+  const [contactName, setContactName] = useState(currentUser?.name || 'Demo User');
   const [contactPhone, setContactPhone] = useState(currentUser?.phone || '+91 98765 43210');
   const [additionalDetails, setAdditionalDetails] = useState('');
   const [isDisaster, setIsDisaster] = useState(false);
   const [disasterDetails, setDisasterDetails] = useState('');
-
-  // Demo OTP state
-  const [otp, setOtp] = useState('123456');
-  const [isOtpVerified, setIsOtpVerified] = useState(true);
 
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
@@ -38,7 +54,7 @@ export default function ReportEmergency({ lang = 'en', onSubmitted, currentUser 
   // Browser Geolocation
   const handleUseMyLocation = () => {
     if (!navigator.geolocation) {
-      alert('Geolocation is not supported by your browser.');
+      alert(t('geo_not_supported') || 'Geolocation is not supported by your browser.');
       return;
     }
     setIsLocating(true);
@@ -47,13 +63,18 @@ export default function ReportEmergency({ lang = 'en', onSubmitted, currentUser 
         setLatitude(pos.coords.latitude);
         setLongitude(pos.coords.longitude);
         if (!locationName) {
-          setLocationName(`GPS: ${pos.coords.latitude.toFixed(4)}, ${pos.coords.longitude.toFixed(4)}`);
+          setLocationName(`Mysuru GPS: ${pos.coords.latitude.toFixed(4)}, ${pos.coords.longitude.toFixed(4)}`);
         }
         setIsLocating(false);
       },
       (err) => {
         setIsLocating(false);
-        alert('Could not fetch location automatically. Please enter location manually.');
+        // Fallback to Mysuru center
+        setLatitude(12.3052);
+        setLongitude(76.6552);
+        if (!locationName) {
+          setLocationName('Mysuru City Center, Karnataka');
+        }
       },
       { timeout: 8000 }
     );
@@ -65,19 +86,19 @@ export default function ReportEmergency({ lang = 'en', onSubmitted, currentUser 
 
     // Validation
     if (!description.trim() || description.length < 5) {
-      setError('Please provide a brief description of what happened (at least 5 characters).');
+      setError(t('err_desc_required') || 'Please provide a brief description of what happened (at least 5 characters).');
       return;
     }
     if (!locationName.trim()) {
-      setError('Please specify the location or landmark.');
+      setError(t('err_loc_required') || 'Please specify the location or landmark.');
       return;
     }
     if (!contactName.trim() || !contactPhone.trim()) {
-      setError('Contact person name and phone number are required.');
+      setError(t('err_contact_required') || 'Contact person name and phone number are required.');
       return;
     }
     if (contactPhone.replace(/[^0-9]/g, '').length < 8) {
-      setError('Please enter a valid phone number with at least 8 digits.');
+      setError(t('invalid_phone') || 'Please enter a valid phone number with at least 8 digits.');
       return;
     }
 
@@ -85,14 +106,14 @@ export default function ReportEmergency({ lang = 'en', onSubmitted, currentUser 
     try {
       const payload = {
         category,
-        description,
-        location_name: locationName,
+        description: description.trim(),
+        location_name: locationName.trim(),
         latitude: parseFloat(latitude),
         longitude: parseFloat(longitude),
         affected_people: parseInt(affectedPeople) || 1,
         help_required: helpRequired.trim() || `${category} immediate assistance`,
-        contact_name: contactName,
-        contact_phone: contactPhone,
+        contact_name: contactName.trim(),
+        contact_phone: contactPhone.trim(),
         additional_details: additionalDetails || null,
         is_disaster: isDisaster || category.startsWith('Disaster'),
         disaster_details: disasterDetails || null,
@@ -101,46 +122,61 @@ export default function ReportEmergency({ lang = 'en', onSubmitted, currentUser 
       const result = await reportIncident(payload);
       onSubmitted?.(result.incident_code || result.id);
     } catch (err) {
-      setError(err.message || 'Failed to submit emergency report.');
+      setError(err.message || t('report_failed') || 'Failed to submit emergency report.');
     } finally {
       setSubmitting(false);
     }
   };
 
   return (
-    <div style={{ maxWidth: '780px', margin: '0 auto' }}>
-      {/* Official emergency reminder */}
+    <div style={{ maxWidth: 780, margin: '1.5rem auto', padding: '0 1rem' }}>
+      {/* 112 Advisory Banner */}
       <div
         style={{
-          backgroundColor: '#fef2f2',
-          border: '1px solid #fecaca',
-          borderRadius: '10px',
-          padding: '14px 18px',
-          marginBottom: '24px',
+          backgroundColor: '#fff1f2',
+          border: '1px solid #fecdd3',
+          borderRadius: 12,
+          padding: '12px 18px',
+          marginBottom: '1.5rem',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          gap: '12px',
+          flexWrap: 'wrap',
+          gap: 12,
         }}
       >
-        <div style={{ fontSize: '13.5px', color: '#991b1b', lineHeight: 1.4 }}>
-          🚨 <strong>Immediate Danger?</strong> If someone is in critical or life-threatening condition, call <strong>112</strong> or <strong>108</strong> directly now.
+        <div style={{ fontSize: '0.875rem', color: '#9f1239', lineHeight: 1.4, display: 'flex', alignItems: 'center', gap: 8 }}>
+          <AlertTriangle size={18} style={{ flexShrink: 0 }} />
+          <span>
+            <strong>{t('helpline_alert_title') || 'Immediate Danger?'}:</strong> {t('helpline_alert_desc') || 'For life-threatening emergencies, dial 112 directly.'}
+          </span>
         </div>
-        <button
-          onClick={() => (window.location.href = 'tel:112')}
-          className="btn btn-primary-red btn-sm"
+        <a
+          href="tel:112"
+          className="btn"
+          style={{
+            background: '#e11d48',
+            color: '#fff',
+            textDecoration: 'none',
+            padding: '0.4rem 0.85rem',
+            fontSize: '0.825rem',
+            fontWeight: 700,
+            borderRadius: 6
+          }}
         >
-          Call 112
-        </button>
+          {t('dial_112_btn') || 'Call 112'}
+        </a>
       </div>
 
-      <div className="card">
-        <h2 style={{ fontSize: '24px', fontWeight: 800, color: '#0f4c5c', marginBottom: '8px' }}>
-          Request Emergency Assistance
-        </h2>
-        <p style={{ color: '#64748b', fontSize: '14px', marginBottom: '24px' }}>
-          Share necessary incident details. CareOn will verify the report, assess urgency, and coordinate available resources.
-        </p>
+      <div className="card" style={{ padding: '2rem', borderRadius: 16, border: '1px solid #e2e8f0', boxShadow: '0 4px 12px rgba(0,0,0,0.03)' }}>
+        <div style={{ marginBottom: '1.5rem' }}>
+          <h2 style={{ fontSize: '1.65rem', fontWeight: 800, color: '#134e4a', margin: '0 0 0.4rem 0' }}>
+            {t('report_emergency_title') || 'Report an Emergency'}
+          </h2>
+          <p style={{ color: '#64748b', fontSize: '0.925rem', margin: 0 }}>
+            {t('report_emergency_desc') || 'Provide key incident details. CareOn coordinates the closest suitable medical, fire, or rescue fleet.'}
+          </p>
+        </div>
 
         {error && (
           <div
@@ -148,99 +184,155 @@ export default function ReportEmergency({ lang = 'en', onSubmitted, currentUser 
               backgroundColor: '#fee2e2',
               border: '1px solid #fca5a5',
               color: '#b91c1c',
-              padding: '12px 16px',
-              borderRadius: '8px',
-              fontSize: '13.5px',
+              padding: '0.75rem 1rem',
+              borderRadius: 8,
+              fontSize: '0.875rem',
               fontWeight: 600,
-              marginBottom: '20px',
+              marginBottom: '1.5rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8
             }}
           >
-            ⚠️ {error}
+            <ShieldAlert size={18} />
+            <span>{error}</span>
           </div>
         )}
 
         <form onSubmit={handleSubmit}>
           {/* Step 1: Category */}
-          <div className="form-group">
-            <label className="form-label">1. Select Emergency Category *</label>
-            <div className="category-grid">
-              {CATEGORIES.map((cat) => (
-                <button
-                  type="button"
-                  key={cat.id}
-                  className={`category-card-btn ${category === cat.id ? 'selected' : ''}`}
-                  onClick={() => {
-                    setCategory(cat.id);
-                    if (cat.id.startsWith('Disaster')) setIsDisaster(true);
-                  }}
-                >
-                  <span className="category-icon">{cat.icon}</span>
-                  <span className="category-title">{cat.title}</span>
-                  <span style={{ fontSize: '11px', color: '#64748b', lineHeight: 1.2 }}>{cat.desc}</span>
-                </button>
-              ))}
+          <div className="form-group" style={{ marginBottom: '1.5rem' }}>
+            <label style={{ display: 'block', fontWeight: 700, fontSize: '0.925rem', marginBottom: '0.6rem', color: '#1e293b' }}>
+              1. {t('emergency_category_label') || 'Select Emergency Category'} *
+            </label>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))',
+              gap: '0.75rem'
+            }}>
+              {CATEGORIES.map((cat) => {
+                const isSelected = category === cat.id;
+                return (
+                  <button
+                    type="button"
+                    key={cat.id}
+                    onClick={() => {
+                      setCategory(cat.id);
+                      if (cat.id.startsWith('Disaster')) setIsDisaster(true);
+                    }}
+                    style={{
+                      textAlign: 'left',
+                      padding: '0.85rem',
+                      borderRadius: 10,
+                      border: isSelected ? '2px solid #0d9488' : '1px solid #cbd5e1',
+                      background: isSelected ? '#f0fdfa' : '#ffffff',
+                      cursor: 'pointer',
+                      transition: 'all 0.15s ease'
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                      <span style={{ color: isSelected ? '#0d9488' : '#64748b' }}>{cat.icon}</span>
+                      <span style={{ fontWeight: 700, fontSize: '0.9rem', color: isSelected ? '#0f766e' : '#1e293b' }}>
+                        {cat.title}
+                      </span>
+                    </div>
+                    <p style={{ margin: 0, fontSize: '0.775rem', color: '#64748b', lineHeight: 1.3 }}>
+                      {cat.desc}
+                    </p>
+                  </button>
+                );
+              })}
             </div>
           </div>
 
           {/* Step 2: Description */}
-          <div className="form-group">
-            <label className="form-label" htmlFor="desc-input">2. What happened? (Short Description) *</label>
+          <div className="form-group" style={{ marginBottom: '1.5rem' }}>
+            <label htmlFor="desc-input" style={{ display: 'block', fontWeight: 700, fontSize: '0.925rem', marginBottom: '0.4rem', color: '#1e293b' }}>
+              2. {t('what_happened_label') || 'What happened? (Short Description)'} *
+            </label>
             <textarea
               id="desc-input"
-              className="form-textarea"
               rows={3}
+              className="input-field"
+              style={{ width: '100%', boxSizing: 'border-box' }}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="E.g., Two-wheeler slipped near junction, rider injured and unconscious on pavement..."
+              placeholder={t('desc_placeholder') || 'E.g., Severe traffic accident near junction, rider injured and unconscious on pavement...'}
               required
             />
           </div>
 
-          {/* Step 3: Location */}
-          <div className="form-group">
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-              <label className="form-label" style={{ margin: 0 }} htmlFor="loc-input">3. Location / Landmark *</label>
+          {/* Step 3: Location (Mysuru) */}
+          <div className="form-group" style={{ marginBottom: '1.5rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem' }}>
+              <label htmlFor="loc-input" style={{ fontWeight: 700, fontSize: '0.925rem', margin: 0, color: '#1e293b' }}>
+                3. {t('location_label') || 'Location / Landmark in Mysuru'} *
+              </label>
               <button
                 type="button"
                 onClick={handleUseMyLocation}
                 disabled={isLocating}
                 style={{
+                  background: 'none',
+                  border: 'none',
                   color: '#0284c7',
-                  fontSize: '12.5px',
+                  fontSize: '0.825rem',
                   fontWeight: 600,
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '4px',
+                  gap: 4,
+                  cursor: 'pointer'
                 }}
               >
-                📍 {isLocating ? 'Detecting GPS...' : 'Use My GPS Location'}
+                <MapPin size={15} />
+                <span>{isLocating ? (t('locating') || 'Detecting GPS...') : (t('use_my_location') || 'Use My GPS Location')}</span>
               </button>
             </div>
             <input
               id="loc-input"
               type="text"
-              className="form-input"
+              className="input-field"
+              style={{ width: '100%', boxSizing: 'border-box' }}
               value={locationName}
               onChange={(e) => setLocationName(e.target.value)}
-              placeholder="E.g., MG Road Metro Station Gate 2, Bangalore"
+              placeholder={t('location_placeholder') || 'E.g., Near KR Hospital, Sayyaji Rao Road, Mysuru'}
               required
             />
-            <div style={{ display: 'flex', gap: '16px', marginTop: '6px', fontSize: '12px', color: '#64748b' }}>
-              <span>Latitude: <strong>{Number(latitude).toFixed(4)}</strong></span>
-              <span>Longitude: <strong>{Number(longitude).toFixed(4)}</strong></span>
+            {/* Interactive Leaflet Location Picker */}
+            <div style={{ marginTop: '0.75rem', borderRadius: 10, overflow: 'hidden', border: '1px solid #cbd5e1' }}>
+              <LeafletMap
+                height="220px"
+                center={[latitude, longitude]}
+                selectable={true}
+                selectedLocation={{ latitude, longitude }}
+                onLocationSelect={({ latitude: lat, longitude: lng, location_name }) => {
+                  setLatitude(lat);
+                  setLongitude(lng);
+                  if (!locationName || locationName.startsWith('Mysuru Coordinates:') || locationName.startsWith('Mysuru Location (')) {
+                    setLocationName(`Mysuru Location (${lat.toFixed(4)}, ${lng.toFixed(4)})`);
+                  }
+                }}
+              />
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.4rem', fontSize: '0.775rem', color: '#64748b' }}>
+              <span>📍 Click map or drag pin to select exact Mysuru coordinates</span>
+              <span>Lat: <strong>{Number(latitude).toFixed(4)}</strong>, Lon: <strong>{Number(longitude).toFixed(4)}</strong></span>
             </div>
           </div>
 
           {/* Step 4: Urgency Metrics */}
-          <div className="grid-2">
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.5rem' }}>
             <div className="form-group">
-              <label className="form-label" htmlFor="affected-input">Number of Affected People *</label>
+              <label htmlFor="affected-input" style={{ display: 'block', fontWeight: 700, fontSize: '0.925rem', marginBottom: '0.4rem', color: '#1e293b' }}>
+                {t('affected_people_label') || 'Affected People'} *
+              </label>
               <input
                 id="affected-input"
                 type="number"
                 min="1"
                 max="500"
-                className="form-input"
+                className="input-field"
+                style={{ width: '100%', boxSizing: 'border-box' }}
                 value={affectedPeople}
                 onChange={(e) => setAffectedPeople(e.target.value)}
                 required
@@ -248,105 +340,131 @@ export default function ReportEmergency({ lang = 'en', onSubmitted, currentUser 
             </div>
 
             <div className="form-group">
-              <label className="form-label" htmlFor="help-input">Type of Help Required</label>
+              <label htmlFor="help-input" style={{ display: 'block', fontWeight: 700, fontSize: '0.925rem', marginBottom: '0.4rem', color: '#1e293b' }}>
+                {t('help_required_label') || 'Type of Help Required'}
+              </label>
               <input
                 id="help-input"
                 type="text"
-                className="form-input"
+                className="input-field"
+                style={{ width: '100%', boxSizing: 'border-box' }}
                 value={helpRequired}
                 onChange={(e) => setHelpRequired(e.target.value)}
-                placeholder="E.g., Ambulance with oxygen, First aid, Fire tender"
+                placeholder={t('help_placeholder') || 'E.g., Advanced ICU ambulance, oxygen, stretcher'}
               />
             </div>
           </div>
 
-          {/* Disaster details if disaster is selected */}
+          {/* Disaster supplies if disaster category */}
           {category.startsWith('Disaster') && (
-            <div className="form-group" style={{ backgroundColor: '#f0f9ff', border: '1px solid #bae6fd', padding: '14px', borderRadius: '8px' }}>
-              <label className="form-label" style={{ color: '#0369a1' }}>Disaster Relief Supplies Needed</label>
+            <div className="form-group" style={{ backgroundColor: '#f0f9ff', border: '1px solid #bae6fd', padding: '1rem', borderRadius: 8, marginBottom: '1.5rem' }}>
+              <label style={{ display: 'block', fontWeight: 700, fontSize: '0.875rem', color: '#0369a1', marginBottom: '0.4rem' }}>
+                {t('disaster_supplies_label') || 'Mass Disaster Relief Supplies'}
+              </label>
               <input
                 type="text"
-                className="form-input"
+                className="input-field"
+                style={{ width: '100%', boxSizing: 'border-box' }}
                 value={disasterDetails}
                 onChange={(e) => setDisasterDetails(e.target.value)}
-                placeholder="E.g., Drinking water (100L), rescue boats, food packets, emergency shelter"
+                placeholder={t('disaster_placeholder') || 'E.g., Drinking water, rescue boats, emergency shelter'}
               />
             </div>
           )}
 
           {/* Step 5: Contact Details */}
-          <div className="grid-2">
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.5rem' }}>
             <div className="form-group">
-              <label className="form-label" htmlFor="contact-name-input">Your / Contact Person Name *</label>
+              <label htmlFor="contact-name-input" style={{ display: 'block', fontWeight: 700, fontSize: '0.925rem', marginBottom: '0.4rem', color: '#1e293b' }}>
+                {t('contact_name_label') || 'Your / Contact Name'} *
+              </label>
               <input
                 id="contact-name-input"
                 type="text"
-                className="form-input"
+                className="input-field"
+                style={{ width: '100%', boxSizing: 'border-box' }}
                 value={contactName}
                 onChange={(e) => setContactName(e.target.value)}
-                placeholder="E.g., Aastha Singh"
+                placeholder={t('full_name_placeholder') || 'Enter contact name'}
                 required
               />
             </div>
 
             <div className="form-group">
-              <label className="form-label" htmlFor="contact-phone-input">Contact Phone Number *</label>
+              <label htmlFor="contact-phone-input" style={{ display: 'block', fontWeight: 700, fontSize: '0.925rem', marginBottom: '0.4rem', color: '#1e293b' }}>
+                {t('contact_phone_label') || 'Contact Phone Number'} *
+              </label>
               <input
                 id="contact-phone-input"
                 type="tel"
-                className="form-input"
+                className="input-field"
+                style={{ width: '100%', boxSizing: 'border-box' }}
                 value={contactPhone}
                 onChange={(e) => setContactPhone(e.target.value)}
-                placeholder="E.g., +91 98765 43210"
+                placeholder="+91 98765 43210"
                 required
               />
             </div>
           </div>
 
-          {/* Demo Verification Box */}
+          {/* Demo OTP Box */}
           <div
             style={{
               backgroundColor: '#f8fafc',
               border: '1px dashed #cbd5e1',
-              borderRadius: '8px',
-              padding: '14px 16px',
-              marginBottom: '20px',
+              borderRadius: 8,
+              padding: '12px 16px',
+              marginBottom: '1.5rem',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
               flexWrap: 'wrap',
-              gap: '12px',
+              gap: 12,
             }}
           >
             <div>
-              <div style={{ fontWeight: 700, fontSize: '13.5px', color: '#0f172a' }}>
-                Local Demo Verification
+              <div style={{ fontWeight: 700, fontSize: '0.85rem', color: '#0f172a' }}>
+                {t('demo_otp_title') || 'Local Demo Verification Mode'}
               </div>
-              <div style={{ fontSize: '12px', color: '#64748b' }}>
-                For expo demonstration, automatic phone verification code is <strong>123456</strong>.
+              <div style={{ fontSize: '0.775rem', color: '#64748b' }}>
+                {t('demo_otp_desc') || 'For faculty demonstration, phone OTP code is pre-authorized: 123456.'}
               </div>
             </div>
-            <span className="status-badge badge-resolved">
-              ✓ Verified for Demo
+            <span className="badge badge-success" style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+              <CheckCircle2 size={13} />
+              <span>{t('pre_authorized') || 'Demo Authorized'}</span>
             </span>
           </div>
 
-          {/* Short Emergency Notice as required in Section 6 */}
-          <div className="notice-box">
-            {t.emergency_notice}
-          </div>
-
           {/* Submit Button */}
-          <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-            <button
-              type="submit"
-              disabled={submitting}
-              className="btn btn-primary-red"
-              style={{ flex: 1, padding: '14px' }}
-            >
-              {submitting ? 'Submitting & Classifying...' : `🚨 ${t.btn_submit}`}
-            </button>
-          </div>
+          <button
+            type="submit"
+            disabled={submitting}
+            className="btn btn-primary"
+            style={{
+              width: '100%',
+              padding: '0.85rem',
+              fontSize: '1.05rem',
+              fontWeight: 700,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 8,
+              background: '#e11d48'
+            }}
+          >
+            {submitting ? (
+              <>
+                <Loader2 size={18} className="spin" />
+                <span>{t('submitting') || 'Submitting Incident...'}</span>
+              </>
+            ) : (
+              <>
+                <Send size={18} />
+                <span>{t('submit_emergency_btn') || 'Submit Emergency Request'}</span>
+              </>
+            )}
+          </button>
         </form>
       </div>
     </div>

@@ -43,21 +43,23 @@ def seed_demo_data(db: Session):
     if not admin_user:
         admin_user = User(
             email="admin@careon.org",
-            name="Coordinator Rajesh Rao",
-            phone="+91 80 2233 4455",
+            name="Aastha Singh",
+            phone="+91 821 244 5566",
             hashed_password=hash_password("admin123"),
             role="admin",
             trust_score="Confirmed Genuine",
-            trust_notes="Primary Command Centre Coordinator",
+            trust_notes="Primary Command Centre Administrator",
             is_flagged=False,
         )
         db.add(admin_user)
+    else:
+        admin_user.name = "Aastha Singh"
 
     demo_user = db.query(User).filter(User.email == "aastha@example.com").first()
     if not demo_user:
         demo_user = User(
             email="aastha@example.com",
-            name="Aastha Singh",
+            name="Demo User",
             phone="+91 98765 43210",
             hashed_password=hash_password("user123"),
             role="user",
@@ -66,6 +68,8 @@ def seed_demo_data(db: Session):
             is_flagged=False,
         )
         db.add(demo_user)
+    else:
+        demo_user.name = "Demo User"
 
     user_rahul = db.query(User).filter(User.email == "rahul@example.com").first()
     if not user_rahul:
@@ -83,7 +87,7 @@ def seed_demo_data(db: Session):
 
     db.commit()
 
-    # 2. Resources (Fleet)
+    # 2. Resources (Fleet) - Mysuru Default Fleet Locations
     if db.query(Resource).count() == 0:
         resources = [
             Resource(
@@ -91,124 +95,124 @@ def seed_demo_data(db: Session):
                 name="Rapid LifeSupport Ambulance 01",
                 category="Ambulance",
                 capabilities="ALS,patient_transport,trauma_care,oxygen_support",
-                location_name="MG Road Station, Central",
-                latitude=12.9738,
-                longitude=77.6094,
+                location_name="KR Hospital Station, Sayyaji Rao Rd, Mysuru",
+                latitude=12.3142,
+                longitude=76.6490,
                 status="Assigned",  # Pre-assigned to CARE-2026-101
                 capacity=2,
-                contact_phone="+91 98001 00001",
+                contact_phone="+91 821 244 0001",
             ),
             Resource(
                 resource_code="AMB-02",
                 name="CityCare BLS Ambulance 02",
                 category="Ambulance",
                 capabilities="BLS,patient_transport,first_aid",
-                location_name="Indiranagar 100ft Rd Station",
-                latitude=12.9784,
-                longitude=77.6408,
+                location_name="Jayalakshmipuram Station, Mysuru",
+                latitude=12.3164,
+                longitude=76.6315,
                 status="Available",
                 capacity=2,
-                contact_phone="+91 98001 00002",
+                contact_phone="+91 821 244 0002",
             ),
             Resource(
                 resource_code="AMB-03",
                 name="Highway Trauma Ambulance 03",
                 category="Ambulance",
                 capabilities="ALS,trauma_care,extrication",
-                location_name="Electronic City Toll Base",
-                latitude=12.8452,
-                longitude=77.6602,
+                location_name="Ring Road Junction, Bannimantap, Mysuru",
+                latitude=12.3420,
+                longitude=76.6480,
                 status="Under Maintenance",
                 capacity=2,
-                contact_phone="+91 98001 00003",
+                contact_phone="+91 821 244 0003",
             ),
             Resource(
                 resource_code="MED-01",
                 name="Trauma Response Medical Team 01",
                 category="Medical Team",
                 capabilities="critical_care,triage,trauma_care,first_aid",
-                location_name="Victoria Hospital Outpost",
-                latitude=12.9625,
-                longitude=77.5750,
+                location_name="Apollo BGS Area Outpost, Kuvempunagar, Mysuru",
+                latitude=12.2912,
+                longitude=76.6320,
                 status="Available",
                 capacity=4,
-                contact_phone="+91 98001 00004",
+                contact_phone="+91 821 244 0004",
             ),
             Resource(
                 resource_code="FIRE-01",
                 name="Quick Intervention Fire Tender 01",
                 category="Fire Response",
                 capabilities="fire_suppression,water_tender,smoke_rescue,extinguisher",
-                location_name="South Fire Brigade Outpost, Jayanagar",
-                latitude=12.9298,
-                longitude=77.5843,
+                location_name="Saraswathipuram Fire Station, Mysuru",
+                latitude=12.3080,
+                longitude=76.6340,
                 status="Available",
                 capacity=5,
-                contact_phone="+91 98001 00005",
+                contact_phone="+91 821 244 0005",
             ),
             Resource(
                 resource_code="RES-01",
                 name="Urban Search & Rescue Squad 01",
                 category="Rescue Team",
                 capabilities="heavy_rescue,structural_collapse,search_and_rescue,flood_rescue",
-                location_name="Hebbal Disaster Depot",
-                latitude=13.0358,
-                longitude=77.5970,
+                location_name="Hebbal Disaster Depot, Mysuru",
+                latitude=12.3605,
+                longitude=76.6015,
                 status="Available",
                 capacity=6,
-                contact_phone="+91 98001 00006",
+                contact_phone="+91 821 244 0006",
             ),
             Resource(
                 resource_code="REL-01",
                 name="Disaster Relief Supply Van 01",
                 category="Relief Vehicle",
                 capabilities="disaster_relief,food_water,shelter_supplies,first_aid",
-                location_name="Majestic Central Logistics Depot",
-                latitude=12.9767,
-                longitude=77.5713,
+                location_name="Mysuru Railway Station Logistics Base",
+                latitude=12.3160,
+                longitude=76.6440,
                 status="Available",
                 capacity=8,
-                contact_phone="+91 98001 00007",
+                contact_phone="+91 821 244 0007",
             ),
             Resource(
                 resource_code="SHELTER-01",
-                name="Community Relief Centre (Indoor Stadium)",
+                name="Chamundi Vihar Stadium Relief Centre",
                 category="Shelter / Relief Centre",
                 capabilities="shelter,food_water,triage,family_housing",
-                location_name="Koramangala 80ft Road",
-                latitude=12.9352,
-                longitude=77.6245,
+                location_name="Nazarbad, Mysuru",
+                latitude=12.3105,
+                longitude=76.6690,
                 status="Available",
                 capacity=150,
-                contact_phone="+91 98001 00008",
+                contact_phone="+91 821 244 0008",
             ),
         ]
         db.add_all(resources)
         db.commit()
 
-    # 3. External Providers (Partners and Fallback Directory)
+    # 3. External Providers (Partners and Fallback Directory - Mysuru)
     if db.query(ExternalProvider).count() == 0:
         providers = [
             ExternalProvider(
-                name="St. Mary's Charitable Hospital Network",
+                name="Mission Hospital & Trauma Centre Network",
                 provider_type="Hospital",
                 is_registered_partner=True,
-                location_name="Residency Road, Central",
-                latitude=12.9698,
-                longitude=77.6085,
+                location_name="Tilaknagar, Central Mysuru",
+                latitude=12.3210,
+                longitude=76.6520,
                 contact_person="Dr. Christine Matthew",
-                phone="+91 80 4000 1100",
+                phone="+91 821 252 0100",
                 service_capabilities="Hospital,ALS,trauma_care,emergency_triage,burn_unit",
                 estimated_base_charge=0.0,  # Free / subsidized charitable care
                 is_active=True,
             ),
             ExternalProvider(
-                name="CityCare Private Ambulance Fleet",
+                name="Mysuru City Care Private Ambulance Fleet",
                 provider_type="Private Ambulance",
                 is_registered_partner=True,
-                location_name="Old Airport Road Base",
-                latitude=12.9601,
-                longitude=77.6480,
+                location_name="Hunsur Road Base, Mysuru",
+                latitude=12.3150,
+                longitude=76.6210,
                 contact_person="Vikram Rao (Fleet Mgr)",
                 phone="+91 99000 44556",
                 service_capabilities="Private Ambulance,ALS,BLS,patient_transport",
@@ -216,25 +220,25 @@ def seed_demo_data(db: Session):
                 is_active=True,
             ),
             ExternalProvider(
-                name="Red Cross Emergency Relief Volunteers",
+                name="Red Cross Disaster Relief Corps Mysuru",
                 provider_type="NGO",
                 is_registered_partner=True,
-                location_name="Red Cross Bhavan, MG Road",
-                latitude=12.9750,
-                longitude=77.6050,
+                location_name="Dhanvantri Road, Mysuru",
+                latitude=12.3100,
+                longitude=76.6480,
                 contact_person="Ananya Desai",
-                phone="+91 80 2226 7788",
+                phone="+91 821 242 7788",
                 service_capabilities="first_aid,disaster_relief,food_water,volunteer_corps",
                 estimated_base_charge=0.0,
                 is_active=True,
             ),
             ExternalProvider(
-                name="RapidTow & Industrial Recovery Services",
+                name="Chamundi Recovery & Industrial Rescue Services",
                 provider_type="Local Rescue",
                 is_registered_partner=False,  # Fallback directory
-                location_name="Peenya Industrial Estate",
-                latitude=13.0285,
-                longitude=77.5190,
+                location_name="Belagola Industrial Area, Mysuru",
+                latitude=12.3750,
+                longitude=76.5820,
                 contact_person="Sunil Gowda",
                 phone="+91 98450 77112",
                 service_capabilities="heavy_extrication,winch_recovery,crane_rescue",
@@ -245,7 +249,7 @@ def seed_demo_data(db: Session):
         db.add_all(providers)
         db.commit()
 
-    # 4. Pre-seeded Incidents
+    # 4. Pre-seeded Incidents across Mysuru
     if db.query(Incident).count() == 0:
         amb01 = db.query(Resource).filter(Resource.resource_code == "AMB-01").first()
 
@@ -257,12 +261,12 @@ def seed_demo_data(db: Session):
                 category="Medical",
                 title="Acute Cardiac Arrest Emergency",
                 description="Elderly gentleman collapsed on pavement, unresponsive with shallow breathing. Bystanders started chest compressions.",
-                location_name="MG Road Metro Station Exit 2",
-                latitude=12.9755,
-                longitude=77.6067,
+                location_name="KR Hospital Circle, Sayyaji Rao Rd, Mysuru",
+                latitude=12.3138,
+                longitude=76.6495,
                 affected_people=1,
                 help_required="ALS Ambulance and Paramedic Defibrillator",
-                contact_name="Aastha Singh",
+                contact_name="Demo User",
                 contact_phone="+91 98765 43210",
                 priority="Critical",
                 priority_reason="Critical priority: Cardiac arrest indicators with loss of consciousness.",
@@ -277,9 +281,9 @@ def seed_demo_data(db: Session):
                 category="Road accident",
                 title="Two-Wheeler & Auto Collision",
                 description="Motorcycle skidded and collided with auto-rickshaw. Two riders injured with road rash and suspected arm fracture.",
-                location_name="Sony World Junction, Koramangala",
-                latitude=12.9348,
-                longitude=77.6253,
+                location_name="Kuvempunagar Complex Junction, Mysuru",
+                latitude=12.2856,
+                longitude=76.6268,
                 affected_people=2,
                 help_required="Ambulance & First Aid Response",
                 contact_name="Rahul Sharma",
@@ -297,9 +301,9 @@ def seed_demo_data(db: Session):
                 category="Fire",
                 title="Commercial Kitchen Electrical Fire",
                 description="Dense smoke and spreading flames from commercial kitchen duct behind restaurant row. Building evacuation in progress.",
-                location_name="100ft Road, Indiranagar",
-                latitude=12.9719,
-                longitude=77.6412,
+                location_name="Gokulam 3rd Stage Main Road, Mysuru",
+                latitude=12.3325,
+                longitude=76.6272,
                 affected_people=3,
                 help_required="Fire Response and Smoke Ventilation Team",
                 contact_name="Suresh Kumar",
@@ -317,9 +321,9 @@ def seed_demo_data(db: Session):
                 category="Disaster / Multiple affected people",
                 title="Flash Flood Waterlogging in Low-lying Colony",
                 description="Basements submerged up to 4 feet following cloudburst. 25+ families trapped on upper terraces without drinking water.",
-                location_name="Bellandur Lake Catchment Area",
-                latitude=12.9260,
-                longitude=77.6762,
+                location_name="Hebbal Lake Catchment Area, Mysuru",
+                latitude=12.3610,
+                longitude=76.6025,
                 affected_people=25,
                 help_required="Evacuation Inflatable Boats, Clean Drinking Water, Emergency Food Packets",
                 contact_name="Ramesh Pillai",
@@ -338,13 +342,13 @@ def seed_demo_data(db: Session):
                 user_id=demo_user.id,
                 category="Medical",
                 title="Heat Exhaustion Collapse in Public Park",
-                description="Morning jogger experienced severe dehydration and collapsed near bandstand. Stable after IV fluids.",
-                location_name="Cubbon Park Bandstand",
-                latitude=12.9763,
-                longitude=77.5929,
+                description="Morning jogger experienced severe dehydration and collapsed near North Gate. Stable after IV fluids.",
+                location_name="Mysuru Palace North Gate, Mysuru",
+                latitude=12.3052,
+                longitude=76.6552,
                 affected_people=1,
                 help_required="First Aid & Hydration",
-                contact_name="Aastha Singh",
+                contact_name="Demo User",
                 contact_phone="+91 98765 43210",
                 priority="Medium",
                 priority_reason="Medium priority: Single casualty conscious and stable.",
@@ -362,9 +366,9 @@ def seed_demo_data(db: Session):
             assignment = Assignment(
                 incident_id=inc101.id,
                 resource_id=amb01.id,
-                assigned_by="Coordinator Rajesh Rao",
+                assigned_by="Coordinator Aastha Singh",
                 status="Active",
-                notes="Assigned closest ALS Ambulance (2.4 km away, ~6 min ETA).",
+                notes="Assigned closest ALS Ambulance (1.8 km away, ~5 min ETA).",
             )
             db.add(assignment)
             amb01.current_assignment_id = inc101.id
@@ -378,27 +382,27 @@ def seed_demo_data(db: Session):
             db.add(IncidentUpdate(
                 incident_id=inc101.id,
                 status="Verified",
-                message="Incident confirmed by phone contact with Aastha Singh.",
-                actor="Coordinator Rajesh Rao",
+                message="Incident confirmed by phone contact with Demo User.",
+                actor="Coordinator Aastha Singh",
             ))
             db.add(IncidentUpdate(
                 incident_id=inc101.id,
                 status="Assignment Confirmed",
                 message="Rapid LifeSupport Ambulance 01 assigned to incident.",
-                actor="Coordinator Rajesh Rao",
+                actor="Coordinator Aastha Singh",
             ))
             db.add(IncidentUpdate(
                 incident_id=inc101.id,
                 status="Team Dispatched",
-                message="Rapid LifeSupport Ambulance 01 en route with siren activated. ETA 6 mins.",
-                actor="Coordinator Rajesh Rao",
+                message="Rapid LifeSupport Ambulance 01 en route with siren activated. ETA 5 mins.",
+                actor="Coordinator Aastha Singh",
             ))
 
             db.add(Notification(
                 user_id=demo_user.id,
                 incident_id=inc101.id,
                 title="Team Dispatched for CARE-2026-101",
-                message="Aastha, Rapid LifeSupport Ambulance 01 has been dispatched to MG Road Metro Station Exit 2.",
+                message="Demo User, Rapid LifeSupport Ambulance 01 has been dispatched to KR Hospital Circle, Mysuru.",
                 type="alert",
                 is_read=False,
             ))
@@ -410,7 +414,7 @@ def seed_demo_data(db: Session):
                 incident_id=inc105.id,
                 status="Resolved",
                 message="Paramedics stabilized jogger and safely discharged onsite.",
-                actor="Coordinator Rajesh Rao",
+                actor="Coordinator Aastha Singh",
             ))
             db.add(Feedback(
                 incident_id=inc105.id,
@@ -539,8 +543,8 @@ def create_incident(
     duplicate_match = check_for_duplicates(
         db,
         payload.category,
-        payload.latitude or 12.9716,
-        payload.longitude or 77.5946,
+        payload.latitude or 12.3052,
+        payload.longitude or 76.6552,
         payload.description,
     )
 
@@ -557,8 +561,8 @@ def create_incident(
         title=title,
         description=payload.description,
         location_name=payload.location_name,
-        latitude=payload.latitude or 12.9716,
-        longitude=payload.longitude or 77.5946,
+        latitude=payload.latitude or 12.3052,
+        longitude=payload.longitude or 76.6552,
         affected_people=payload.affected_people or 1,
         help_required=payload.help_required,
         contact_name=payload.contact_name,
@@ -1107,7 +1111,7 @@ def create_provider_enquiry(
             incident_id=incident.id,
             status="Provider Contacted",
             message=f"Coordinator contacted external partner {provider.name} ({provider.provider_type}).",
-            actor="Coordinator Rajesh Rao",
+            actor="Coordinator Aastha Singh",
         ))
 
     db.commit()

@@ -134,19 +134,25 @@ def health_check(db: Session = Depends(get_db)):
 # ==============================================================================
 @app.post("/api/auth/register", response_model=TokenResponse, status_code=status.HTTP_201_CREATED, tags=["Auth"])
 def register(payload: UserRegister, db: Session = Depends(get_db)):
+    if payload.confirm_password and payload.password != payload.confirm_password:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Passwords do not match.",
+        )
     existing = crud.get_user_by_email(db, payload.email)
     if existing:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="A user with this email address already exists.",
         )
+    # Security Rule: Public registration MUST NEVER create an admin account. Role is forced to 'user'.
     user = crud.create_user(
         db=db,
         name=payload.name,
         email=payload.email,
         phone=payload.phone,
         password=payload.password,
-        role=payload.role or "user",
+        role="user",
     )
     token = create_access_token({"sub": user.id, "email": user.email, "role": user.role})
     return TokenResponse(access_token=token, token_type="Bearer", user=UserResponse.model_validate(user))
@@ -194,14 +200,14 @@ def list_incidents(
     db: Session = Depends(get_db),
 ):
     """
-    List incidents with role-based filtering:
-    - If user is not admin, only their incidents are returned if requested.
-    - Admins see all incidents.
+    List incidents with role-based privacy:
+    - If user is logged in as a normal user, only their own incidents are returned.
+    - Admins see all incidents across the platform.
     """
     user_id = None
-    if my_requests_only and current_user:
+    if current_user and current_user.role != "admin":
         user_id = current_user.id
-    elif current_user and current_user.role != "admin" and my_requests_only:
+    elif my_requests_only and current_user:
         user_id = current_user.id
 
     return crud.get_incidents(
@@ -217,8 +223,23 @@ def list_incidents(
 @app.get("/api/incidents/{identifier}", response_model=IncidentDetailResponse, tags=["Incidents"])
 def get_incident_details(
     identifier: str,
+    current_user: Optional[User] = Depends(get_optional_user),
     db: Session = Depends(get_db),
 ):
+    """Retrieve full incident details by numeric ID or incident code with privacy protection."""
+    item = crud.get_incident_by_id_or_code(db, identifier)
+    if not item:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Incident '{identifier}' not found.",
+        )
+    # Privacy check: Regular user cannot view another user's private emergency record
+    if current_user and current_user.role != "admin" and item.user_id and item.user_id != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Access denied: You cannot view another user's private emergency incident.",
+        )
+    return item
     """Retrieve full incident details by numeric ID or incident code (e.g. CARE-2026-101)."""
     item = crud.get_incident_by_id_or_code(db, identifier)
     if not item:

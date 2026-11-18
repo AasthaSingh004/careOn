@@ -18,9 +18,32 @@ import {
   resolveIncident,
   resetSimulationData,
 } from '../api';
+import { useTranslation } from '../translations';
 import LeafletMap from '../components/LeafletMap';
+import {
+  ShieldCheck,
+  RefreshCw,
+  AlertTriangle,
+  RotateCcw,
+  Truck,
+  Building2,
+  Brain,
+  MapPin,
+  Flame,
+  Activity,
+  Layers,
+  FileCheck2,
+  TrendingUp,
+  Waves,
+  CheckCircle2,
+  Clock,
+  Send,
+  Eye,
+  X
+} from 'lucide-react';
 
-export default function AdminDashboard({ currentUser, onNavigate }) {
+export default function AdminDashboard({ lang = 'en', currentUser, onNavigate }) {
+  const { t } = useTranslation(lang);
   const [activeTab, setActiveTab] = useState('overview'); // overview, incidents, resources, allocation, providers, map, simulation, verification, disaster, analytics
 
   const [incidents, setIncidents] = useState([]);
@@ -32,6 +55,7 @@ export default function AdminDashboard({ currentUser, onNavigate }) {
   const [feedbackList, setFeedbackList] = useState([]);
 
   const [loading, setLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const [actionNotice, setActionNotice] = useState(null);
 
   // Selected Incident Drawer / Modal
@@ -48,13 +72,14 @@ export default function AdminDashboard({ currentUser, onNavigate }) {
     setTimeout(() => setActionNotice(null), 4000);
   };
 
-  const loadAllData = useCallback(async () => {
+  const loadAllData = useCallback(async (isManualRefresh = false) => {
+    if (isManualRefresh) setRefreshing(true);
     setLoading(true);
     try {
       const [inc, res, prov, short, ana, pred, fb] = await Promise.all([
-        fetchIncidents().catch(() => []),
-        fetchResources().catch(() => []),
-        fetchProviders().catch(() => []),
+        fetchIncidents({}, 'admin').catch(() => []),
+        fetchResources({}, 'admin').catch(() => []),
+        fetchProviders('admin').catch(() => []),
         fetchShortages().catch(() => ({ shortages: [], available_fleet_summary: {} })),
         fetchAnalytics().catch(() => null),
         fetchPredictions().catch(() => []),
@@ -67,12 +92,16 @@ export default function AdminDashboard({ currentUser, onNavigate }) {
       setAnalytics(ana);
       setPredictions(pred);
       setFeedbackList(fb);
+      if (isManualRefresh) {
+        showNotice(t('feed_refreshed') || 'Feed refreshed successfully with live incident data.');
+      }
     } catch (err) {
       console.error('Failed to load admin dashboard data:', err);
     } finally {
       setLoading(false);
+      if (isManualRefresh) setRefreshing(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     loadAllData();
@@ -203,31 +232,42 @@ export default function AdminDashboard({ currentUser, onNavigate }) {
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <span style={{ fontSize: '24px' }}>🛡️</span>
-            <h1 style={{ fontSize: '24px', fontWeight: 800, color: '#0f4c5c' }}>Command Centre</h1>
-            <span className="status-badge badge-resolved">Coordinator Access Active</span>
+            <h1 style={{ fontSize: '24px', fontWeight: 800, color: '#0f4c5c', margin: 0 }}>
+              {t('command_centre_title') || 'Command Centre'}
+            </h1>
+            <span className="status-badge badge-resolved" style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+              <ShieldCheck size={14} />
+              <span>{currentUser?.name || 'Aastha Singh'} ({t('admin_role') || 'Coordinator'})</span>
+            </span>
           </div>
-          <div style={{ fontSize: '13px', color: '#64748b', marginTop: '2px' }}>
-            Real-time incident triage, capability matching, shortage alerts, and partner coordination.
+          <div style={{ fontSize: '13px', color: '#64748b', marginTop: '4px' }}>
+            {t('command_centre_subtitle') || 'Real-time incident triage, capability matching, shortage alerts, and partner coordination across Mysuru.'}
           </div>
         </div>
 
         <div style={{ display: 'flex', gap: '10px' }}>
-          <button className="btn btn-outline btn-sm" onClick={loadAllData} disabled={loading}>
-            🔄 Refresh Feed
+          <button
+            className="btn btn-outline btn-sm"
+            onClick={() => loadAllData(true)}
+            disabled={loading || refreshing}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
+          >
+            <RefreshCw size={14} className={refreshing ? 'spin' : ''} />
+            <span>{refreshing ? t('refreshing') || 'Refreshing...' : t('refresh_feed') || 'Refresh Feed'}</span>
           </button>
           <button className="btn btn-primary-red btn-sm" onClick={handleResetDemoData}>
-            ↺ Reset Demo State
+            ↺ {t('reset_demo_state') || 'Reset Demo State'}
           </button>
         </div>
       </div>
 
-      {/* Top 8 Overview Metric Cards */}
+      {/* Top 4 Overview Metric Cards */}
       <div className="grid-4" style={{ marginBottom: '24px' }}>
         <div className="stat-card">
           <div className="stat-icon" style={{ backgroundColor: '#fee2e2', color: '#991b1b' }}>🚨</div>
           <div>
             <div className="stat-val">{analytics?.active_incidents || incidents.filter(i => !['Resolved','Cancelled'].includes(i.status)).length}</div>
-            <div className="stat-label">Active Incidents</div>
+            <div className="stat-label">{t('stat_active_incidents') || 'Active Incidents'}</div>
           </div>
         </div>
 
@@ -235,7 +275,7 @@ export default function AdminDashboard({ currentUser, onNavigate }) {
           <div className="stat-icon" style={{ backgroundColor: '#fef3c7', color: '#92400e' }}>⚡</div>
           <div>
             <div className="stat-val">{analytics?.critical_incidents || incidents.filter(i => i.priority === 'Critical').length}</div>
-            <div className="stat-label">Critical Priority</div>
+            <div className="stat-label">{t('stat_critical_priority') || 'Critical Priority'}</div>
           </div>
         </div>
 
@@ -243,7 +283,7 @@ export default function AdminDashboard({ currentUser, onNavigate }) {
           <div className="stat-icon" style={{ backgroundColor: '#ecfdf5', color: '#047857' }}>🚑</div>
           <div>
             <div className="stat-val">{resources.filter(r => r.status === 'Available').length}</div>
-            <div className="stat-label">Fleet Available</div>
+            <div className="stat-label">{t('stat_fleet_available') || 'Fleet Available'}</div>
           </div>
         </div>
 
@@ -251,7 +291,7 @@ export default function AdminDashboard({ currentUser, onNavigate }) {
           <div className="stat-icon" style={{ backgroundColor: '#fff1f2', color: '#be123c' }}>⚠️</div>
           <div>
             <div className="stat-val">{shortages.shortages?.length || 0}</div>
-            <div className="stat-label">Active Shortages</div>
+            <div className="stat-label">{t('stat_active_shortages') || 'Active Shortages'}</div>
           </div>
         </div>
       </div>
@@ -268,16 +308,16 @@ export default function AdminDashboard({ currentUser, onNavigate }) {
         }}
       >
         {[
-          { id: 'overview', label: '📊 Overview' },
-          { id: 'incidents', label: `🚨 Incidents (${incidents.length})` },
-          { id: 'resources', label: `🚑 Resources (${resources.length})` },
-          { id: 'allocation', label: `🧠 Smart Allocation & Shortages` },
-          { id: 'providers', label: `🏥 External Partners (${providers.length})` },
-          { id: 'map', label: '🗺️ Live Map & Dispatch' },
-          { id: 'simulation', label: '🎯 Resource Shortage Challenge' },
-          { id: 'verification', label: '🔍 Trust & Duplicate Review' },
-          { id: 'disaster', label: '🌊 Disaster Relief Mode' },
-          { id: 'analytics', label: '📈 Analytics & ML Predictions' },
+          { id: 'overview', label: t('tab_overview', '📊 Overview') },
+          { id: 'incidents', label: `${t('tab_incidents', '🚨 Incidents')} (${incidents.length})` },
+          { id: 'resources', label: `${t('tab_resources', '🚑 Fleet Resources')} (${resources.length})` },
+          { id: 'allocation', label: t('tab_allocations', '🧠 Smart Allocation') },
+          { id: 'providers', label: `${t('tab_providers', '🏥 External Partners')} (${providers.length})` },
+          { id: 'map', label: t('tab_map', '🗺️ Mysuru Live Map') },
+          { id: 'simulation', label: t('tab_simulation', '🎯 Shortage Challenge') },
+          { id: 'verification', label: t('tab_verification', '🔍 Trust & Verification') },
+          { id: 'disaster', label: t('tab_disaster', '🌊 Disaster Relief') },
+          { id: 'analytics', label: t('tab_analytics', '📈 Analytics & Predictions') },
         ].map((tab) => (
           <button
             key={tab.id}
@@ -871,7 +911,7 @@ export default function AdminDashboard({ currentUser, onNavigate }) {
                 Step 1: Multiple Simultaneous Emergencies Loaded
               </div>
               <p style={{ fontSize: '13px', color: '#64748b', lineHeight: 1.5 }}>
-                Three simultaneous emergencies are active across Bangalore (MG Road cardiac arrest, Koramangala road accident, and Indiranagar kitchen fire).
+                Three simultaneous emergencies are active across Mysuru (Sayyaji Rao Road cardiac arrest, Kuvempunagar road accident, and Gokulam kitchen fire).
               </p>
             </div>
 
@@ -1001,7 +1041,7 @@ export default function AdminDashboard({ currentUser, onNavigate }) {
           <div className="grid-2">
             <div style={{ border: '1px solid #bae6fd', backgroundColor: '#f0f9ff', padding: '16px', borderRadius: '10px' }}>
               <h4 style={{ fontSize: '15px', fontWeight: 700, color: '#0369a1', marginBottom: '8px' }}>
-                Active Disaster Incident: CARE-2026-104 (Bellandur Lake Catchment)
+                Active Disaster Incident: CARE-2026-104 (Hebbal Lake Catchment, Mysuru)
               </h4>
               <p style={{ fontSize: '13px', color: '#0c4a6e', lineHeight: 1.5, marginBottom: '12px' }}>
                 Affected Individuals: <strong>25 residents trapped by flash flooding</strong>.<br/>
@@ -1029,7 +1069,7 @@ export default function AdminDashboard({ currentUser, onNavigate }) {
               </h4>
               <div style={{ fontSize: '13px', color: '#14532d', lineHeight: 1.6 }}>
                 <div>• <strong>REL-01:</strong> Disaster Relief Van (Food & Clean Water Supply) — Available</div>
-                <div>• <strong>SHELTER-01:</strong> Community Relief Centre (150 capacity, Koramangala) — Available</div>
+                <div>• <strong>SHELTER-01:</strong> Community Relief Centre (150 capacity, Kuvempunagar, Mysuru) — Available</div>
                 <div>• <strong>RES-01:</strong> Urban Search & Rescue Squad (Inflatable boats) — Available</div>
               </div>
             </div>

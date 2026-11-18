@@ -3,13 +3,13 @@ from typing import Dict, Any, List
 from sqlalchemy.orm import Session
 from app.models import Incident, Resource
 
-# Predefined urban demo zones with historical baseline weighting
+# Predefined urban demo zones with historical baseline weighting (Mysuru, Karnataka)
 ZONES = [
-    {"name": "Central Business District / MG Road", "baseline_demand": 1.4, "primary_risk": "Medical / Traffic"},
-    {"name": "Koramangala - HSR Tech Corridor", "baseline_demand": 1.2, "primary_risk": "Road Accidents"},
-    {"name": "Indiranagar - Commercial Zone", "baseline_demand": 1.1, "primary_risk": "Fire / Kitchen Hazards"},
-    {"name": "Bellandur - Low-lying Catchment", "baseline_demand": 1.5, "primary_risk": "Disaster / Urban Flood"},
-    {"name": "Whitefield Industrial Suburb", "baseline_demand": 1.0, "primary_risk": "Industrial Trauma"},
+    {"name": "Central Mysuru / KR Hospital & Palace Corridor", "baseline_demand": 1.4, "primary_risk": "Medical / Traffic"},
+    {"name": "Kuvempunagar - Saraswathipuram Residential Zone", "baseline_demand": 1.2, "primary_risk": "Road Accidents"},
+    {"name": "Gokulam - Vijayanagar Commercial Corridor", "baseline_demand": 1.1, "primary_risk": "Fire / Kitchen Hazards"},
+    {"name": "Hebbal - Belagola Industrial Suburb", "baseline_demand": 1.5, "primary_risk": "Disaster / Urban Flood"},
+    {"name": "Chamundi Hill & Nazarbad Enclave", "baseline_demand": 1.0, "primary_risk": "Trauma / Medical Support"},
 ]
 
 
@@ -63,7 +63,7 @@ def predict_resource_shortage_risk(db: Session, zone_name: str = None) -> List[D
         if raw_score >= 1.8:
             risk_level = "High"
             resource_in_demand = "Ambulance (Advanced Life Support)"
-            action = "Pre-stage standby ambulance or notify St. Mary's Partner Hospital."
+            action = "Pre-stage standby ambulance or notify Mission Hospital Partner Network."
         elif raw_score >= 1.2:
             risk_level = "Moderate"
             resource_in_demand = "Paramedic First-Aid Team"

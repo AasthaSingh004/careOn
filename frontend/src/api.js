@@ -4,6 +4,10 @@ export const getApiBase = () => {
     return import.meta.env.VITE_API_URL;
   }
   if (typeof window !== 'undefined' && window.location) {
+    // When served via Nginx (port 3000 or 80), use same-origin '/api' to avoid CORS and port mismatches
+    if (window.location.port === '3000' || window.location.port === '80' || !window.location.port) {
+      return '/api';
+    }
     const host = window.location.hostname || 'localhost';
     return `http://${host}:8000/api`;
   }
@@ -12,13 +16,81 @@ export const getApiBase = () => {
 
 const API_BASE = getApiBase();
 
-function getAuthHeaders() {
-  const token = localStorage.getItem('careon_token');
+/**
+ * Returns auth headers.
+ * Supports dual simultaneous sessions:
+ * - 'admin': uses careon_admin_token
+ * - 'user': uses careon_user_token
+ * - 'auto': detects based on current URL path
+ */
+export function getAuthHeaders(scope = 'auto') {
+  let token = null;
+  if (typeof localStorage !== 'undefined') {
+    if (scope === 'admin') {
+      token = localStorage.getItem('careon_admin_token') || localStorage.getItem('careon_token');
+    } else if (scope === 'user') {
+      token = localStorage.getItem('careon_user_token') || localStorage.getItem('careon_token');
+    } else {
+      // Auto-detect based on route
+      const isApiPathAdmin = typeof window !== 'undefined' && window.location.pathname.startsWith('/admin');
+      if (isApiPathAdmin) {
+        token = localStorage.getItem('careon_admin_token') || localStorage.getItem('careon_user_token');
+      } else {
+        token = localStorage.getItem('careon_user_token') || localStorage.getItem('careon_admin_token');
+      }
+    }
+    // Fallback to legacy single token if neither is found
+    if (!token) {
+      token = localStorage.getItem('careon_token');
+    }
+  }
+
   const headers = { 'Content-Type': 'application/json' };
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
   }
   return headers;
+}
+
+// Session Helpers
+export function getStoredUserSession() {
+  try {
+    const raw = localStorage.getItem('careon_user_info');
+    if (raw) return JSON.parse(raw);
+    const legacy = localStorage.getItem('careon_user');
+    if (legacy) {
+      const u = JSON.parse(legacy);
+      if (u.role === 'user') return u;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+export function getStoredAdminSession() {
+  try {
+    const raw = localStorage.getItem('careon_admin_info');
+    if (raw) return JSON.parse(raw);
+    const legacy = localStorage.getItem('careon_user');
+    if (legacy) {
+      const u = JSON.parse(legacy);
+      if (u.role === 'admin') return u;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+export function logoutUser() {
+  localStorage.removeItem('careon_user_token');
+  localStorage.removeItem('careon_user_info');
+}
+
+export function logoutAdmin() {
+  localStorage.removeItem('careon_admin_token');
+  localStorage.removeItem('careon_admin_info');
 }
 
 // ==============================================================================
@@ -47,9 +119,16 @@ export async function registerUser(payload) {
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new Error(err.detail || 'Registration failed');
+    throw new Error(err.detail || 'Registration failed. Please check your information.');
   }
-  return res.json();
+  const data = await res.json();
+  if (data.access_token && data.user) {
+    localStorage.setItem('careon_user_token', data.access_token);
+    localStorage.setItem('careon_user_info', JSON.stringify(data.user));
+    localStorage.setItem('careon_token', data.access_token); // fallback
+    localStorage.setItem('careon_user', JSON.stringify(data.user));
+  }
+  return data;
 }
 
 export async function loginUser(email, password) {
@@ -60,14 +139,42 @@ export async function loginUser(email, password) {
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new Error(err.detail || 'Login failed');
+    throw new Error(err.detail || 'Invalid email or password.');
   }
-  return res.json();
+  const data = await res.json();
+  if (data.access_token && data.user) {
+    localStorage.setItem('careon_user_token', data.access_token);
+    localStorage.setItem('careon_user_info', JSON.stringify(data.user));
+    localStorage.setItem('careon_token', data.access_token);
+    localStorage.setItem('careon_user', JSON.stringify(data.user));
+  }
+  return data;
 }
 
-export async function fetchCurrentUser() {
+export async function loginAdmin(email, password) {
+  const res = await fetch(`${API_BASE}/auth/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || 'Invalid coordinator credentials.');
+  }
+  const data = await res.json();
+  if (data.user?.role !== 'admin') {
+    throw new Error('Access denied. Administrator privileges required to access the Command Centre.');
+  }
+  if (data.access_token && data.user) {
+    localStorage.setItem('careon_admin_token', data.access_token);
+    localStorage.setItem('careon_admin_info', JSON.stringify(data.user));
+  }
+  return data;
+}
+
+export async function fetchCurrentUser(scope = 'auto') {
   const res = await fetch(`${API_BASE}/auth/me`, {
-    headers: getAuthHeaders(),
+    headers: getAuthHeaders(scope),
   });
   if (!res.ok) return null;
   return res.json();
@@ -79,7 +186,7 @@ export async function fetchCurrentUser() {
 export async function reportIncident(data) {
   const res = await fetch(`${API_BASE}/incidents`, {
     method: 'POST',
-    headers: getAuthHeaders(),
+    headers: getAuthHeaders('user'),
     body: JSON.stringify(data),
   });
   if (!res.ok) {
@@ -89,7 +196,7 @@ export async function reportIncident(data) {
   return res.json();
 }
 
-export async function fetchIncidents(params = {}) {
+export async function fetchIncidents(params = {}, scope = 'auto') {
   const query = new URLSearchParams();
   if (params.status) query.append('status', params.status);
   if (params.priority) query.append('priority', params.priority);
@@ -98,24 +205,24 @@ export async function fetchIncidents(params = {}) {
   if (params.my_requests_only) query.append('my_requests_only', 'true');
 
   const res = await fetch(`${API_BASE}/incidents?${query.toString()}`, {
-    headers: getAuthHeaders(),
+    headers: getAuthHeaders(scope),
   });
   if (!res.ok) throw new Error('Failed to fetch incidents');
   return res.json();
 }
 
-export async function fetchIncidentDetails(idOrCode) {
+export async function fetchIncidentDetails(idOrCode, scope = 'auto') {
   const res = await fetch(`${API_BASE}/incidents/${idOrCode}`, {
-    headers: getAuthHeaders(),
+    headers: getAuthHeaders(scope),
   });
-  if (!res.ok) throw new Error(`Incident ${idOrCode} not found`);
+  if (!res.ok) throw new Error(`Incident ${idOrCode} not found or access restricted`);
   return res.json();
 }
 
-export async function verifyIncidentOtp(incidentId, otp) {
+export async function verifyIncidentOtp(incidentId, otp, scope = 'auto') {
   const res = await fetch(`${API_BASE}/incidents/${incidentId}/verify`, {
     method: 'POST',
-    headers: getAuthHeaders(),
+    headers: getAuthHeaders(scope),
     body: JSON.stringify({ otp }),
   });
   if (!res.ok) {
@@ -128,7 +235,7 @@ export async function verifyIncidentOtp(incidentId, otp) {
 export async function updateIncidentStatus(incidentId, status, message = '', internalNotes = '') {
   const res = await fetch(`${API_BASE}/incidents/${incidentId}/status`, {
     method: 'PATCH',
-    headers: getAuthHeaders(),
+    headers: getAuthHeaders('admin'),
     body: JSON.stringify({ status, message, internal_admin_notes: internalNotes }),
   });
   if (!res.ok) {
@@ -141,7 +248,7 @@ export async function updateIncidentStatus(incidentId, status, message = '', int
 export async function updateIncidentPriority(incidentId, priority, reason) {
   const res = await fetch(`${API_BASE}/incidents/${incidentId}/priority`, {
     method: 'PATCH',
-    headers: getAuthHeaders(),
+    headers: getAuthHeaders('admin'),
     body: JSON.stringify({ priority, reason }),
   });
   if (!res.ok) {
@@ -151,10 +258,10 @@ export async function updateIncidentPriority(incidentId, priority, reason) {
   return res.json();
 }
 
-export async function cancelIncident(incidentId, reason, details = '') {
+export async function cancelIncident(incidentId, reason, details = '', scope = 'user') {
   const res = await fetch(`${API_BASE}/incidents/${incidentId}/cancel`, {
     method: 'POST',
-    headers: getAuthHeaders(),
+    headers: getAuthHeaders(scope),
     body: JSON.stringify({ reason, details }),
   });
   if (!res.ok) {
@@ -167,7 +274,7 @@ export async function cancelIncident(incidentId, reason, details = '') {
 export async function acknowledgeCancellation(incidentId) {
   const res = await fetch(`${API_BASE}/incidents/${incidentId}/acknowledge-cancellation`, {
     method: 'POST',
-    headers: getAuthHeaders(),
+    headers: getAuthHeaders('admin'),
   });
   if (!res.ok) throw new Error('Failed to acknowledge cancellation');
   return res.json();
@@ -176,7 +283,7 @@ export async function acknowledgeCancellation(incidentId) {
 export async function resolveIncident(incidentId, notes = '') {
   const res = await fetch(`${API_BASE}/incidents/${incidentId}/resolve?notes=${encodeURIComponent(notes)}`, {
     method: 'POST',
-    headers: getAuthHeaders(),
+    headers: getAuthHeaders('admin'),
   });
   if (!res.ok) throw new Error('Failed to resolve incident');
   return res.json();
@@ -185,13 +292,13 @@ export async function resolveIncident(incidentId, notes = '') {
 // ==============================================================================
 // Resources & Allocation
 // ==============================================================================
-export async function fetchResources(params = {}) {
+export async function fetchResources(params = {}, scope = 'admin') {
   const query = new URLSearchParams();
   if (params.status) query.append('status', params.status);
   if (params.category) query.append('category', params.category);
 
   const res = await fetch(`${API_BASE}/resources?${query.toString()}`, {
-    headers: getAuthHeaders(),
+    headers: getAuthHeaders(scope),
   });
   if (!res.ok) throw new Error('Failed to fetch resources');
   return res.json();
@@ -200,7 +307,7 @@ export async function fetchResources(params = {}) {
 export async function updateResourceStatus(resourceId, status) {
   const res = await fetch(`${API_BASE}/resources/${resourceId}`, {
     method: 'PATCH',
-    headers: getAuthHeaders(),
+    headers: getAuthHeaders('admin'),
     body: JSON.stringify({ status }),
   });
   if (!res.ok) throw new Error('Failed to update resource');
@@ -210,7 +317,7 @@ export async function updateResourceStatus(resourceId, status) {
 export async function getRecommendedAllocation(incidentId) {
   const res = await fetch(`${API_BASE}/allocations/recommend`, {
     method: 'POST',
-    headers: getAuthHeaders(),
+    headers: getAuthHeaders('admin'),
     body: JSON.stringify({ incident_id: incidentId }),
   });
   if (!res.ok) throw new Error('Failed to generate recommendation');
@@ -220,7 +327,7 @@ export async function getRecommendedAllocation(incidentId) {
 export async function getMultiAllocations() {
   const res = await fetch(`${API_BASE}/allocations/multi-recommend`, {
     method: 'POST',
-    headers: getAuthHeaders(),
+    headers: getAuthHeaders('admin'),
   });
   if (!res.ok) throw new Error('Failed to evaluate multi-incident allocations');
   return res.json();
@@ -229,7 +336,7 @@ export async function getMultiAllocations() {
 export async function confirmAllocation(incidentId, resourceId, notes = '') {
   const res = await fetch(`${API_BASE}/allocations/confirm`, {
     method: 'POST',
-    headers: getAuthHeaders(),
+    headers: getAuthHeaders('admin'),
     body: JSON.stringify({ incident_id: incidentId, resource_id: resourceId, notes }),
   });
   if (!res.ok) {
@@ -242,7 +349,7 @@ export async function confirmAllocation(incidentId, resourceId, notes = '') {
 export async function releaseAllocation(assignmentId) {
   const res = await fetch(`${API_BASE}/allocations/${assignmentId}/release`, {
     method: 'POST',
-    headers: getAuthHeaders(),
+    headers: getAuthHeaders('admin'),
   });
   if (!res.ok) throw new Error('Failed to release resource');
   return res.json();
@@ -250,7 +357,7 @@ export async function releaseAllocation(assignmentId) {
 
 export async function fetchShortages() {
   const res = await fetch(`${API_BASE}/allocations/shortages`, {
-    headers: getAuthHeaders(),
+    headers: getAuthHeaders('admin'),
   });
   if (!res.ok) throw new Error('Failed to fetch shortages');
   return res.json();
@@ -259,9 +366,9 @@ export async function fetchShortages() {
 // ==============================================================================
 // External Providers
 // ==============================================================================
-export async function fetchProviders() {
+export async function fetchProviders(scope = 'admin') {
   const res = await fetch(`${API_BASE}/providers`, {
-    headers: getAuthHeaders(),
+    headers: getAuthHeaders(scope),
   });
   if (!res.ok) throw new Error('Failed to fetch providers');
   return res.json();
@@ -270,7 +377,7 @@ export async function fetchProviders() {
 export async function createProviderEnquiry(payload) {
   const res = await fetch(`${API_BASE}/providers/enquiries`, {
     method: 'POST',
-    headers: getAuthHeaders(),
+    headers: getAuthHeaders('admin'),
     body: JSON.stringify(payload),
   });
   if (!res.ok) throw new Error('Failed to record provider enquiry');
@@ -280,7 +387,7 @@ export async function createProviderEnquiry(payload) {
 export async function updateProviderEnquiry(enquiryId, payload) {
   const res = await fetch(`${API_BASE}/providers/enquiries/${enquiryId}`, {
     method: 'PATCH',
-    headers: getAuthHeaders(),
+    headers: getAuthHeaders('admin'),
     body: JSON.stringify(payload),
   });
   if (!res.ok) throw new Error('Failed to update provider enquiry');
@@ -290,18 +397,18 @@ export async function updateProviderEnquiry(enquiryId, payload) {
 // ==============================================================================
 // Notifications & Feedback
 // ==============================================================================
-export async function fetchNotifications() {
+export async function fetchNotifications(scope = 'auto') {
   const res = await fetch(`${API_BASE}/notifications`, {
-    headers: getAuthHeaders(),
+    headers: getAuthHeaders(scope),
   });
   if (!res.ok) return [];
   return res.json();
 }
 
-export async function markNotificationAsRead(id) {
+export async function markNotificationAsRead(id, scope = 'auto') {
   const res = await fetch(`${API_BASE}/notifications/${id}/read`, {
     method: 'PATCH',
-    headers: getAuthHeaders(),
+    headers: getAuthHeaders(scope),
   });
   return res.ok;
 }
@@ -309,7 +416,7 @@ export async function markNotificationAsRead(id) {
 export async function submitFeedback(payload) {
   const res = await fetch(`${API_BASE}/feedback`, {
     method: 'POST',
-    headers: getAuthHeaders(),
+    headers: getAuthHeaders('user'),
     body: JSON.stringify(payload),
   });
   if (!res.ok) {
@@ -321,7 +428,7 @@ export async function submitFeedback(payload) {
 
 export async function fetchFeedbackList() {
   const res = await fetch(`${API_BASE}/feedback`, {
-    headers: getAuthHeaders(),
+    headers: getAuthHeaders('admin'),
   });
   if (!res.ok) return [];
   return res.json();
@@ -342,7 +449,7 @@ export async function sendChatMessage(message, sessionId = 'careon_user_session'
 
 export async function fetchAnalytics() {
   const res = await fetch(`${API_BASE}/admin/analytics`, {
-    headers: getAuthHeaders(),
+    headers: getAuthHeaders('admin'),
   });
   if (!res.ok) throw new Error('Failed to fetch analytics');
   return res.json();
@@ -351,7 +458,7 @@ export async function fetchAnalytics() {
 export async function fetchPredictions(zone = '') {
   const url = `${API_BASE}/admin/predictions${zone ? `?zone=${encodeURIComponent(zone)}` : ''}`;
   const res = await fetch(url, {
-    headers: getAuthHeaders(),
+    headers: getAuthHeaders('admin'),
   });
   if (!res.ok) return [];
   return res.json();
@@ -360,7 +467,7 @@ export async function fetchPredictions(zone = '') {
 export async function resetSimulationData() {
   const res = await fetch(`${API_BASE}/simulation/reset`, {
     method: 'POST',
-    headers: getAuthHeaders(),
+    headers: getAuthHeaders('admin'),
   });
   if (!res.ok) throw new Error('Failed to reset simulation');
   return res.json();

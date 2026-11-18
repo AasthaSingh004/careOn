@@ -45,8 +45,8 @@ class Incident(Base):
     title = Column(String(200), nullable=False)
     description = Column(Text, nullable=False)
     location_name = Column(String(255), nullable=False)
-    latitude = Column(Float, nullable=False, default=12.9716)
-    longitude = Column(Float, nullable=False, default=77.5946)
+    latitude = Column(Float, nullable=False, default=12.3052)
+    longitude = Column(Float, nullable=False, default=76.6552)
     affected_people = Column(Integer, nullable=False, default=1)
     help_required = Column(String(150), nullable=False)
     contact_name = Column(String(100), nullable=False)
@@ -107,8 +107,8 @@ class Resource(Base):
     category = Column(String(60), nullable=False)  # Ambulance, Medical Team, Fire Response, Rescue Team, First-Aid Team, Relief Vehicle, Shelter / Relief Centre
     capabilities = Column(String(255), nullable=False)  # e.g. "ALS,patient_transport,trauma_care"
     location_name = Column(String(200), nullable=False)
-    latitude = Column(Float, nullable=False, default=12.9716)
-    longitude = Column(Float, nullable=False, default=77.5946)
+    latitude = Column(Float, nullable=False, default=12.3052)
+    longitude = Column(Float, nullable=False, default=76.6552)
     status = Column(String(30), nullable=False, default="Available")  # Available, Assigned, Busy, Unavailable, Under Maintenance
     capacity = Column(Integer, nullable=False, default=1)
     contact_phone = Column(String(30), nullable=False)
@@ -124,7 +124,7 @@ class Assignment(Base):
     id = Column(Integer, primary_key=True, index=True)
     incident_id = Column(Integer, ForeignKey("incidents.id"), nullable=False)
     resource_id = Column(Integer, ForeignKey("resources.id"), nullable=False)
-    assigned_by = Column(String(100), nullable=False, default="Coordinator Rao")
+    assigned_by = Column(String(100), nullable=False, default="Coordinator Aastha Singh")
     status = Column(String(30), nullable=False, default="Active")  # Active, Completed, Released, Cancelled
     assigned_at = Column(DateTime, default=utc_now)
     released_at = Column(DateTime, nullable=True)
@@ -142,8 +142,8 @@ class ExternalProvider(Base):
     provider_type = Column(String(60), nullable=False)  # Hospital, Private Ambulance, NGO, Volunteer Organisation, Local Rescue
     is_registered_partner = Column(Boolean, default=True)  # True = Partner, False = Fallback Directory
     location_name = Column(String(200), nullable=False)
-    latitude = Column(Float, nullable=False, default=12.9716)
-    longitude = Column(Float, nullable=False, default=77.5946)
+    latitude = Column(Float, nullable=False, default=12.3052)
+    longitude = Column(Float, nullable=False, default=76.6552)
     contact_person = Column(String(100), nullable=False)
     phone = Column(String(30), nullable=False)
     service_capabilities = Column(String(255), nullable=False)

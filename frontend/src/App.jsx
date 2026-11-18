@@ -10,33 +10,80 @@ import ReportEmergency from './pages/ReportEmergency';
 import TrackRequest from './pages/TrackRequest';
 import AdminDashboard from './pages/AdminDashboard';
 import PrivacyPolicy from './pages/PrivacyPolicy';
+import UserLogin from './pages/UserLogin';
+import UserRegister from './pages/UserRegister';
+import UserDashboard from './pages/UserDashboard';
+import AdminLogin from './pages/AdminLogin';
 
 import {
   fetchHealth,
   fetchStats,
   fetchNotifications,
   markNotificationAsRead,
-  loginUser,
-  fetchCurrentUser,
+  getStoredUserSession,
+  getStoredAdminSession,
+  logoutUser,
+  logoutAdmin,
 } from './api';
 import './App.css';
 
+// Helper to determine initial tab from URL path
+function getTabFromPath(pathname) {
+  if (pathname === '/user/login') return 'user_login';
+  if (pathname === '/user/register') return 'user_register';
+  if (pathname === '/user/dashboard' || pathname === '/user/history') return 'user_dashboard';
+  if (pathname === '/user/report' || pathname === '/report') return 'user_report';
+  if (pathname === '/user/track' || pathname === '/track') return 'user_track';
+  if (pathname === '/admin/login') return 'admin_login';
+  if (pathname.startsWith('/admin')) return 'admin_dashboard';
+  if (pathname === '/privacy') return 'privacy';
+  return 'home';
+}
+
+function getPathFromTab(tab) {
+  switch (tab) {
+    case 'user_login': return '/user/login';
+    case 'user_register': return '/user/register';
+    case 'user_dashboard': return '/user/dashboard';
+    case 'user_report':
+    case 'report': return '/user/report';
+    case 'user_track':
+    case 'track': return '/user/track';
+    case 'admin_login': return '/admin/login';
+    case 'admin_dashboard':
+    case 'admin': return '/admin/dashboard';
+    case 'privacy': return '/privacy';
+    case 'home':
+    default: return '/';
+  }
+}
+
 export default function App() {
   const [health, setHealth] = useState(null);
-  const [stats, setStats] = useState({ total: 0, pending: 0, responded: 0, resolved: 0, critical: 0 });
-  const [currentTab, setCurrentTab] = useState('home'); // home, report, track, admin, privacy
+  const [stats, setStats] = useState({ total: 5, pending: 2, responded: 2, resolved: 1, critical: 2 });
+  const [currentTab, setCurrentTab] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return getTabFromPath(window.location.pathname);
+    }
+    return 'home';
+  });
   const [activeIncidentCode, setActiveIncidentCode] = useState('CARE-2026-101');
   const [lang, setLang] = useState(() => localStorage.getItem('careon_lang') || 'en');
   const [notifications, setNotifications] = useState([]);
   const [showNotifications, setShowNotifications] = useState(false);
-  const [currentUser, setCurrentUser] = useState(() => {
-    try {
-      const saved = localStorage.getItem('careon_user');
-      return saved ? JSON.parse(saved) : { name: 'Aastha Singh', role: 'user', email: 'aastha@example.com' };
-    } catch {
-      return { name: 'Aastha Singh', role: 'user', email: 'aastha@example.com' };
-    }
-  });
+
+  // Independent Dual Sessions
+  const [userSession, setUserSession] = useState(() => getStoredUserSession());
+  const [adminSession, setAdminSession] = useState(() => getStoredAdminSession());
+
+  // Handle URL history popstate (Back/Forward browser buttons)
+  useEffect(() => {
+    const handlePopState = () => {
+      setCurrentTab(getTabFromPath(window.location.pathname));
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
 
   const handleLangChange = (newLang) => {
     setLang(newLang);
@@ -64,57 +111,45 @@ export default function App() {
     return () => clearInterval(interval);
   }, [loadSystemData]);
 
-  // Demo user logins
-  const handleLoginDemoUser = async () => {
-    try {
-      const res = await loginUser('aastha@example.com', 'user123');
-      localStorage.setItem('careon_token', res.access_token);
-      localStorage.setItem('careon_user', JSON.stringify(res.user));
-      setCurrentUser(res.user);
-      loadSystemData();
-    } catch (err) {
-      console.warn('Demo user login notice:', err);
-      const fallback = { name: 'Aastha Singh', role: 'user', email: 'aastha@example.com' };
-      setCurrentUser(fallback);
-      localStorage.setItem('careon_user', JSON.stringify(fallback));
-    }
-  };
-
-  const handleLoginDemoAdmin = async () => {
-    try {
-      const res = await loginUser('admin@careon.org', 'admin123');
-      localStorage.setItem('careon_token', res.access_token);
-      localStorage.setItem('careon_user', JSON.stringify(res.user));
-      setCurrentUser(res.user);
-      setCurrentTab('admin');
-      loadSystemData();
-    } catch (err) {
-      console.warn('Demo admin login notice:', err);
-      const fallback = { name: 'Coordinator Rajesh Rao', role: 'admin', email: 'admin@careon.org' };
-      setCurrentUser(fallback);
-      localStorage.setItem('careon_user', JSON.stringify(fallback));
-      setCurrentTab('admin');
-    }
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem('careon_token');
-    localStorage.removeItem('careon_user');
-    setCurrentUser(null);
-    setCurrentTab('home');
-  };
-
   const handleNavigate = (tab, code = null) => {
     if (code) {
       setActiveIncidentCode(code);
     }
     setCurrentTab(tab);
+    const targetPath = getPathFromTab(tab);
+    if (typeof window !== 'undefined' && window.location.pathname !== targetPath) {
+      window.history.pushState(null, '', targetPath);
+    }
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleUserLoginSuccess = (user) => {
+    setUserSession(user);
+    handleNavigate('user_dashboard');
+    loadSystemData();
+  };
+
+  const handleAdminLoginSuccess = (admin) => {
+    setAdminSession(admin);
+    handleNavigate('admin_dashboard');
+    loadSystemData();
+  };
+
+  const handleLogoutUser = () => {
+    logoutUser();
+    setUserSession(null);
+    handleNavigate('home');
+  };
+
+  const handleLogoutAdmin = () => {
+    logoutAdmin();
+    setAdminSession(null);
+    handleNavigate('admin_login');
   };
 
   const handleEmergencySubmitted = (code) => {
     setActiveIncidentCode(code);
-    setCurrentTab('track');
+    handleNavigate('user_track', code);
     loadSystemData();
   };
 
@@ -138,26 +173,53 @@ export default function App() {
         onLangChange={handleLangChange}
         unreadCount={unreadCount}
         onOpenNotifications={() => setShowNotifications(true)}
-        currentUser={currentUser}
-        onLoginDemoUser={handleLoginDemoUser}
-        onLoginDemoAdmin={handleLoginDemoAdmin}
-        onLogout={handleLogout}
+        userSession={userSession}
+        adminSession={adminSession}
+        onLogoutUser={handleLogoutUser}
+        onLogoutAdmin={handleLogoutAdmin}
       />
 
-      <main className="container" style={{ flex: 1 }}>
+      <main className="container" style={{ flex: 1, padding: '1rem 0' }}>
+        {/* Public Home */}
         {currentTab === 'home' && (
           <Home lang={lang} onNavigate={handleNavigate} />
         )}
 
-        {currentTab === 'report' && (
-          <ReportEmergency
+        {/* User Portal Pages */}
+        {currentTab === 'user_login' && (
+          <UserLogin
             lang={lang}
-            onSubmitted={handleEmergencySubmitted}
-            currentUser={currentUser}
+            onLoginSuccess={handleUserLoginSuccess}
+            onNavigate={handleNavigate}
           />
         )}
 
-        {currentTab === 'track' && (
+        {currentTab === 'user_register' && (
+          <UserRegister
+            lang={lang}
+            onRegisterSuccess={handleUserLoginSuccess}
+            onNavigate={handleNavigate}
+          />
+        )}
+
+        {currentTab === 'user_dashboard' && (
+          <UserDashboard
+            lang={lang}
+            currentUser={userSession}
+            onNavigate={handleNavigate}
+            onSelectIncident={(code) => setActiveIncidentCode(code)}
+          />
+        )}
+
+        {(currentTab === 'user_report' || currentTab === 'report') && (
+          <ReportEmergency
+            lang={lang}
+            onSubmitted={handleEmergencySubmitted}
+            currentUser={userSession}
+          />
+        )}
+
+        {(currentTab === 'user_track' || currentTab === 'track') && (
           <TrackRequest
             lang={lang}
             initialIncidentCode={activeIncidentCode}
@@ -165,13 +227,24 @@ export default function App() {
           />
         )}
 
-        {currentTab === 'admin' && (
-          <AdminDashboard
-            currentUser={currentUser}
+        {/* Admin Portal Pages */}
+        {currentTab === 'admin_login' && (
+          <AdminLogin
+            lang={lang}
+            onLoginSuccess={handleAdminLoginSuccess}
             onNavigate={handleNavigate}
           />
         )}
 
+        {(currentTab === 'admin_dashboard' || currentTab === 'admin') && (
+          <AdminDashboard
+            lang={lang}
+            currentUser={adminSession}
+            onNavigate={handleNavigate}
+          />
+        )}
+
+        {/* Privacy & Legal */}
         {currentTab === 'privacy' && (
           <PrivacyPolicy />
         )}
