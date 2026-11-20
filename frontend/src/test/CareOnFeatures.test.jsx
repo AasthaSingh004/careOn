@@ -216,9 +216,9 @@ describe('Language Normalization and Complete Localization Verification', () => 
     const hiKeys = Object.keys(translations.hi);
     const knKeys = Object.keys(translations.kn);
 
-    expect(enKeys.length).toBe(627);
-    expect(hiKeys.length).toBe(627);
-    expect(knKeys.length).toBe(627);
+    expect(enKeys.length).toBe(642);
+    expect(hiKeys.length).toBe(642);
+    expect(knKeys.length).toBe(642);
 
     const missingInHi = enKeys.filter((k) => !translations.hi[k]);
     const missingInKn = enKeys.filter((k) => !translations.kn[k]);

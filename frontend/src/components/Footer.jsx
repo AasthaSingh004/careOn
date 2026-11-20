@@ -85,6 +85,30 @@ export default function Footer({ lang = 'en', onTabChange }) {
             >
               {t('nav_privacy')}
             </button>
+            <button
+              onClick={() => {
+                if (typeof window !== 'undefined') {
+                  window.dispatchEvent(new CustomEvent('careon-open-install-prompt'));
+                }
+              }}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: '#F04438',
+                textAlign: 'left',
+                cursor: 'pointer',
+                padding: 0,
+                fontWeight: 700,
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 4
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.color = '#B42318'}
+              onMouseLeave={(e) => e.currentTarget.style.color = '#F04438'}
+            >
+              <span>📲</span>
+              <span>{t('pwa_install_careon', 'Install CareOn')}</span>
+            </button>
           </div>
         </div>
 

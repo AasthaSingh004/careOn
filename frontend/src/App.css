@@ -919,3 +919,39 @@ p {
     font-size: 0.75rem !important;
   }
 }
+
+/* Progressive Web App (PWA) Animations & Mobile Styles */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 20px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@media (max-width: 640px) {
+  .pwa-install-btn-text {
+    display: none;
+  }
+  .pwa-install-header-btn {
+    padding: 6px 8px !important;
+  }
+  .pwa-install-banner {
+    bottom: 12px !important;
+    padding: 12px 14px !important;
+  }
+}

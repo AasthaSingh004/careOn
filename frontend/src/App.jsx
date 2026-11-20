@@ -4,6 +4,7 @@ import Footer from './components/Footer';
 import SaharaChatbot from './components/SaharaChatbot';
 import NotificationDrawer from './components/NotificationDrawer';
 import NotificationToast from './components/NotificationToast';
+import InstallPwaPrompt from './components/InstallPwaPrompt';
 
 // Pages
 import Home from './pages/Home';
@@ -384,6 +385,8 @@ export default function App() {
         onOpenDrawer={() => setShowNotifications(true)}
         lang={lang}
       />
+
+      <InstallPwaPrompt lang={lang} />
 
       <Footer lang={lang} onTabChange={handleNavigate} />
     </div>

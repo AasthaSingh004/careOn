@@ -730,6 +730,23 @@ export const translations = {
     alloc_auto_dispatch: "Safe for Auto-Dispatch",
     alloc_admin_review: "Requires Coordinator Review",
     alloc_algorithm_badge: "Rule-Based Multi-Factor Scoring Engine",
+
+    // Progressive Web App (PWA)
+    pwa_install_app: "Install App",
+    pwa_install_careon: "Install CareOn",
+    pwa_banner_title: "Install CareOn on your device",
+    pwa_banner_desc: "Add CareOn to your home screen for instant one-tap emergency access.",
+    pwa_install_btn: "Install Now",
+    pwa_dismiss_btn: "Not Now",
+    pwa_ios_title: "Install CareOn on your iPhone",
+    pwa_ios_subtitle: "Follow these simple steps in Safari to add CareOn to your home screen:",
+    pwa_ios_step1: "1. Tap the Share button at the bottom of Safari.",
+    pwa_ios_step2: "2. Scroll down and tap 'Add to Home Screen'.",
+    pwa_ios_step3: "3. Tap 'Add' in the top-right corner to install.",
+    pwa_instructions_close: "Got it",
+    pwa_already_installed: "App Installed",
+    pwa_android_other_title: "Add CareOn to Home Screen",
+    pwa_android_other_desc: "Tap your browser menu (⋮) and select 'Install App' or 'Add to Home screen'.",
   },
   hi: {
     // Brand & Identity
@@ -1462,6 +1479,23 @@ export const translations = {
     alloc_auto_dispatch: "स्वचालित प्रेषण के लिए सुरक्षित",
     alloc_admin_review: "समन्वयक समीक्षा आवश्यक",
     alloc_algorithm_badge: "नियम-आधारित बहु-कारक स्कोरिंग इंजन",
+
+    // Progressive Web App (PWA)
+    pwa_install_app: "ऐप इंस्टॉल करें",
+    pwa_install_careon: "CareOn इंस्टॉल करें",
+    pwa_banner_title: "अपने डिवाइस पर CareOn इंस्टॉल करें",
+    pwa_banner_desc: "त्वरित 1-टैप आपातकालीन पहुंच के लिए अपनी होम स्क्रीन पर CareOn जोड़ें।",
+    pwa_install_btn: "अभी इंस्टॉल करें",
+    pwa_dismiss_btn: "अभी नहीं",
+    pwa_ios_title: "अपने iPhone पर CareOn इंस्टॉल करें",
+    pwa_ios_subtitle: "CareOn को अपनी होम स्क्रीन पर जोड़ने के लिए Safari में इन चरणों का पालन करें:",
+    pwa_ios_step1: "1. Safari के नीचे शेयर (Share) बटन पर टैप करें।",
+    pwa_ios_step2: "2. नीचे स्क्रॉल करें और 'Add to Home Screen' चुनें।",
+    pwa_ios_step3: "3. इंस्टॉल करने के लिए ऊपर दाईं ओर 'Add' पर टैप करें।",
+    pwa_instructions_close: "समझ गया",
+    pwa_already_installed: "ऐप इंस्टॉल है",
+    pwa_android_other_title: "CareOn को होम स्क्रीन पर जोड़ें",
+    pwa_android_other_desc: "अपने ब्राउज़र मेनू (⋮) पर टैप करें और 'Install App' या 'Add to Home screen' चुनें।",
   },
   kn: {
     // Brand & Identity
@@ -2193,6 +2227,23 @@ export const translations = {
     alloc_auto_dispatch: "ಸ್ವಯಂ-ರವಾನೆಗೆ ಸುರಕ್ಷಿತ",
     alloc_admin_review: "ಸಂಯೋಜಕರ ಪರಿಶೀಲನೆ ಅಗತ್ಯವಿದೆ",
     alloc_algorithm_badge: "ನಿಯಮ-ಆಧಾರಿತ ಬಹು-ಅಂಶ ಸ್ಕೋರಿಂಗ್ ಎಂಜಿನ್",
+
+    // Progressive Web App (PWA)
+    pwa_install_app: "ಆ್ಯಪ್ ಸ್ಥಾಪಿಸಿ",
+    pwa_install_careon: "CareOn ಸ್ಥಾಪಿಸಿ",
+    pwa_banner_title: "ನಿಮ್ಮ ಸಾಧನದಲ್ಲಿ CareOn ಸ್ಥಾಪಿಸಿ",
+    pwa_banner_desc: "ತ್ವರಿತ 1-ಟ್ಯಾಪ್ ತುರ್ತು ಪ್ರವೇಶಕ್ಕಾಗಿ ನಿಮ್ಮ ಮುಖಪುಟ ಪರದೆಗೆ CareOn ಸೇರಿಸಿ.",
+    pwa_install_btn: "ಈಗಲೇ ಸ್ಥಾಪಿಸಿ",
+    pwa_dismiss_btn: "ಈಗ ಬೇಡ",
+    pwa_ios_title: "ನಿಮ್ಮ iPhone ನಲ್ಲಿ CareOn ಸ್ಥಾಪಿಸಿ",
+    pwa_ios_subtitle: "ನಿಮ್ಮ ಮುಖಪುಟ ಪರದೆಗೆ CareOn ಸೇರಿಸಲು Safari ನಲ್ಲಿ ಈ ಹಂತಗಳನ್ನು ಅನುಸರಿಸಿ:",
+    pwa_ios_step1: "1. Safari ಯ ಕೆಳಭಾಗದಲ್ಲಿರುವ ಹಂಚಿಕೆ (Share) ಬಟನ್ ಟ್ಯಾಪ್ ಮಾಡಿ.",
+    pwa_ios_step2: "2. ಕೆಳಗೆ ಸ್ಕ್ರೋಲ್ ಮಾಡಿ ಮತ್ತು 'Add to Home Screen' ಆಯ್ಕೆಮಾಡಿ.",
+    pwa_ios_step3: "3. ಸ್ಥಾಪಿಸಲು ಮೇಲಿನ ಬಲ ಮೂಲೆಯಲ್ಲಿ 'Add' ಟ್ಯಾಪ್ ಮಾಡಿ.",
+    pwa_instructions_close: "ಅರ್ಥವಾಯಿತು",
+    pwa_already_installed: "ಆ್ಯಪ್ ಸ್ಥಾಪಿಸಲಾಗಿದೆ",
+    pwa_android_other_title: "CareOn ಮುಖಪುಟ ಪರದೆಗೆ ಸೇರಿಸಿ",
+    pwa_android_other_desc: "ನಿಮ್ಮ ಬ್ರೌಸರ್ ಮೆನು (⋮) ಟ್ಯಾಪ್ ಮಾಡಿ ಮತ್ತು 'Install App' ಅಥವಾ 'Add to Home screen' ಆಯ್ಕೆಮಾಡಿ.",
   },
 };
 

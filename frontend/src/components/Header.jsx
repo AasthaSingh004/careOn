@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from '../translations';
 import CareOnLogo from './CareOnLogo';
 import {
@@ -10,7 +10,8 @@ import {
   ShieldCheck,
   LogIn,
   Globe,
-  ChevronDown
+  ChevronDown,
+  Download
 } from 'lucide-react';
 
 export default function Header({
@@ -29,6 +30,16 @@ export default function Header({
 }) {
   const { t } = useTranslation(lang);
   const [showAuthDropdown, setShowAuthDropdown] = useState(false);
+  const [isStandalone, setIsStandalone] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const standalone =
+        (typeof window.matchMedia === 'function' && window.matchMedia('(display-mode: standalone)').matches) ||
+        window.navigator.standalone === true;
+      setIsStandalone(Boolean(standalone));
+    }
+  }, []);
 
   const isHealthy = health?.status === 'healthy';
 
@@ -219,6 +230,36 @@ export default function Header({
               <option value="kn">ಕನ್ನಡ (Kannada)</option>
             </select>
           </div>
+
+          {/* PWA Install Button */}
+          {!isStandalone && (
+            <button
+              className="pwa-install-header-btn"
+              onClick={() => {
+                if (typeof window !== 'undefined') {
+                  window.dispatchEvent(new CustomEvent('careon-open-install-prompt'));
+                }
+              }}
+              title={t('pwa_install_app')}
+              aria-label={t('pwa_install_app')}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6,
+                background: '#F5F6F7',
+                border: '1px solid #DCE5EB',
+                borderRadius: 8,
+                padding: '6px 12px',
+                fontSize: '0.825rem',
+                fontWeight: 700,
+                color: '#171C24',
+                cursor: 'pointer'
+              }}
+            >
+              <Download size={15} style={{ color: '#F04438' }} />
+              <span className="pwa-install-btn-text">{t('pwa_install_app')}</span>
+            </button>
+          )}
 
           {/* Notification Bell */}
           <button
