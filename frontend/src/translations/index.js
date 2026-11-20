@@ -127,15 +127,15 @@ export const translations = {
 
     // Home & Features
     how_it_works_title: "How CareOn Works",
-    feature1_title: "Multi-Resource Fleet Dispatch",
-    feature1_desc: "Coordinates ALS ambulances, trauma teams, fire engines, and rescue boats from nearest bases.",
-    feature2_title: "Shortage Alerting & Partner Fallback",
+    feature1_title: "Quick Emergency Dispatch",
+    feature1_desc: "Coordinates ALS ambulances, trauma teams, fire engines, and rescue vehicles from nearest bases.",
+    feature2_title: "Backup Help & Partner Network",
     feature2_desc: "Automatically queries registered private hospitals and volunteer NGOs when municipal resources are occupied.",
-    feature3_title: "Conflict Prevention Engine",
+    feature3_title: "No Double-Booking",
     feature3_desc: "Ensures no vehicle is double-assigned across concurrent emergencies with real-time lock verification.",
-    feature4_title: "Predictive Surge Risk Analytics",
+    feature4_title: "Smart Resource Planning",
     feature4_desc: "Forecasts resource demand based on demographic density, weather conditions, and historical trends.",
-    feature5_title: "End-to-End Privacy & Verification",
+    feature5_title: "Safe & Private Emergency Help",
     feature5_desc: "Citizen health records remain strictly confidential with OTP verification to deter spam.",
     feature6_title: "Sahara 24/7 AI Companion",
     feature6_desc: "Caring, multi-lingual emergency support assistant available around the clock.",
@@ -188,7 +188,7 @@ export const translations = {
     contact_phone_label: "Contact Phone Number *",
     disaster_details_label: "Disaster Relief Supplies Needed",
     disaster_details_placeholder: "E.g., Drinking water (500L), rescue boats, food packets",
-    demo_otp_notice: "Local Demo Verification: For demonstration, automatic phone verification code is 123456.",
+    demo_otp_notice: "Emergency Verification: Enter the in-app verification code generated for your contact number.",
     emergency_notice: "Before you request help: Please share correct information so we can coordinate the right assistance. Your details may be used to verify and respond to your request. External services may have separate charges; we'll inform you before arranging paid assistance whenever consent can be obtained. Deliberately false reports may lead to review and appropriate action. Your safety comes first. ❤️",
     btn_submit_report: "🚨 Submit Emergency Report",
     submitting_report: "Submitting & Classifying Emergency...",
@@ -291,7 +291,7 @@ export const translations = {
     tab_providers: "🏥 External Partners",
     tab_map: "🗺️ Live Mysuru Map",
     tab_simulation: "🎯 Shortage Challenge",
-    tab_verification: "🔍 Trust & Duplicates",
+    tab_verification: "🔍 Trust & Verification",
     tab_disaster: "🌊 Disaster Relief",
     tab_analytics: "📈 Analytics & ML",
 
@@ -328,7 +328,7 @@ export const translations = {
     command_centre_subtitle: "Real-time incident triage, capability matching, shortage alerts, and partner coordination across Mysuru.",
     admin_role: "Coordinator",
     refreshing: "Refreshing...",
-    reset_demo_state: "Reset Demo State",
+    reset_demo_state: "Reset Simulation",
     built_with_care: "Built with care for emergency decision-support.",
     quick_links: "Portals & Services",
     command_support_title: "Coordinator Support",
@@ -366,9 +366,9 @@ export const translations = {
     contact_phone_label: "Contact Phone Number",
     submit_emergency_btn: "Submit Emergency Request",
     submitting: "Submitting Incident...",
-    demo_otp_title: "Local Demo Verification Mode",
-    demo_otp_desc: "For faculty demonstration, phone OTP code is pre-authorized: 123456.",
-    pre_authorized: "Demo Authorized",
+    demo_otp_title: "Emergency Contact Verification",
+    demo_otp_desc: "An emergency verification code is generated for your contact number upon submission.",
+    pre_authorized: "Simulated Verification",
     report_failed: "Failed to submit emergency report.",
     err_desc_required: "Please provide a brief description of what happened (at least 5 characters).",
     err_loc_required: "Please specify the location or landmark.",
@@ -448,6 +448,288 @@ export const translations = {
     comments_label: "Comments or Coordinator Notes",
     faq_categories_question: "What emergency categories are supported?",
     faq_charge_question: "Does CareOn charge any coordination fees?",
+    // Privacy Policy
+    privacy_title: "Privacy, Terms & Responsible Prototype Disclosure",
+    privacy_updated: "Last updated: Prototype Demonstration Version 2026",
+    privacy_sec1_title: "1. Educational Decision-Support Prototype Notice",
+    privacy_sec1_desc: "CareOn is an intelligent emergency resource coordination prototype developed for academic demonstration and faculty review. CareOn is NOT an official emergency service, municipal 911/112 operator, police service, or replacement for government emergency dispatchers.",
+    privacy_sec2_title: "2. Cost Transparency & ₹0 Platform Fee",
+    privacy_sec2_desc: "CareOn does not charge citizens any commission or platform fee for requesting emergency help. If platform resources are unavailable and an external private provider is engaged, the coordinator transparently displays the quotation and requests informed user consent before dispatching paid assistance.",
+    privacy_sec3_title: "3. Data Retention & Responsible Handling",
+    privacy_sec3_item1: "Contact details and coordinates are only collected to coordinate relevant specialist assistance.",
+    privacy_sec3_item2: "Passwords are encrypted with PBKDF2-HMAC-SHA256 salts.",
+    privacy_sec3_item3: "All phone numbers in seeded demonstrations are safe fictional demo numbers.",
+    privacy_sec3_item4: "Normal users cannot inspect another user's private incident details.",
+    privacy_sec3_item5: "Administrators have role-protected command centre access with audit logging.",
+    privacy_sec4_title: "4. Sahara Emergency Companion Boundaries",
+    privacy_sec4_desc: "Sahara is a rule-based AI companion designed to provide supportive guidance and help track emergency requests. Sahara does NOT diagnose medical conditions, prescribe medication, or invent dispatch arrival times. For immediate life threats, citizens are directed to official emergency hotlines (112 / 108).",
+
+    // Notification Drawer
+    notification_centre_title: "Notification Centre",
+    no_notifications_desc: "No notifications yet. Updates will appear here in real time.",
+    mark_read: "Mark Read",
+    dismiss: "Dismiss",
+    view_in_drawer: "View in Bell",
+    refresh_failed: "Failed to refresh live data from server.",
+    updated_just_now: "Updated just now",
+    acknowledge_alert: "Acknowledge & Silence",
+    new_emergency_alert: "🚨 New Emergency Alert: Immediate Action Required",
+    alert_acknowledged: "Alert acknowledged and silenced.",
+    sound_enabled: "Sound: On",
+    sound_disabled: "Sound: Off",
+    view_incident_triage: "View & Triage",
+
+    // Admin Dashboard Sections & Cards
+    active_incident_queue_title: "Active Incident Priority Queue",
+    btn_view_all: "View All",
+    fleet_availability_title: "Fleet Availability & Immediate Shortages",
+    fleet_categories_label: "Fleet Categories:",
+    critical_shortage_detected: "⚠️ Critical Shortage Detected:",
+    incident_mgmt_title: "Incident Management & Verification Queue",
+    duplicate_flag_badge: "Duplicate Flag",
+    fleet_mgmt_title: "Emergency Fleet Management",
+    fleet_mgmt_desc: "Monitor vehicle availability, maintenance states, and current active assignments. Double-assignment is prevented at the database transaction layer.",
+    smart_allocation_engine_title: "Smart Resource Allocation Engine",
+    smart_allocation_engine_desc: "Evaluates incident urgency, capability match, and geographic travel time while strictly enforcing conflict prevention.",
+    active_shortages_mgmt_title: "Active Resource Shortage Management",
+    active_shortages_mgmt_desc: "When city fleet resources are depleted, CareOn recommends engaging external partner hospitals or private ambulances.",
+    no_active_shortages_msg: "✓ No active fleet shortages at this time. All active calls have available response units.",
+    external_providers_dir_title: "Registered Partners & External Providers Directory",
+    external_providers_dir_desc: "CareOn operates with a partner-first fallback strategy. An external provider quotation requires informed user consent before dispatch confirmation.",
+    registered_partner_badge: "Registered Partner",
+    fallback_dir_badge: "Fallback Directory",
+    live_map_dispatch_title: "Live Geographical Dispatch & Tracking",
+    live_map_dispatch_desc: "OpenStreetMap Leaflet visualization showing active emergency pins, available units, and partner facilities.",
+    simulation_expo_title: "🎯 Resource Shortage Challenge — Interactive Walkthrough",
+    simulation_expo_desc: "This interactive walkthrough demonstrates CareOn's core coordination capabilities: multi-incident prioritization, conflict prevention, shortage detection, and external provider coordination.",
+    trust_review_title: "Reporter Verification & Trust Review",
+    trust_review_desc: "CareOn assesses trust signals (phone format, OTP verification, proximity duplicates, reporting history) to prevent deliberate misuse without deterring genuine citizens.",
+    disaster_mgmt_title: "🌊 Disaster Management & Mass Casualty Extension",
+    disaster_mgmt_desc: "Tracking supplies (food, drinking water, family tents) and coordination for large-scale urban flooding or structural collapse.",
+    available_relief_assets_title: "Available Relief Assets",
+    ml_predictor_title: "📊 Rule-Based Resource Shortage Risk Predictor",
+    ml_predictor_desc: "Calculates estimated demand surges by zone, time-of-day multipliers, and active fleet buffer.",
+    ml_predictor_notice: "Notice: Rule-based demand estimation model for coordinator decision support. Not an official municipal emergency forecast.",
+
+    // Badges & Verifications
+    flagged_duplicate_badge: "Flagged Proximity Duplicate",
+    unique_incident_badge: "✓ Unique Incident",
+    genuine_incident_badge: "Genuine Incident",
+    awaiting_otp_label: "Awaiting OTP",
+    verified_label: "✓ Verified",
+
+    // KPIs
+    kpi_avg_rating: "AVG COORDINATOR RATING",
+    kpi_from_reviews: "From 14 verified reporter reviews",
+    kpi_avg_eta: "ESTIMATED AVERAGE ETA",
+    kpi_eta_context: "Urban corridor with 1.25x traffic factor",
+    kpi_conflict_rate: "CONFLICT PREVENTION RATE",
+    kpi_zero_double: "0 double-assignments recorded",
+
+    // Admin Details Modal
+    lbl_category: "Category",
+    lbl_description: "Description",
+    lbl_location: "Location",
+    lbl_casualties: "Casualties / Affected",
+    lbl_help_requested: "Help Requested",
+    lbl_contact: "Contact",
+    lbl_initial_priority_reason: "Initial Priority Reason",
+    lbl_coordinator_priority_adj: "Coordinator Priority Adjustment",
+    lbl_available_fleet_units: "Available Fleet Units (Direct Assignment):",
+
+    // Table Headers
+    th_verified: "Verified",
+    th_incident_code: "Incident Code",
+    th_contact_person: "Contact Person",
+    th_phone_number: "Phone Number",
+    th_otp_status: "OTP Status",
+    th_duplicate_check: "Duplicate Check",
+    th_trust_decision: "Trust Decision",
+    th_zone: "Geographic Zone",
+    th_predicted_risk: "Predicted Shortage Risk",
+    th_risk_score: "Risk Score",
+    th_resource_in_demand: "Resource in Demand",
+    th_time_context: "Time Context",
+    th_recommended_action: "Recommended Coordinator Action",
+
+    // Buttons
+    btn_details: "Details",
+    btn_mark_available: "Mark Available",
+    btn_set_maintenance: "Set Maintenance",
+    btn_simulate_partner_contact: "Simulate Partner Contact",
+    btn_simulate_contact_quote: "Simulate Contact & Quotation",
+    btn_pause_movement: "⏸ Pause Movement Simulation",
+    btn_simulate_movement: "▶ Simulate Live Dispatch Movement",
+    btn_reset_scenario: "↺ Reset Scenario to Step 1",
+    btn_assign_prefix: "+ Assign",
+    btn_dispatch_relief_van: "Dispatch Disaster Relief Supply Van 01",
+    btn_save_priority_change: "Save Priority Change",
+
+    // Simulation Steps
+    sim_step1_title: "Step 1: Multiple Simultaneous Emergencies Loaded",
+    sim_step1_desc: "Three simultaneous emergencies are active across Mysuru (Sayyaji Rao Road cardiac arrest, Kuvempunagar road accident, and Gokulam kitchen fire).",
+    sim_step2_title: "Step 2: Fleet Constrained (Only 1 Ambulance Available)",
+    sim_step2_desc: "Ambulance 01 is assigned to CARE-2026-101. Ambulance 03 is in maintenance. Only CityCare Ambulance 02 remains in the active fleet.",
+    sim_step3_title: "Step 3: Run Allocation & Demonstrate Conflict Prevention",
+    sim_step3_desc: "The smart allocator awards the remaining ambulance to the highest priority call. The system strictly blocks assigning the occupied ambulance to another active incident.",
+    sim_step4_title: "Step 4: Shortage Alert & Partner Enquiry",
+    sim_step4_desc: "CARE-2026-103 experiences a critical fleet shortage. Contact the registered partner (CityCare Private Fleet) and record the quotation (₹1,500).",
+
+    // Quotation & Tracking Labels
+    lbl_ext_quotation: "External Partner Quotation",
+    lbl_subsidy_amount: "Subsidy / NGO Sponsorship",
+    lbl_net_payable: "Net Payable to Service Provider",
+    contact_label: "Contact",
+    mins_label: "mins",
+
+    // Badges & Common
+    urgent_badge: "URGENT",
+    live_badge: "LIVE",
+    ai_badge: "24/7 AI",
+    sahara_safe_companion_desc: "Sahara provides coordination support. For life-threatening emergencies, dial 112 immediately.",
+    backend_service_status: "Backend Service Status",
+    role_admin: "Admin",
+    role_user: "User",
+    language_selector: "Language Selector",
+    national_helpline_label: "National Helpline",
+    coordination_email_label: "Coordination",
+    mysuru_command_region: "Mysuru Command Region, Karnataka, India",
+
+    // Map Picker & Legend
+    map_picker_hint: "📍 Click map or drag pin to select exact Mysuru coordinates",
+    lat_label: "Lat",
+    lon_label: "Lon",
+    map_legend_incidents: "Emergency Incidents",
+    map_legend_available: "Available Fleet",
+    map_legend_dispatched: "Dispatched Units",
+    map_legend_partners: "Partner Hospitals & NGOs",
+    map_simulation_active: "Vehicle Movement Active",
+    map_center_label: "Mysuru City Region (12.3052° N, 76.6552° E)",
+
+    // Notification Titles & System Terms
+    "Emergency Request Received": "Emergency Request Received",
+    "Ambulance Dispatched": "Ambulance Dispatched",
+    "Assistance Search Started": "Assistance Search Started",
+    "Provider Contacted": "Provider Contacted",
+    "Provider Quoted": "Provider Quoted",
+    "Consent Accepted": "Consent Accepted",
+    "Incident Resolved": "Incident Resolved",
+    "Request Cancelled": "Request Cancelled",
+    "Cancellation Acknowledged": "Cancellation Acknowledged",
+    "Emergency OTP Verified": "Emergency OTP Verified",
+    "Medical Tele-triage Callback Requested": "Medical Tele-triage Callback Requested",
+    "Doctor Callback Status Updated": "Doctor Callback Status Updated",
+    "New Incident Reported": "New Incident Reported",
+    "Incident Needs Review": "Incident Needs Review",
+    "Shortage Alert": "Shortage Alert",
+    "Duplicate Flagged": "Duplicate Flagged",
+    "Urgent Action Required": "Urgent Action Required",
+    "Under Maintenance": "Under Maintenance",
+    "Available": "Available",
+    "Assigned": "Assigned",
+    "Dispatched": "Dispatched",
+    "System": "System",
+    "Coordinator": "Coordinator",
+    "Reporter": "Reporter",
+
+
+    // Stage 5 & 6: Sahara Voice & Personalized Greetings
+    voice_input_tooltip: "Voice input (Speak to Sahara)",
+    voice_listening: "Listening... Speak now",
+    voice_unsupported: "Voice input is not supported in this browser",
+    voice_permission_error: "Microphone access denied or unavailable",
+    personalized_greeting_prefix: "Hey",
+
+    // Stage 5 & 6: Simulated In-App OTP Verification
+    otp_verification_title: "Emergency Contact Verification (Simulated In-App OTP)",
+    otp_verification_desc: "A secure verification code was generated for your contact number. Enter the 6-digit code below to confirm this report.",
+    simulated_otp_display: "Simulated Code:",
+    enter_otp_placeholder: "Enter 6-digit code",
+    btn_verify_otp: "Verify Code",
+    btn_request_new_otp: "Request New Code",
+    otp_verified_badge: "✓ Phone Contact Verified",
+    otp_verifying: "Verifying...",
+    otp_success_msg: "Emergency contact phone verified successfully.",
+
+    // Stage 5 & 6: Doctor Tele-Triage Callback
+    doctor_callback_title: "Doctor Tele-Triage Callback",
+    doctor_callback_desc: "Request an urgent tele-triage consultation with an on-call medical advisor while responders coordinate.",
+    btn_request_callback: "Request Doctor Callback",
+    chief_complaint_label: "Chief Complaint / Urgent Symptoms",
+    chief_complaint_placeholder: "Describe patient condition (e.g. chest tightness, high fever with breathlessness)...",
+    callback_disclaimer: "Doctor callbacks provide tele-triage guidance for urgent concerns. For acute, life-threatening danger, dial 112 immediately.",
+    callback_status_pending: "Callback Requested (Awaiting Coordinator Review)",
+    callback_status_in_progress: "Callback In Progress (Doctor Contacting)",
+    callback_status_contacted: "Citizen Contacted by Medical Advisor",
+    callback_status_completed: "Tele-Triage Consultation Completed",
+    tab_doctor_callbacks: "🩺 Doctor Callbacks",
+    th_chief_complaint: "Chief Complaint",
+    th_callback_status: "Callback Status",
+    btn_mark_in_progress: "Mark In Progress",
+    btn_mark_contacted: "Mark Contacted",
+    btn_mark_completed: "Mark Completed",
+
+    // Stage 5 & 6: Official Direct Emergency Line
+    direct_emergency_line: "Official Emergency Services",
+
+    // Arrival Tracker
+    arrival_tracker_title: "Help is on the way!",
+    arrival_tracker_subtitle: "Your emergency response vehicle has been dispatched and is moving toward your location.",
+    arrival_tracker_eta: "Estimated Arrival",
+    arrival_tracker_mins: "mins",
+    arrival_tracker_unit: "Assigned Unit",
+    arrival_tracker_demo_badge: "DEMO SIMULATION",
+    arrival_tracker_live_badge: "LIVE GPS",
+    arrival_confirm_btn: "Confirm Help Arrived",
+    arrival_confirm_dialog: "Did the emergency response unit arrive at your location?",
+    arrival_stage_received: "Request Received",
+    arrival_stage_dispatched: "Unit Dispatched",
+    arrival_stage_enroute: "On Route",
+    arrival_stage_arrived: "Arrived at Scene",
+    arrival_tracker_map_preview: "Live Route Preview",
+    enlarge_map_btn: "Enlarge Map",
+    close_map_btn: "Close Map",
+    enlarged_map_title: "Emergency Response Route & Tracker",
+    stay_safe_title: "Stay Safe While You Wait",
+    safety_tips_paused: "Paused on interaction",
+    safety_tip_med_1: "Keep the person comfortable and avoid unnecessary movement if seriously injured.",
+    safety_tip_med_2: "Ensure clear airflow around the person and loosen tight clothing.",
+    safety_tip_med_3: "Stay calm, keep your phone line free, and prepare any known medical history for responders.",
+    safety_tip_fire_1: "Move away from smoke and fire immediately. Do not use lifts or elevators.",
+    safety_tip_fire_2: "Stay low under smoke where the air is cooler and cleaner.",
+    safety_tip_fire_3: "Never re-enter a burning building to retrieve belongings.",
+    safety_tip_road_1: "Stay away from moving traffic and wait in a safe, visible spot on the sidewalk.",
+    safety_tip_road_2: "Turn on vehicle hazard lights if possible to warn oncoming drivers.",
+    safety_tip_road_3: "Do not move severely injured victims unless there is immediate risk of fire or collision.",
+    safety_tip_flood_1: "Move to higher ground immediately and avoid walking or driving through floodwater.",
+    safety_tip_flood_2: "Stay clear of fallen electrical poles, wires, and structurally damaged walls.",
+    safety_tip_flood_3: "Keep a torch, drinking water, and fully charged phone ready while waiting for rescue.",
+    safety_tip_rescue_1: "Stay in a stable, clear location away from falling debris or unstable structures.",
+    safety_tip_rescue_2: "Make noise or signal with light if trapped, but avoid shouting unnecessarily to conserve energy.",
+    safety_tip_rescue_3: "Keep access routes clear for the incoming rescue and search team.",
+    safety_tip_gen_1: "Stay in a well-lit, populated location if possible until help arrives.",
+    safety_tip_gen_2: "Keep your phone line free so the emergency crew or coordinator can call you.",
+    safety_tip_gen_3: "Have someone watch for the vehicle and wave to guide responders to the exact scene.",
+
+    // Call a Doctor
+    call_doctor_title: "Call a Doctor",
+    call_doctor_subtitle: "Connect with on-call medical triage or request an immediate doctor callback.",
+    call_doctor_btn: "Request Urgent Doctor Call",
+    call_doctor_direct_108: "Call 108 Medical Ambulance",
+    call_doctor_notes_placeholder: "Describe patient condition or urgent symptoms (optional)",
+    call_doctor_success: "Doctor call request submitted. Medical advisor will contact you shortly.",
+    doctor_calling_unavailable: "Doctor calling is currently unavailable. For medical emergencies, dial 112 directly.",
+
+    // Coordinator Persistent Notifications
+    admin_notifications_title: "Coordinator Alerts",
+    admin_notifications_mark_all: "Mark All as Read",
+    admin_notifications_empty: "No coordinator notifications yet.",
+
+    // Multi-factor Smart Allocation
+    alloc_score_label: "Confidence Score",
+    alloc_auto_dispatch: "Safe for Auto-Dispatch",
+    alloc_admin_review: "Requires Coordinator Review",
+    alloc_algorithm_badge: "Rule-Based Multi-Factor Scoring Engine",
   },
   hi: {
     // Brand & Identity
@@ -520,77 +802,77 @@ export const translations = {
     feat_transparency_desc: "CareOn हमेशा ₹0 शुल्क लेता है। बाहरी निजी प्रदाताओं के शुल्क के लिए उपयोगकर्ता की स्पष्ट सहमति आवश्यक है।",
 
     // Auth & Navigation
-    user_login_title: "Citizen Portal Login",
-    user_login_subtitle: "Access your reported emergencies, live tracking, and emergency alerts.",
-    user_register_title: "Create Citizen Account",
-    user_register_subtitle: "Register to maintain private emergency records and receive coordinated updates.",
-    admin_login_title: "Command Centre Login",
-    admin_login_subtitle: "Authorized access for emergency coordinators and administrators.",
-    admin_login_btn: "Access Command Centre",
-    email_label: "Email Address",
-    email_placeholder: "Enter your email",
-    password_label: "Password",
-    password_placeholder: "Create a secure password",
-    confirm_password_label: "Confirm Password",
-    confirm_password_placeholder: "Confirm your password",
-    full_name_label: "Full Name",
-    full_name_placeholder: "Enter your full name",
-    phone_label: "Phone Number",
-    phone_placeholder: "Enter your phone number",
-    sign_in_btn: "Sign In",
-    create_account_btn: "Create Account",
-    demo_account_hint: "Fast Evaluation Demo Credentials",
-    fill_demo_user: "Fill Citizen Demo",
-    fill_demo_admin: "Fill Coordinator Demo",
-    no_account_prompt: "Don't have an account?",
-    register_link: "Register here",
+    user_login_title: "नागरिक पोर्टल लॉगिन",
+    user_login_subtitle: "अपनी दर्ज की गई आपात स्थितियों, लाइव ट्रैकिंग और आपातकालीन अलर्ट तक पहुंचें।",
+    user_register_title: "नागरिक खाता बनाएं",
+    user_register_subtitle: "निजी आपातकालीन रिकॉर्ड बनाए रखने और समन्वित अपडेट प्राप्त करने के लिए पंजीकरण करें।",
+    admin_login_title: "कमांड सेंटर लॉगिन",
+    admin_login_subtitle: "आपातकालीन समन्वयकों और व्यवस्थापकों के लिए अधिकृत पहुंच।",
+    admin_login_btn: "कमांड सेंटर में प्रवेश करें",
+    email_label: "ईमेल पता",
+    email_placeholder: "अपना ईमेल दर्ज करें",
+    password_label: "पासवर्ड",
+    password_placeholder: "एक सुरक्षित पासवर्ड बनाएं",
+    confirm_password_label: "पासवर्ड की पुष्टि करें",
+    confirm_password_placeholder: "अपने पासवर्ड की पुष्टि करें",
+    full_name_label: "पूरा नाम",
+    full_name_placeholder: "अपना पूरा नाम दर्ज करें",
+    phone_label: "फ़ोन नंबर",
+    phone_placeholder: "अपना फ़ोन नंबर दर्ज करें",
+    sign_in_btn: "साइन इन करें",
+    create_account_btn: "खाता बनाएं",
+    demo_account_hint: "त्वरित मूल्यांकन डेमो क्रेडेंशियल्स",
+    fill_demo_user: "नागरिक डेमो क्रेडेंशियल भरें",
+    fill_demo_admin: "समन्वयक डेमो क्रेडेंशियल भरें",
+    no_account_prompt: "क्या आपका खाता नहीं है?",
+    register_link: "यहाँ पंजीकरण करें",
     already_have_account: "Already have an account?",
-    coordinator_access_hint: "Are you an emergency coordinator?",
-    admin_login_link: "Coordinator Login",
-    looking_for_user_portal: "Looking for Citizen Portal?",
-    fill_all_fields: "Please fill in all required fields.",
-    invalid_credentials: "Invalid email or password.",
-    admin_unauthorized: "Access denied. Administrator privileges required.",
-    login_success: "Login successful! Redirecting...",
-    register_success: "Account created successfully! Redirecting...",
-    password_mismatch: "Passwords do not match.",
-    loading: "Loading...",
-    logout_btn: "Logout Session",
+    coordinator_access_hint: "क्या आप आपातकालीन समन्वयक हैं?",
+    admin_login_link: "समन्वयक लॉगिन",
+    looking_for_user_portal: "क्या आप नागरिक पोर्टल तलाश रहे हैं?",
+    fill_all_fields: "कृपया सभी आवश्यक फ़ील्ड भरें।",
+    invalid_credentials: "अमान्य ईमेल या पासवर्ड।",
+    admin_unauthorized: "पहुंच अस्वीकृत। व्यवस्थापक विशेषाधिकार आवश्यक हैं।",
+    login_success: "लॉगिन सफल! पुनर्निर्देशित किया जा रहा है...",
+    register_success: "खाता सफलतापूर्वक बनाया गया! पुनर्निर्देशित किया जा रहा है...",
+    password_mismatch: "पासवर्ड मेल नहीं खाते।",
+    loading: "लोड हो रहा है...",
+    logout_btn: "सत्र से लॉगआउट करें",
 
     // User Dashboard
-    authenticated_citizen_badge: "Verified Citizen Account",
-    welcome_back: "Welcome,",
-    refresh_feed: "Refresh Feed",
-    refresh: "Refresh",
-    feed_refreshed: "Feed refreshed successfully with live incident data.",
-    my_requests_title: "My Emergency Incidents",
-    btn_report_new: "Report New Emergency",
-    no_incidents_title: "No Active Emergency Incidents",
-    no_incidents_desc: "You have not submitted any emergency requests yet. If you require medical, fire or rescue assistance, report an incident anytime.",
-    track_incident_btn: "Track Live",
-    recent_notifications: "My Notifications",
-    no_notifications: "No new notifications.",
-    helpline_alert_title: "National Emergency Helpline",
-    helpline_alert_desc: "For immediate life-threatening situations, also dial 112 directly.",
-    dial_112_btn: "Call 112",
-    feedback: "Feedback",
+    authenticated_citizen_badge: "सत्यापित नागरिक खाता",
+    welcome_back: "स्वागत है,",
+    refresh_feed: "फ़ीड रीफ़्रेश करें",
+    refresh: "रीफ़्रेश करें",
+    feed_refreshed: "लाइव घटना डेटा के साथ फ़ीड सफलतापूर्वक रीफ़्रेश किया गया।",
+    my_requests_title: "मेरी आपातकालीन घटनाएं",
+    btn_report_new: "नया आपातकाल रिपोर्ट करें",
+    no_incidents_title: "कोई सक्रिय आपातकालीन घटना नहीं",
+    no_incidents_desc: "आपने अभी तक कोई आपातकालीन अनुरोध प्रस्तुत नहीं किया है। यदि आपको चिकित्सा, अग्नि या बचाव सहायता की आवश्यकता है, तो कभी भी घटना की रिपोर्ट करें।",
+    track_incident_btn: "लाइव ट्रैक करें",
+    recent_notifications: "मेरी सूचनाएं",
+    no_notifications: "कोई नई सूचना नहीं है।",
+    helpline_alert_title: "राष्ट्रीय आपातकालीन हेल्पलाइन",
+    helpline_alert_desc: "तात्कालिक जानलेवा परिस्थितियों के लिए, सीधे 112 पर भी डायल करें।",
+    dial_112_btn: "112 पर कॉल करें",
+    feedback: "प्रतिक्रिया",
 
     // Home & Features
-    how_it_works_title: "How CareOn Works",
-    feature1_title: "Multi-Resource Fleet Dispatch",
-    feature1_desc: "Coordinates ALS ambulances, trauma teams, fire engines, and rescue boats from nearest bases.",
-    feature2_title: "Shortage Alerting & Partner Fallback",
-    feature2_desc: "Automatically queries registered private hospitals and volunteer NGOs when municipal resources are occupied.",
-    feature3_title: "Conflict Prevention Engine",
-    feature3_desc: "Ensures no vehicle is double-assigned across concurrent emergencies with real-time lock verification.",
-    feature4_title: "Predictive Surge Risk Analytics",
-    feature4_desc: "Forecasts resource demand based on demographic density, weather conditions, and historical trends.",
-    feature5_title: "End-to-End Privacy & Verification",
-    feature5_desc: "Citizen health records remain strictly confidential with OTP verification to deter spam.",
-    feature6_title: "Sahara 24/7 AI Companion",
-    feature6_desc: "Caring, multi-lingual emergency support assistant available around the clock.",
-    zero_commission_title: "₹0 Platform Fee — Transparent Emergency Coordination",
-    zero_commission_desc: "CareOn charges ₹0 platform fee. If private providers charge a fee, coordinators present quotations for explicit citizen consent.",
+    how_it_works_title: "CareOn कैसे काम करता है",
+    feature1_title: "त्वरित आपातकालीन प्रेषण",
+    feature1_desc: "निकटतम केंद्रों से एएलएस एम्बुलेंस, ट्रॉमा टीमों, दमकल गाड़ियों और बचाव वाहनों का समन्वय करता है।",
+    feature2_title: "बैकअप मदद और साझेदार नेटवर्क",
+    feature2_desc: "यदि सरकारी एम्बुलेंस व्यस्त हैं, तो तुरंत सत्यापित निजी अस्पतालों और सहायकों से संपर्क करता है।",
+    feature3_title: "सटीक वाहन आवंटन",
+    feature3_desc: "वास्तविक समय लॉक सत्यापन के साथ यह सुनिश्चित करता है कि समवर्ती आपात स्थितियों में कोई भी वाहन दोहरा आवंटित न हो।",
+    feature4_title: "स्मार्ट संसाधन योजना",
+    feature4_desc: "जनसांख्यिकीय घनत्व, मौसम की स्थिति और रुझानों के आधार पर संसाधन मांग का अनुमान लगाता है।",
+    feature5_title: "सुरक्षित और निजी आपातकालीन मदद",
+    feature5_desc: "स्पैम को रोकने के लिए ओटीपी सत्यापन के साथ नागरिकों के स्वास्थ्य रिकॉर्ड पूरी तरह से गोपनीय रहते हैं।",
+    feature6_title: "सहारा 24/7 एआई साथी",
+    feature6_desc: "चौबीसों घंटे उपलब्ध संवेदनशील, बहुभाषी आपातकालीन सहायता सहायक।",
+    zero_commission_title: "₹0 प्लेटफ़ॉर्म शुल्क — पारदर्शी आपातकालीन समन्वय",
+    zero_commission_desc: "CareOn ₹0 प्लेटफ़ॉर्म शुल्क लेता है। यदि निजी प्रदाता शुल्क लेते हैं, तो समन्वयक नागरिक की स्पष्ट सहमति के लिए कोटेशन प्रस्तुत करते हैं।",
 
     // User Portal & Auth
     login_title_user: "नागरिक पोर्टल लॉगिन",
@@ -638,7 +920,7 @@ export const translations = {
     contact_phone_label: "संपर्क फ़ोन नंबर *",
     disaster_details_label: "आवश्यक आपदा राहत सामग्री",
     disaster_details_placeholder: "उदा., पीने का पानी (500L), बचाव नौकाएं, भोजन के पैकेट",
-    demo_otp_notice: "स्थानीय डेमो सत्यापन: प्रदर्शन के लिए स्वचालित फ़ोन कोड 123456 है।",
+    demo_otp_notice: "आपातकालीन सत्यापन: अपने संपर्क नंबर के लिए उत्पन्न इन-ऐप सत्यापन कोड दर्ज करें।",
     emergency_notice: "मदद मांगने से पहले: कृपया सही जानकारी साझा करें ताकि हम सही सहायता का समन्वय कर सकें। वास्तविक सहमति मिलने पर ही सशुल्क निजी सेवाओं की व्यवस्था की जाएगी। जानबूझकर झूठी रिपोर्टों पर समीक्षा की जा सकती है। आपकी सुरक्षा हमारी प्राथमिकता है। ❤️",
     btn_submit_report: "🚨 आपातकालीन रिपोर्ट भेजें",
     submitting_report: "आपातकाल सबमिट व वर्गीकृत किया जा रहा है...",
@@ -741,7 +1023,7 @@ export const translations = {
     tab_providers: "🏥 बाहरी साझेदार",
     tab_map: "🗺️ मैसूर लाइव मैप",
     tab_simulation: "🎯 कमी चुनौती (डेमो)",
-    tab_verification: "🔍 विश्वास व डुप्लिकेट",
+    tab_verification: "🔍 विश्वास व सत्यापन",
     tab_disaster: "🌊 आपदा राहत",
     tab_analytics: "📈 एनालिटिक्स व एमएल",
 
@@ -778,7 +1060,7 @@ export const translations = {
     command_centre_subtitle: "मैसूरु भर में रीयल-टाइम आपातकालीन घटना छंटाई, क्षमता मिलान, संसाधन कमी अलर्ट और भागीदार समन्वय।",
     admin_role: "समन्वयक",
     refreshing: "ताज़ा हो रहा है...",
-    reset_demo_state: "डेमो रीसेट करें",
+    reset_demo_state: "सिमुलेशन रीसेट करें",
     built_with_care: "आपातकालीन निर्णय-समर्थन के लिए विशेष रूप से निर्मित।",
     quick_links: "पोर्टल और सेवाएं",
     command_support_title: "समन्वयक सहायता",
@@ -816,9 +1098,9 @@ export const translations = {
     contact_phone_label: "संपर्क फोन नंबर",
     submit_emergency_btn: "आपातकालीन अनुरोध दर्ज करें",
     submitting: "अनुरोध दर्ज हो रहा है...",
-    demo_otp_title: "स्थानीय डेमो सत्यापन मोड",
-    demo_otp_desc: "मूल्यांकन प्रदर्शन के लिए, फोन ओटीपी कोड पहले से स्वीकृत है: 123456।",
-    pre_authorized: "डेमो अधिकृत",
+    demo_otp_title: "आपातकालीन संपर्क सत्यापन",
+    demo_otp_desc: "सबमिट करने पर आपके संपर्क नंबर के लिए एक आपातकालीन सत्यापन कोड उत्पन्न होता है।",
+    pre_authorized: "सिम्युलेटेड सत्यापन",
     report_failed: "आपातकालीन रिपोर्ट दर्ज करने में विफल।",
     err_desc_required: "कृपया घटना का संक्षिप्त विवरण दें (कम से कम 5 अक्षर)।",
     err_loc_required: "कृपया स्थान या लैंडमार्क निर्दिष्ट करें।",
@@ -898,6 +1180,288 @@ export const translations = {
     comments_label: "टिप्पणियां या समन्वयक नोट्स",
     faq_categories_question: "कौन सी आपातकालीन श्रेणियां समर्थित हैं?",
     faq_charge_question: "क्या CareOn समन्वय के लिए कोई शुल्क लेता है?",
+    // Privacy Policy
+    privacy_title: "गोपनीयता, शर्तें और जिम्मेदार प्रोटोटाइप प्रकटीकरण",
+    privacy_updated: "अंतिम अद्यतन: प्रोटोटाइप प्रदर्शन संस्करण 2026",
+    privacy_sec1_title: "1. शैक्षिक निर्णय-समर्थन प्रोटोटाइप सूचना",
+    privacy_sec1_desc: "CareOn एक बुद्धिमान आपातकालीन संसाधन समन्वय प्रोटोटाइप है जिसे शैक्षणिक प्रदर्शन और संकाय समीक्षा के लिए विकसित किया गया है। CareOn कोई आधिकारिक आपातकालीन सेवा, नगरपालिका 911/112 ऑपरेटर, पुलिस सेवा या सरकारी आपातकालीन डिस्पैचर का प्रतिस्थापन नहीं है।",
+    privacy_sec2_title: "2. लागत पारदर्शिता और ₹0 प्लेटफ़ॉर्म शुल्क",
+    privacy_sec2_desc: "CareOn आपातकालीन सहायता का अनुरोध करने के लिए नागरिकों से कोई कमीशन या प्लेटफ़ॉर्म शुल्क नहीं लेता है। यदि प्लेटफ़ॉर्म संसाधन अनुपलब्ध हैं और किसी बाहरी निजी प्रदाता को शामिल किया जाता है, तो समन्वयक पारदर्शी रूप से उद्धरण प्रदर्शित करता है और सशुल्क सहायता भेजने से पहले उपयोगकर्ता की सूचित सहमति मांगता है।",
+    privacy_sec3_title: "3. डेटा प्रतिधारण और जिम्मेदार प्रबंधन",
+    privacy_sec3_item1: "संपर्क विवरण और निर्देशांक केवल प्रासंगिक विशेषज्ञ सहायता के समन्वय के लिए एकत्र किए जाते हैं।",
+    privacy_sec3_item2: "पासवर्ड PBKDF2-HMAC-SHA256 साल्ट के साथ एन्क्रिप्ट किए गए हैं।",
+    privacy_sec3_item3: "सीडेड प्रदर्शनों में सभी फ़ोन नंबर सुरक्षित काल्पनिक डेमो नंबर हैं।",
+    privacy_sec3_item4: "सामान्य उपयोगकर्ता किसी अन्य उपयोगकर्ता के निजी घटना विवरण का निरीक्षण नहीं कर सकते हैं।",
+    privacy_sec3_item5: "प्रशासकों के पास ऑडिट लॉगिंग के साथ भूमिका-संरक्षित कमांड सेंटर पहुंच है।",
+    privacy_sec4_title: "4. सहारा आपातकालीन साथी सीमाएं",
+    privacy_sec4_desc: "सहारा एक नियम-आधारित एआई साथी है जिसे सहायक मार्गदर्शन प्रदान करने और आपातकालीन अनुरोधों को ट्रैक करने में मदद करने के लिए डिज़ाइन किया गया है। सहारा चिकित्सा स्थितियों का निदान नहीं करता है, दवाएं नहीं लिखता है, या आगमन समय का आविष्कार नहीं करता है। तत्काल जीवन के खतरों के लिए, नागरिकों को आधिकारिक आपातकालीन हेल्पलाइन (112/108) पर निर्देशित किया जाता है।",
+
+    // Notification Drawer
+    notification_centre_title: "अधिसूचना केंद्र",
+    no_notifications_desc: "अभी तक कोई सूचना नहीं है। अद्यतन यहाँ वास्तविक समय में दिखाई देंगे।",
+    mark_read: "पढ़ा हुआ चिह्नित करें",
+    dismiss: "खारिज करें",
+    view_in_drawer: "बेल में देखें",
+    refresh_failed: "सर्वर से लाइव डेटा रीफ़्रेश करने में विफल।",
+    updated_just_now: "अभी अपडेट किया गया",
+    acknowledge_alert: "स्वीकार करें और म्यूट करें",
+    new_emergency_alert: "🚨 नया आपातकालीन अलर्ट: तत्काल कार्रवाई आवश्यक",
+    alert_acknowledged: "अलर्ट स्वीकार किया गया और म्यूट कर दिया गया।",
+    sound_enabled: "ध्वनि: चालू",
+    sound_disabled: "ध्वनि: बंद",
+    view_incident_triage: "देखें और ट्राइएज करें",
+
+    // Admin Dashboard Sections & Cards
+    active_incident_queue_title: "सक्रिय आपातकालीन प्राथमिकता कतार",
+    btn_view_all: "सभी देखें",
+    fleet_availability_title: "बेड़े की उपलब्धता और तत्काल कमी",
+    fleet_categories_label: "बेड़ा श्रेणियां:",
+    critical_shortage_detected: "⚠️ गंभीर कमी का पता चला:",
+    incident_mgmt_title: "आपातकालीन प्रबंधन और सत्यापन कतार",
+    duplicate_flag_badge: "डुप्लिकेट फ्लैग",
+    fleet_mgmt_title: "आपातकालीन बेड़ा प्रबंधन",
+    fleet_mgmt_desc: "वाहन उपलब्धता, रखरखाव की स्थिति और सक्रिय असाइनमेंट की निगरानी करें। डेटाबेस लेनदेन स्तर पर दोहराव को रोका जाता है।",
+    smart_allocation_engine_title: "स्मार्ट संसाधन आवंटन इंजन",
+    smart_allocation_engine_desc: "टकराव की रोकथाम करते हुए घटना की गंभीरता, क्षमता मिलान और यात्रा के समय का मूल्यांकन करता है।",
+    active_shortages_mgmt_title: "सक्रिय संसाधन कमी प्रबंधन",
+    active_shortages_mgmt_desc: "जब शहर के बेड़े के संसाधन समाप्त हो जाते हैं, तो CareOn बाहरी साझेदार अस्पतालों या निजी एम्बुलेंसों को शामिल करने की सिफारिश करता है।",
+    no_active_shortages_msg: "✓ इस समय कोई सक्रिय बेड़ा कमी नहीं है। सभी सक्रिय कॉलों के पास प्रतिक्रिया इकाइयां उपलब्ध हैं।",
+    external_providers_dir_title: "पंजीकृत साझेदार और बाहरी प्रदाता निर्देशिका",
+    external_providers_dir_desc: "CareOn साझेदार-प्राथमिकता रणनीति के साथ कार्य करता है। बाहरी प्रदाता के उद्धरण के लिए नागरिक की सहमति आवश्यक है।",
+    registered_partner_badge: "पंजीकृत साझेदार",
+    fallback_dir_badge: "बैकअप निर्देशिका",
+    live_map_dispatch_title: "लाइव भौगोलिक प्रेषण और ट्रैकिंग",
+    live_map_dispatch_desc: "सक्रिय आपातकालीन पिन, उपलब्ध इकाइयों और साझेदार सुविधाओं को प्रदर्शित करता हुआ ओपनस्ट्रीटमैप विज़ुअलाइज़ेशन।",
+    simulation_expo_title: "🎯 संसाधन कमी चुनौती — इंटरैक्टिव वॉकथ्रू",
+    simulation_expo_desc: "यह इंटरैक्टिव वॉकथ्रू CareOn की मुख्य समन्वय क्षमताओं को प्रदर्शित करता है: बहु-घटना प्राथमिकता, टकराव की रोकथाम, कमी का पता लगाना और बाहरी प्रदाता समन्वय।",
+    trust_review_title: "रिपोर्टर सत्यापन और विश्वास समीक्षा",
+    trust_review_desc: "CareOn जानबूझकर दुरुपयोग को रोकने के लिए विश्वास संकेतों (फ़ोन प्रारूप, ओटीपी, निकटता डुप्लिकेट, इतिहास) का आकलन करता है।",
+    disaster_mgmt_title: "🌊 आपदा प्रबंधन और सामूहिक हताहत विस्तार",
+    disaster_mgmt_desc: "शहरी बाढ़ या संरचनात्मक पतन के लिए आपूर्ति (भोजन, पेयजल, टेंट) और समन्वय का प्रबंधन।",
+    available_relief_assets_title: "उपलब्ध राहत संपत्तियां",
+    ml_predictor_title: "📊 नियम-आधारित संसाधन कमी जोखिम भविष्यवक्ता",
+    ml_predictor_desc: "ज़ोन, समय के अनुसार मांग में वृद्धि और सक्रिय बेड़े के बफर की गणना करता है।",
+    ml_predictor_notice: "सूचना: समन्वयक निर्णय समर्थन के लिए नियम-आधारित मांग अनुमान मॉडल। आधिकारिक नगरपालिका आपातकालीन पूर्वानुमान नहीं।",
+
+    // Badges & Verifications
+    flagged_duplicate_badge: "फ्लैग किया गया निकटता डुप्लिकेट",
+    unique_incident_badge: "✓ विशिष्ट आपातकाल",
+    genuine_incident_badge: "वास्तविक आपातकाल",
+    awaiting_otp_label: "ओटीपी की प्रतीक्षा है",
+    verified_label: "✓ सत्यापित",
+
+    // KPIs
+    kpi_avg_rating: "औसत समन्वयक रेटिंग",
+    kpi_from_reviews: "14 सत्यापित रिपोर्टर समीक्षाओं से",
+    kpi_avg_eta: "अनुमानित औसत आगमन समय (ETA)",
+    kpi_eta_context: "1.25x ट्रैफ़िक कारक वाला शहरी गलियारा",
+    kpi_conflict_rate: "टकराव रोकथाम दर",
+    kpi_zero_double: "0 दोहराव दर्ज किया गया",
+
+    // Admin Details Modal
+    lbl_category: "श्रेणी",
+    lbl_description: "विवरण",
+    lbl_location: "स्थान",
+    lbl_casualties: "हताहत / प्रभावित",
+    lbl_help_requested: "अनुरोधित सहायता",
+    lbl_contact: "संपर्क",
+    lbl_initial_priority_reason: "प्रारंभिक प्राथमिकता कारण",
+    lbl_coordinator_priority_adj: "समन्वयक प्राथमिकता समायोजन",
+    lbl_available_fleet_units: "उपलब्ध बेड़ा इकाइयां (प्रत्यक्ष असाइनमेंट):",
+
+    // Table Headers
+    th_verified: "सत्यापित",
+    th_incident_code: "घटना कोड",
+    th_contact_person: "संपर्क व्यक्ति",
+    th_phone_number: "फ़ोन नंबर",
+    th_otp_status: "ओटीपी स्थिति",
+    th_duplicate_check: "डुप्लिकेट जाँच",
+    th_trust_decision: "विश्वास निर्णय",
+    th_zone: "भौगोलिक क्षेत्र",
+    th_predicted_risk: "अनुमानित कमी जोखिम",
+    th_risk_score: "जोखिम स्कोर",
+    th_resource_in_demand: "मांग में संसाधन",
+    th_time_context: "समय संदर्भ",
+    th_recommended_action: "अनुशंसित समन्वयक कार्रवाई",
+
+    // Buttons
+    btn_details: "विवरण",
+    btn_mark_available: "उपलब्ध चिह्नित करें",
+    btn_set_maintenance: "रखरखाव सेट करें",
+    btn_simulate_partner_contact: "साझेदार संपर्क अनुकरण करें",
+    btn_simulate_contact_quote: "संपर्क और उद्धरण अनुकरण करें",
+    btn_pause_movement: "⏸ आंदोलन अनुकरण रोकें",
+    btn_simulate_movement: "▶ लाइव प्रेषण आंदोलन अनुकरण करें",
+    btn_reset_scenario: "↺ परिदृश्य को चरण 1 पर रीसेट करें",
+    btn_assign_prefix: "+ असाइन करें",
+    btn_dispatch_relief_van: "आपदा राहत आपूर्ति वैन 01 भेजें",
+    btn_save_priority_change: "प्राथमिकता परिवर्तन सहेजें",
+
+    // Simulation Steps
+    sim_step1_title: "चरण 1: कई समकालिक आपात स्थिति लोड की गई",
+    sim_step1_desc: "मैसूर भर में तीन समकालिक आपात स्थिति सक्रिय हैं (सयाजी राव रोड कार्डियक अरेस्ट, कुवेम्पुनगर सड़क दुर्घटना, और गोकुलम रसोई की आग)।",
+    sim_step2_title: "चरण 2: बेड़े की कमी (केवल 1 एम्बुलेंस उपलब्ध)",
+    sim_step2_desc: "एम्बुलेंस 01 CARE-2026-101 को सौंपी गई है। एम्बुलेंस 03 रखरखाव में है। सक्रिय बेड़े में केवल सिटीकेयर एम्बुलेंस 02 शेष है।",
+    sim_step3_title: "चरण 3: आवंटन चलाएं और टकराव रोकथाम प्रदर्शित करें",
+    sim_step3_desc: "स्मार्ट आवंटक शेष एम्बुलेंस को उच्चतम प्राथमिकता वाली कॉल को सौंपता है। सिस्टम व्यस्त एम्बुलेंस को किसी अन्य सक्रिय घटना को सौंपने से रोकता है।",
+    sim_step4_title: "चरण 4: कमी चेतावनी और साझेदार पूछताछ",
+    sim_step4_desc: "CARE-2026-103 एक गंभीर बेड़े की कमी का अनुभव करता है। पंजीकृत साझेदार से संपर्क करें और उद्धरण (₹1,500) दर्ज करें।",
+
+    // Quotation & Tracking Labels
+    lbl_ext_quotation: "बाहरी साझेदार उद्धरण",
+    lbl_subsidy_amount: "सब्सिडी / एनजीओ प्रायोजन",
+    lbl_net_payable: "सेवा प्रदाता को देय शुद्ध राशि",
+    contact_label: "संपर्क",
+    mins_label: "मिनट",
+
+    // Badges & Common
+    urgent_badge: "अत्यावश्यक",
+    live_badge: "लाइव",
+    ai_badge: "24/7 एआई",
+    sahara_safe_companion_desc: "सहारा समन्वय सहायता प्रदान करती है। जीवन के तत्काल खतरे में तुरंत 112 डायल करें।",
+    backend_service_status: "बैकएंड सेवा स्थिति",
+    role_admin: "प्रशासक",
+    role_user: "उपयोगकर्ता",
+    language_selector: "भाषा चयनकर्ता",
+    national_helpline_label: "राष्ट्रीय हेल्पलाइन",
+    coordination_email_label: "समन्वय",
+    mysuru_command_region: "मैसूर कमांड क्षेत्र, कर्नाटक, भारत",
+
+    // Map Picker & Legend
+    map_picker_hint: "📍 सटीक मैसूर निर्देशांक चुनने के लिए मानचित्र पर क्लिक करें या पिन खींचें",
+    lat_label: "अक्षांश",
+    lon_label: "देशांतर",
+    map_legend_incidents: "आपातकालीन घटनाएं",
+    map_legend_available: "उपलब्ध बेड़ा",
+    map_legend_dispatched: "भेजी गई इकाइयां",
+    map_legend_partners: "साझेदार अस्पताल और एनजीओ",
+    map_simulation_active: "वाहन आंदोलन सक्रिय",
+    map_center_label: "मैसूर शहर क्षेत्र (12.3052° N, 76.6552° E)",
+
+    // Notification Titles & System Terms
+    "Emergency Request Received": "आपातकालीन अनुरोध प्राप्त हुआ",
+    "Ambulance Dispatched": "एम्बुलेंस रवाना की गई",
+    "Assistance Search Started": "सहायता खोज शुरू हुई",
+    "Provider Contacted": "प्रदाता से संपर्क किया गया",
+    "Provider Quoted": "प्रदाता ने उद्धरण दिया",
+    "Consent Accepted": "सहमति स्वीकार की गई",
+    "Incident Resolved": "घटना हल हो गई",
+    "Request Cancelled": "अनुरोध रद्द किया गया",
+    "Cancellation Acknowledged": "रद्दीकरण स्वीकार किया गया",
+    "Emergency OTP Verified": "आपातकालीन ओटीपी सत्यापित",
+    "Medical Tele-triage Callback Requested": "मेडिकल टेली-ट्राइएज कॉलबैक का अनुरोध किया गया",
+    "Doctor Callback Status Updated": "डॉक्टर कॉलबैक स्थिति अपडेट की गई",
+    "New Incident Reported": "नई आपातकालीन घटना दर्ज की गई",
+    "Incident Needs Review": "घटना की समीक्षा आवश्यक है",
+    "Shortage Alert": "संसाधन कमी चेतावनी",
+    "Duplicate Flagged": "डुप्लिकेट फ्लैग किया गया",
+    "Urgent Action Required": "अत्यावश्यक कार्रवाई आवश्यक है",
+    "Under Maintenance": "रखरखाव में",
+    "Available": "उपलब्ध",
+    "Assigned": "असाइन किया गया",
+    "Dispatched": "रवाना किया गया",
+    "System": "सिस्टम",
+    "Coordinator": "समन्वयक",
+    "Reporter": "रिपोर्टर",
+
+
+    // Stage 5 & 6: Sahara Voice & Personalized Greetings
+    voice_input_tooltip: "आवाज़ इनपुट (सहारा से बोलें)",
+    voice_listening: "सुन रहा है... अब बोलें",
+    voice_unsupported: "इस ब्राउज़र में वॉइस इनपुट समर्थित नहीं है",
+    voice_permission_error: "माइक्रोफ़ोन एक्सेस अस्वीकृत या अनुपलब्ध है",
+    personalized_greeting_prefix: "नमस्ते",
+
+    // Stage 5 & 6: Simulated In-App OTP Verification
+    otp_verification_title: "आपातकालीन संपर्क सत्यापन (सिम्युलेटेड इन-ऐप ओटीपी)",
+    otp_verification_desc: "आपके संपर्क नंबर के लिए एक सुरक्षित सत्यापन कोड उत्पन्न किया गया है। इस रिपोर्ट की पुष्टि करने के लिए नीचे 6 अंकों का कोड दर्ज करें।",
+    simulated_otp_display: "सिम्युलेटेड कोड:",
+    enter_otp_placeholder: "6 अंकों का कोड दर्ज करें",
+    btn_verify_otp: "कोड सत्यापित करें",
+    btn_request_new_otp: "नया कोड प्राप्त करें",
+    otp_verified_badge: "✓ फ़ोन संपर्क सत्यापित",
+    otp_verifying: "सत्यापित हो रहा है...",
+    otp_success_msg: "आपातकालीन संपर्क फ़ोन सफलतापूर्वक सत्यापित किया गया।",
+
+    // Stage 5 & 6: Doctor Tele-Triage Callback
+    doctor_callback_title: "डॉक्टर टेली-ट्राइएज कॉलबैक",
+    doctor_callback_desc: "प्रतिक्रिया दल के समन्वय के दौरान एक ऑन-कॉल चिकित्सा सलाहकार से टेली-ट्राइएज परामर्श का अनुरोध करें।",
+    btn_request_callback: "डॉक्टर कॉलबैक का अनुरोध करें",
+    chief_complaint_label: "मुख्य लक्षण / तात्कालिक समस्या",
+    chief_complaint_placeholder: "मरीज़ की स्थिति का वर्णन करें (उदा. सीने में जकड़न, सांस लेने में तकलीफ)...",
+    callback_disclaimer: "डॉक्टर कॉलबैक तात्कालिक मार्गदर्शन प्रदान करता है। तीव्र, जानलेवा खतरे के लिए तुरंत 112 डायल करें।",
+    callback_status_pending: "कॉलबैक का अनुरोध किया गया (समीक्षा लंबित)",
+    callback_status_in_progress: "कॉलबैक प्रगति पर है (डॉक्टर संपर्क कर रहे हैं)",
+    callback_status_contacted: "चिकित्सा सलाहकार द्वारा नागरिक से संपर्क किया गया",
+    callback_status_completed: "टेली-ट्राइएज परामर्श पूरा हुआ",
+    tab_doctor_callbacks: "🩺 डॉक्टर कॉलबैक",
+    th_chief_complaint: "मुख्य शिकायत",
+    th_callback_status: "कॉलबैक स्थिति",
+    btn_mark_in_progress: "प्रगति में चिह्नित करें",
+    btn_mark_contacted: "संपर्क किया गया चिह्नित करें",
+    btn_mark_completed: "पूर्ण चिह्नित करें",
+
+    // Stage 5 & 6: Official Direct Emergency Line
+    direct_emergency_line: "आधिकारिक आपातकालीन सेवाएं",
+
+    // Arrival Tracker
+    arrival_tracker_title: "मदद रास्ते में है!",
+    arrival_tracker_subtitle: "आपका आपातकालीन वाहन रवाना हो चुका है और आपके स्थान की ओर आ रहा है।",
+    arrival_tracker_eta: "अनुमानित आगमन",
+    arrival_tracker_mins: "मिनट",
+    arrival_tracker_unit: "आवंटित वाहन",
+    arrival_tracker_demo_badge: "डेमो सिमुलेशन",
+    arrival_tracker_live_badge: "लाइव जीपीएस",
+    arrival_confirm_btn: "पुष्टि करें कि मदद पहुंच गई",
+    arrival_confirm_dialog: "क्या आपातकालीन सहायता आपके स्थान पर पहुंच गई है?",
+    arrival_stage_received: "अनुरोध प्राप्त हुआ",
+    arrival_stage_dispatched: "वाहन रवाना हुआ",
+    arrival_stage_enroute: "रास्ते में है",
+    arrival_stage_arrived: "घटनास्थल पर पहुंचे",
+    arrival_tracker_map_preview: "लाइव रूट पूर्वावलोकन",
+    enlarge_map_btn: "नक्शा बड़ा करें",
+    close_map_btn: "नक्शा बंद करें",
+    enlarged_map_title: "आपातकालीन प्रतिक्रिया मार्ग और ट्रैकर",
+    stay_safe_title: "मदद आने तक सुरक्षित रहें",
+    safety_tips_paused: "बातचीत पर रुका हुआ",
+    safety_tip_med_1: "व्यक्ति को आरामदायक स्थिति में रखें और गंभीर चोट होने पर अनावश्यक हलचल से बचें।",
+    safety_tip_med_2: "व्यक्ति के आसपास खुली हवा सुनिश्चित करें और तंग कपड़े ढीले करें।",
+    safety_tip_med_3: "शांत रहें, अपनी फोन लाइन खाली रखें और ज्ञात मेडिकल इतिहास तैयार रखें।",
+    safety_tip_fire_1: "धुएं और आग से तुरंत दूर हटें। लिफ्ट का उपयोग बिल्कुल न करें।",
+    safety_tip_fire_2: "धुएं के नीचे झुककर रहें जहां हवा ठंडी और अधिक सांस लेने योग्य होती है।",
+    safety_tip_fire_3: "सामान लेने के लिए कभी भी जलती हुई इमारत में वापस न जाएं।",
+    safety_tip_road_1: "चलते ट्रैफिक से दूर रहें और फुटपाथ पर सुरक्षित स्थान पर प्रतीक्षा करें।",
+    safety_tip_road_2: "आने वाले वाहनों को सचेत करने के लिए संभव हो तो वाहन की हैजर्ड लाइट चालू करें।",
+    safety_tip_road_3: "गंभीर रूप से घायल पीड़ितों को तब तक न हिलाएं जब तक कि आग या टक्कर का सीधा खतरा न हो।",
+    safety_tip_flood_1: "तुरंत ऊंचे स्थान पर जाएं और बाढ़ के पानी में चलने या गाड़ी चलाने से बचें।",
+    safety_tip_flood_2: "गिरे हुए बिजली के खंभों, तारों और क्षतिग्रस्त दीवारों से दूर रहें।",
+    safety_tip_flood_3: "बचाव दल की प्रतीक्षा करते हुए टॉर्च, पीने का पानी और चार्ज फोन साथ रखें।",
+    safety_tip_rescue_1: "मलबे या अस्थिर संरचनाओं से दूर एक स्थिर और सुरक्षित स्थान पर रहें।",
+    safety_tip_rescue_2: "यदि फंसे हों तो आवाज करें या रोशनी से संकेत दें, ऊर्जा बचाने के लिए अनावश्यक चिल्लाने से बचें।",
+    safety_tip_rescue_3: "आने वाले बचाव और खोजी दल के लिए प्रवेश मार्ग खुला और खाली रखें।",
+    safety_tip_gen_1: "मदद आने तक यदि संभव हो तो अच्छी रोशनी वाले और सुरक्षित स्थान पर रहें।",
+    safety_tip_gen_2: "अपनी फोन लाइन खाली रखें ताकि आपातकालीन दल या समन्वयक आपसे संपर्क कर सकें।",
+    safety_tip_gen_3: "किसी साथी से कहें कि वह सड़क पर नज़र रखे और वाहन को सही स्थान तक निर्देशित करे।",
+
+    // Call a Doctor
+    call_doctor_title: "डॉक्टर को कॉल करें",
+    call_doctor_subtitle: "ऑन-कॉल डॉक्टर से संपर्क करें या तुरंत कॉलबैक का अनुरोध करें।",
+    call_doctor_btn: "तुरंत डॉक्टर कॉल का अनुरोध करें",
+    call_doctor_direct_108: "108 मेडिकल एम्बुलेंस कॉल करें",
+    call_doctor_notes_placeholder: "वैकल्पिक: रोगी की स्थिति या लक्षण संक्षेप में लिखें",
+    call_doctor_success: "डॉक्टर कॉल अनुरोध दर्ज किया गया। चिकित्सा सलाहकार शीघ्र ही आपसे संपर्क करेंगे।",
+    doctor_calling_unavailable: "डॉक्टर कॉलिंग वर्तमान में अनुपलब्ध है। चिकित्सीय आपात स्थिति के लिए, सीधे 112 डायल करें।",
+
+    // Coordinator Persistent Notifications
+    admin_notifications_title: "समन्वयक अलर्ट",
+    admin_notifications_mark_all: "सभी को पढ़ा हुआ चिह्नित करें",
+    admin_notifications_empty: "अभी कोई समन्वयक सूचना नहीं है।",
+
+    // Multi-factor Smart Allocation
+    alloc_score_label: "विश्वास स्कोर",
+    alloc_auto_dispatch: "स्वचालित प्रेषण के लिए सुरक्षित",
+    alloc_admin_review: "समन्वयक समीक्षा आवश्यक",
+    alloc_algorithm_badge: "नियम-आधारित बहु-कारक स्कोरिंग इंजन",
   },
   kn: {
     // Brand & Identity
@@ -970,77 +1534,77 @@ export const translations = {
     feat_transparency_desc: "CareOn ಯಾವಾಗಲೂ ₹0 ಶುಲ್ಕ ವಿಧಿಸುತ್ತದೆ. ಖಾಸಗಿ ಸೇವೆಗಳ ದರಕ್ಕೆ ನಿಮ್ಮ ಸ್ಪಷ್ಟ ಅನುಮತಿಯನ್ನು ಮೊದಲೇ ಪಡೆಯಲಾಗುತ್ತದೆ.",
 
     // Auth & Navigation
-    user_login_title: "Citizen Portal Login",
-    user_login_subtitle: "Access your reported emergencies, live tracking, and emergency alerts.",
-    user_register_title: "Create Citizen Account",
-    user_register_subtitle: "Register to maintain private emergency records and receive coordinated updates.",
-    admin_login_title: "Command Centre Login",
-    admin_login_subtitle: "Authorized access for emergency coordinators and administrators.",
-    admin_login_btn: "Access Command Centre",
-    email_label: "Email Address",
-    email_placeholder: "Enter your email",
-    password_label: "Password",
-    password_placeholder: "Create a secure password",
-    confirm_password_label: "Confirm Password",
-    confirm_password_placeholder: "Confirm your password",
-    full_name_label: "Full Name",
-    full_name_placeholder: "Enter your full name",
-    phone_label: "Phone Number",
-    phone_placeholder: "Enter your phone number",
-    sign_in_btn: "Sign In",
-    create_account_btn: "Create Account",
-    demo_account_hint: "Fast Evaluation Demo Credentials",
-    fill_demo_user: "Fill Citizen Demo",
-    fill_demo_admin: "Fill Coordinator Demo",
-    no_account_prompt: "Don't have an account?",
-    register_link: "Register here",
+    user_login_title: "ನಾಗರಿಕ ಪೋರ್ಟಲ್ ಲಾಗಿನ್",
+    user_login_subtitle: "ನಿಮ್ಮ ವರದಿ ಮಾಡಿದ ತುರ್ತು ಪರಿಸ್ಥಿತಿಗಳು, ಲೈವ್ ಟ್ರ್ಯಾಕಿಂಗ್ ಮತ್ತು ತುರ್ತು ಎಚ್ಚರಿಕೆಗಳನ್ನು ವೀಕ್ಷಿಸಿ.",
+    user_register_title: "ನಾಗರಿಕ ಖಾತೆಯನ್ನು ರಚಿಸಿ",
+    user_register_subtitle: "ಖಾಸಗಿ ತುರ್ತು ದಾಖಲೆಗಳನ್ನು ನಿರ್ವಹಿಸಲು ಮತ್ತು ಸಮನ್ವಯಗೊಂಡ ಅಪ್‌ಡೇಟ್‌ಗಳನ್ನು ಪಡೆಯಲು ನೋಂದಾಯಿಸಿ.",
+    admin_login_title: "ಕಮಾಂಡ್ ಸೆಂಟರ್ ಲಾಗಿನ್",
+    admin_login_subtitle: "ತುರ್ತು ಸಂಯೋಜಕರು ಮತ್ತು ನಿರ್ವಾಹಕರಿಗೆ ಮಾತ್ರ ಅಧಿಕೃತ ಪ್ರವೇಶ.",
+    admin_login_btn: "ಕಮಾಂಡ್ ಸೆಂಟರ್‌ಗೆ ಪ್ರವೇಶಿಸಿ",
+    email_label: "ಇಮೇಲ್ ವಿಳಾಸ",
+    email_placeholder: "ನಿಮ್ಮ ಇಮೇಲ್ ನಮೂದಿಸಿ",
+    password_label: "ಪಾಸ್‌ವರ್ಡ್",
+    password_placeholder: "ಸುರಕ್ಷಿತ ಪಾಸ್‌ವರ್ಡ್ ರಚಿಸಿ",
+    confirm_password_label: "ಪಾಸ್‌ವರ್ಡ್ ದೃಢೀಕರಿಸಿ",
+    confirm_password_placeholder: "ನಿಮ್ಮ ಪಾಸ್‌ವರ್ಡ್ ಅನ್ನು ದೃಢೀಕರಿಸಿ",
+    full_name_label: "ಪೂರ್ಣ ಹೆಸರು",
+    full_name_placeholder: "ನಿಮ್ಮ ಪೂರ್ಣ ಹೆಸರನ್ನು ನಮೂದಿಸಿ",
+    phone_label: "ಫೋನ್ ಸಂಖ್ಯೆ",
+    phone_placeholder: "ನಿಮ್ಮ ಫೋನ್ ಸಂಖ್ಯೆಯನ್ನು ನಮೂದಿಸಿ",
+    sign_in_btn: "ಸೈನ್ ಇನ್ ಮಾಡಿ",
+    create_account_btn: "ಖಾತೆ ರಚಿಸಿ",
+    demo_account_hint: "ತ್ವರಿತ ಮೌಲ್ಯಮಾಪನ ಡೆಮೊ ವಿವರಗಳು",
+    fill_demo_user: "ನಾಗರಿಕ ಡೆಮೊ ವಿವರ ಭರ್ತಿ ಮಾಡಿ",
+    fill_demo_admin: "ಸಂಯೋಜಕ ಡೆಮೊ ವಿವರ ಭರ್ತಿ ಮಾಡಿ",
+    no_account_prompt: "ಖಾತೆ ಹೊಂದಿಲ್ಲವೇ?",
+    register_link: "ಇಲ್ಲಿ ನೋಂದಾಯಿಸಿ",
     already_have_account: "Already have an account?",
-    coordinator_access_hint: "Are you an emergency coordinator?",
-    admin_login_link: "Coordinator Login",
-    looking_for_user_portal: "Looking for Citizen Portal?",
-    fill_all_fields: "Please fill in all required fields.",
-    invalid_credentials: "Invalid email or password.",
-    admin_unauthorized: "Access denied. Administrator privileges required.",
-    login_success: "Login successful! Redirecting...",
-    register_success: "Account created successfully! Redirecting...",
-    password_mismatch: "Passwords do not match.",
-    loading: "Loading...",
-    logout_btn: "Logout Session",
+    coordinator_access_hint: "ನೀವು ತುರ್ತು ಸಂಯೋಜಕರಾಗಿದ್ದೀರಾ?",
+    admin_login_link: "ಸಂಯೋಜಕ ಲಾಗಿನ್",
+    looking_for_user_portal: "ನಾಗರಿಕ ಪೋರ್ಟಲ್‌ಗಾಗಿ ಹುಡುಕುತ್ತಿರುವಿರಾ?",
+    fill_all_fields: "ದಯವಿಟ್ಟು ಎಲ್ಲಾ ಅಗತ್ಯ ಕ್ಷೇತ್ರಗಳನ್ನು ಭರ್ತಿ ಮಾಡಿ.",
+    invalid_credentials: "ಅಮಾನ್ಯ ಇಮೇಲ್ ಅಥವಾ ಪಾಸ್‌ವರ್ಡ್.",
+    admin_unauthorized: "ಪ್ರವೇಶ ನಿರಾಕರಿಸಲಾಗಿದೆ. ನಿರ್ವಾಹಕ ಸವಲತ್ತುಗಳು ಅಗತ್ಯವಿದೆ.",
+    login_success: "ಲಾಗಿನ್ ಯಶಸ್ವಿಯಾಗಿದೆ! ಮರುನಿರ್ದೇಶಿಸಲಾಗುತ್ತಿದೆ...",
+    register_success: "ಖಾತೆ ಯಶಸ್ವಿಯಾಗಿ ರಚನೆಯಾಗಿದೆ! ಮರುನಿರ್ದೇಶಿಸಲಾಗುತ್ತಿದೆ...",
+    password_mismatch: "ಪಾಸ್‌ವರ್ಡ್‌ಗಳು ಹೊಂದಿಕೆಯಾಗುತ್ತಿಲ್ಲ.",
+    loading: "ಲೋಡ್ ಆಗುತ್ತಿದೆ...",
+    logout_btn: "ಲಾಗ್‌ಔಟ್ ಮಾಡಿ",
 
     // User Dashboard
-    authenticated_citizen_badge: "Verified Citizen Account",
-    welcome_back: "Welcome,",
-    refresh_feed: "Refresh Feed",
-    refresh: "Refresh",
-    feed_refreshed: "Feed refreshed successfully with live incident data.",
-    my_requests_title: "My Emergency Incidents",
-    btn_report_new: "Report New Emergency",
-    no_incidents_title: "No Active Emergency Incidents",
-    no_incidents_desc: "You have not submitted any emergency requests yet. If you require medical, fire or rescue assistance, report an incident anytime.",
-    track_incident_btn: "Track Live",
-    recent_notifications: "My Notifications",
-    no_notifications: "No new notifications.",
-    helpline_alert_title: "National Emergency Helpline",
-    helpline_alert_desc: "For immediate life-threatening situations, also dial 112 directly.",
-    dial_112_btn: "Call 112",
-    feedback: "Feedback",
+    authenticated_citizen_badge: "ದೃಢೀಕರಿಸಿದ ನಾಗರಿಕ ಖಾತೆ",
+    welcome_back: "ಸ್ವಾಗತ,",
+    refresh_feed: "ಫೀಡ್ ರಿಫ್ರೆಶ್ ಮಾಡಿ",
+    refresh: "ರಿಫ್ರೆಶ್ ಮಾಡಿ",
+    feed_refreshed: "ಲೈವ್ ಘಟನೆಯ ಮಾಹಿತಿಯೊಂದಿಗೆ ಫೀಡ್ ಯಶಸ್ವಿಯಾಗಿ ರಿಫ್ರೆಶ್ ಆಗಿದೆ.",
+    my_requests_title: "ನನ್ನ ತುರ್ತು ಘಟನೆಗಳು",
+    btn_report_new: "ಹೊಸ ತುರ್ತು ಪರಿಸ್ಥಿತಿಯನ್ನು ವರದಿ ಮಾಡಿ",
+    no_incidents_title: "ಯಾವುದೇ ಸಕ್ರಿಯ ತುರ್ತು ಘಟನೆಗಳಿಲ್ಲ",
+    no_incidents_desc: "ನೀವು ಇನ್ನೂ ಯಾವುದೇ ತುರ್ತು ವಿನಂತಿಗಳನ್ನು ಸಲ್ಲಿಸಿಲ್ಲ. ನಿಮಗೆ ವೈದ್ಯಕೀಯ, ಅಗ್ನಿಶಾಮಕ ಅಥವಾ ರಕ್ಷಣಾ ನೆರವು ಅಗತ್ಯವಿದ್ದರೆ, ಯಾವುದೇ ಸಮಯದಲ್ಲಿ ವರದಿ ಮಾಡಿ.",
+    track_incident_btn: "ಲೈವ್ ಟ್ರ್ಯಾಕ್ ಮಾಡಿ",
+    recent_notifications: "ನನ್ನ ಅಧಿಸೂಚನೆಗಳು",
+    no_notifications: "ಯಾವುದೇ ಹೊಸ ಅಧಿಸೂಚನೆಗಳಿಲ್ಲ.",
+    helpline_alert_title: "ರಾಷ್ಟ್ರೀಯ ತುರ್ತು ಸಹಾಯವಾಣಿ",
+    helpline_alert_desc: "ತಕ್ಷಣದ ಜೀವಕ್ಕೆ ಅಪಾಯವಿರುವ ಸಂದರ್ಭಗಳಲ್ಲಿ, ನೇರವಾಗಿ 112 ಗೆ ಕರೆ ಮಾಡಿ.",
+    dial_112_btn: "112 ಗೆ ಕರೆ ಮಾಡಿ",
+    feedback: "ಪ್ರತಿಕ್ರಿಯೆ",
 
     // Home & Features
-    how_it_works_title: "How CareOn Works",
-    feature1_title: "Multi-Resource Fleet Dispatch",
-    feature1_desc: "Coordinates ALS ambulances, trauma teams, fire engines, and rescue boats from nearest bases.",
-    feature2_title: "Shortage Alerting & Partner Fallback",
-    feature2_desc: "Automatically queries registered private hospitals and volunteer NGOs when municipal resources are occupied.",
-    feature3_title: "Conflict Prevention Engine",
-    feature3_desc: "Ensures no vehicle is double-assigned across concurrent emergencies with real-time lock verification.",
-    feature4_title: "Predictive Surge Risk Analytics",
-    feature4_desc: "Forecasts resource demand based on demographic density, weather conditions, and historical trends.",
-    feature5_title: "End-to-End Privacy & Verification",
-    feature5_desc: "Citizen health records remain strictly confidential with OTP verification to deter spam.",
-    feature6_title: "Sahara 24/7 AI Companion",
-    feature6_desc: "Caring, multi-lingual emergency support assistant available around the clock.",
-    zero_commission_title: "₹0 Platform Fee — Transparent Emergency Coordination",
-    zero_commission_desc: "CareOn charges ₹0 platform fee. If private providers charge a fee, coordinators present quotations for explicit citizen consent.",
+    how_it_works_title: "CareOn ಹೇಗೆ ಕಾರ್ಯನಿರ್ವಹಿಸುತ್ತದೆ",
+    feature1_title: "ತ್ವರಿತ ತುರ್ತು ರವಾನೆ",
+    feature1_desc: "ಹತ್ತಿರದ ನೆಲೆಗಳಿಂದ ಎಎಲ್‌ಎಸ್ ಆಂಬ್ಯುಲೆನ್ಸ್‌ಗಳು, ಟ್ರಾಮಾ ತಂಡಗಳು, ಅಗ್ನಿಶಾಮಕ ವಾಹನಗಳು ಮತ್ತು ರಕ್ಷಣಾ ಪಡೆಗಳನ್ನು ಸಂಯೋಜಿಸುತ್ತದೆ.",
+    feature2_title: "ಬ್ಯಾಕಪ್ ನೆರವು ಮತ್ತು ಪಾಲುದಾರ ಜಾಲ",
+    feature2_desc: "ಸರ್ಕಾರಿ ಆಂಬ್ಯುಲೆನ್ಸ್‌ಗಳು ಕಾರ್ಯನಿರತವಾಗಿದ್ದರೆ, ತಕ್ಷಣವೇ ಪರಿಶೀಲಿಸಿದ ಖಾಸಗಿ ಆಸ್ಪತ್ರೆಗಳು ಮತ್ತು ಸಹಾಯಕರೊಂದಿಗೆ ಸಂಪರ್ಕಿಸುತ್ತದೆ.",
+    feature3_title: "ಏಕಕಾಲೀನ ನಿಖರ ನಿಯೋಜನೆ",
+    feature3_desc: "ನೈಜ-ಸಮಯದ ಲಾಕ್ ಪರಿಶೀಲನೆಯೊಂದಿಗೆ ಏಕಕಾಲೀನ ತುರ್ತು ಸಂದರ್ಭಗಳಲ್ಲಿ ಯಾವುದೇ ವಾಹನವನ್ನು ಎರಡು ಬಾರಿ ನಿಯೋಜಿಸದಂತೆ ತಡೆಯುತ್ತದೆ.",
+    feature4_title: "ಸ್ಮಾರ್ಟ್ ಸಂಪನ್ಮೂಲ ಯೋಜನೆ",
+    feature4_desc: "ಜನಸಂಖ್ಯೆಯ ಸಾಂದ್ರತೆ ಮತ್ತು ಹವಾಮಾನ ಪರಿಸ್ಥಿತಿಗಳ ಆಧಾರದ ಮೇಲೆ ಸಂಪನ್ಮೂಲ ಬೇಡಿಕೆಯನ್ನು ಲೆಕ್ಕಾಚಾರ ಮಾಡುತ್ತದೆ.",
+    feature5_title: "ಸಂಪೂರ್ಣ ಸುರಕ್ಷಿತ ಮತ್ತು ಖಾಸಗಿ ನೆರವು",
+    feature5_desc: "ಸ್ಪ್ಯಾಮ್ ತಡೆಗಟ್ಟಲು ಒಟಿಪಿ ದೃಢೀಕರಣದೊಂದಿಗೆ ನಾಗರಿಕರ ಆರೋಗ್ಯ ದಾಖಲೆಗಳು ಕಟ್ಟುನಿಟ್ಟಾಗಿ ಗೌಪ್ಯವಾಗಿರುತ್ತವೆ.",
+    feature6_title: "ಸಹಾರಾ 24/7 AI ಸಹಾಯಕ",
+    feature6_desc: "ದಿನದ 24 ಗಂಟೆಯೂ ಲಭ್ಯವಿರುವ ಕಾಳಜಿಯುಕ್ತ, ಬಹುಭಾಷಾ ತುರ್ತು ನೆರವು ಸಹಾಯಕ.",
+    zero_commission_title: "₹0 ಪ್ಲಾಟ್‌ಫಾರ್ಮ್ ಶುಲ್ಕ — ಪಾರದರ್ಶಕ ತುರ್ತು ಸಮನ್ವಯ",
+    zero_commission_desc: "CareOn ₹0 ಪ್ಲಾಟ್‌ಫಾರ್ಮ್ ಶುಲ್ಕವನ್ನು ವಿಧಿಸುತ್ತದೆ. ಖಾಸಗಿ ಸೇವಾ ಪೂರೈಕೆದಾರರು ಶುಲ್ಕ ವಿಧಿಸಿದರೆ, ಸಂಯೋಜಕರು ನಾಗರಿಕರ ಸ್ಪಷ್ಟ ಒಪ್ಪಿಗೆಗಾಗಿ ದರಪಟ್ಟಿಯನ್ನು ಪ್ರಸ್ತುತಪಡಿಸುತ್ತಾರೆ.",
 
     // User Portal & Auth
     login_title_user: "ನಾಗರಿಕ ಪೋರ್ಟಲ್ ಲಾಗಿನ್",
@@ -1088,7 +1652,7 @@ export const translations = {
     contact_phone_label: "ಸಂಪರ್ಕ ದೂರವಾಣಿ ಸಂಖ್ಯೆ *",
     disaster_details_label: "ಅಗತ್ಯವಿರುವ ವಿಪತ್ತು ಪರಿಹಾರ ಸಾಮಗ್ರಿಗಳು",
     disaster_details_placeholder: "ಉದಾ., ಕುಡಿಯುವ ನೀರು (500L), ರಕ್ಷಣಾ ದೋಣಿಗಳು, ಆಹಾರ ಪೊಟ್ಟಣಗಳು",
-    demo_otp_notice: "ಸ್ಥಳೀಯ ಡೆಮೊ ದೃಢೀಕರಣ: ಪ್ರಾತ್ಯಕ್ಷಿಕೆಗಾಗಿ ಕೋಡ್ 123456 ಆಗಿದೆ.",
+    demo_otp_notice: "ತುರ್ತು ಪರಿಶೀಲನೆ: ನಿಮ್ಮ ಸಂಪರ್ಕ ಸಂಖ್ಯೆಗಾಗಿ ರಚಿಸಲಾದ ಇನ್-ಆ್ಯಪ್ ಪರಿಶೀಲನಾ ಕೋಡ್ ಅನ್ನು ನಮೂದಿಸಿ.",
     emergency_notice: "ಸಹಾಯ ಕೋರುವ ಮುನ್ನ: ಸರಿಯಾದ ಮಾಹಿತಿಯನ್ನು ನೀಡಿ ಇದರಿಂದ ನಾವು ಸೂಕ್ತ ಸಹಾಯವನ್ನು ತಲುಪಿಸಬಹುದು. ಶುಲ್ಕವಿರುವ ಬಾಹ್ಯ ಸೇವೆಗಳಿಗೆ ನಿಮ್ಮ ಅನುಮತಿಯನ್ನು ಮೊದಲೇ ಪಡೆಯಲಾಗುತ್ತದೆ. ನಿಮ್ಮ ಸುರಕ್ಷತೆಯೇ ನಮ್ಮ ಆದ್ಯತೆ. ❤️",
     btn_submit_report: "🚨 ತುರ್ತು ಮಾಹಿತಿ ಸಲ್ಲಿಸಿ",
     submitting_report: "ವರ್ಗೀಕರಣ ಮತ್ತು ಸಲ್ಲಿಕೆ ಪ್ರಕ್ರಿಯೆಯಲ್ಲಿದೆ...",
@@ -1191,7 +1755,7 @@ export const translations = {
     tab_providers: "🏥 ಬಾಹ್ಯ ಪಾಲುದಾರರು",
     tab_map: "🗺️ ಮೈಸೂರು ಲೈವ್ ಮ್ಯಾಪ್",
     tab_simulation: "🎯 ಕೊರತೆ ಸವಾಲು (ಡೆಮೊ)",
-    tab_verification: "🔍 ವಿಶ್ವಾಸಾರ್ಹತೆ ಪರಿಶೀಲನೆ",
+    tab_verification: "🔍 ವಿಶ್ವಾಸಾರ್ಹತೆ ಮತ್ತು ಪರಿಶೀಲನೆ",
     tab_disaster: "🌊 ವಿಪತ್ತು ಪರಿಹಾರ",
     tab_analytics: "📈 ಅಂಕಿಅಂಶ & ಎಂಎಲ್",
 
@@ -1227,7 +1791,7 @@ export const translations = {
     command_centre_subtitle: "ಮೈಸೂರಿನಾದ್ಯಂತ ನೈಜ-ಸಮಯದ ತುರ್ತು ಘಟನೆ ವರ್ಗೀಕರಣ, ವಾಹನ ಹೊಂದಾಣಿಕೆ, ಕೊರತೆಯ ಎಚ್ಚರಿಕೆ ಮತ್ತು ಪಾಲುದಾರರ ಸಮನ್ವಯ.",
     admin_role: "ಸಮನ್ವಯಕಾರ",
     refreshing: "ನವೀಕರಿಸಲಾಗುತ್ತಿದೆ...",
-    reset_demo_state: "ಡೆಮೊ ಮರುಹೊಂದಿಸಿ",
+    reset_demo_state: "ಸಿಮ್ಯುಲೇಶನ್ ಮರುಹೊಂದಿಸಿ",
     built_with_care: "ತುರ್ತು ನಿರ್ಧಾರ-ಬೆಂಬಲಕ್ಕಾಗಿ ಕಾಳಜಿಯಿಂದ ನಿರ್ಮಿಸಲಾಗಿದೆ.",
     quick_links: "ಪೋರ್ಟಲ್‌ಗಳು & ಸೇವೆಗಳು",
     command_support_title: "ಸಮನ್ವಯಕಾರರ ಬೆಂಬಲ",
@@ -1265,8 +1829,8 @@ export const translations = {
     contact_phone_label: "ಸಂಪರ್ಕ ಫೋನ್ ಸಂಖ್ಯೆ",
     submit_emergency_btn: "ತುರ್ತು ವಿನಂತಿಯನ್ನು ಸಲ್ಲಿಸಿ",
     submitting: "ಸಲ್ಲಿಸಲಾಗುತ್ತಿದೆ...",
-    demo_otp_title: "ಸ್ಥಳೀಯ ಡೆಮೊ ಪರಿಶೀಲನಾ ಮೋಡ್",
-    demo_otp_desc: "ಮೌಲ್ಯಮಾಪನ ಪ್ರಾತ್ಯಕ್ಷಿಕೆಗಾಗಿ, ಫೋನ್ ಒಟಿಪಿ ಕೋಡ್ ಮೊದಲೇ ಅನುಮೋದಿಸಲಾಗಿದೆ: 123456.",
+    demo_otp_title: "ತುರ್ತು ಸಂಪರ್ಕ ಪರಿಶೀಲನೆ",
+    demo_otp_desc: "ಸಲ್ಲಿಕೆಯ ನಂತರ ನಿಮ್ಮ ಸಂಪರ್ಕ ಸಂಖ್ಯೆಗೆ ತುರ್ತು ಪರಿಶೀಲನಾ ಕೋಡ್ ರಚಿಸಲಾಗುತ್ತದೆ.",
     pre_authorized: "ಡೆಮೊ ಅನುಮೋದಿತ",
     report_failed: "ತುರ್ತು ವರದಿ ಸಲ್ಲಿಸಲು ವಿಫಲವಾಗಿದೆ.",
     err_desc_required: "ದಯವಿಟ್ಟು ಸಂಕ್ಷಿಪ್ತ ವಿವರಣೆಯನ್ನು ನೀಡಿ (ಕನಿಷ್ಠ 5 ಅಕ್ಷರಗಳು).",
@@ -1347,6 +1911,288 @@ export const translations = {
     comments_label: "ಟಿಪ್ಪಣಿಗಳು ಅಥವಾ ಸಂಯೋಜಕರ ವಿವರ",
     faq_categories_question: "ಯಾವ ತುರ್ತು ವರ್ಗಗಳನ್ನು ಬೆಂಬಲಿಸಲಾಗುತ್ತದೆ?",
     faq_charge_question: "CareOn ಸಮನ್ವಯಕ್ಕಾಗಿ ಯಾವುದೇ ಶುಲ್ಕ ವಿಧಿಸುತ್ತದೆಯೇ?",
+    // Privacy Policy
+    privacy_title: "ಗೌಪ್ಯತೆ, ನಿಯಮಗಳು ಮತ್ತು ಜವಾಬ್ದಾರಿಯುತ ಪ್ರೋಟೋಟೈಪ್ ಬಹಿರಂಗಪಡಿಸುವಿಕೆ",
+    privacy_updated: "ಕೊನೆಯದಾಗಿ ನವೀಕರಿಸಲಾಗಿದೆ: ಪ್ರಾಯೋಗಿಕ ಪ್ರಾತ್ಯಕ್ಷಿಕೆ ಆವೃತ್ತಿ 2026",
+    privacy_sec1_title: "1. ಶೈಕ್ಷಣಿಕ ನಿರ್ಧಾರ-ಬೆಂಬಲ ಪ್ರೋಟೋಟೈಪ್ ಸೂಚನೆ",
+    privacy_sec1_desc: "CareOn ಶೈಕ್ಷಣಿಕ ಪ್ರಾತ್ಯಕ್ಷಿಕೆ ಮತ್ತು ಅಧ್ಯಾಪಕರ ಪರಿಶೀಲನೆಗಾಗಿ ಅಭಿವೃದ್ಧಿಪಡಿಸಲಾದ ಬುದ್ಧಿವಂತ ತುರ್ತು ಸಂಪನ್ಮೂಲ ಸಂಯೋಜನಾ ಪ್ರೋಟೋಟೈಪ್ ಆಗಿದೆ. CareOn ಅಧಿಕೃತ ತುರ್ತು ಸೇವೆ, ಪುರಸಭೆಯ 911/112 ಆಪರೇಟರ್, ಪೊಲೀಸ್ ಸೇವೆ ಅಥವಾ ಸರ್ಕಾರಿ ತುರ್ತು ರವಾನೆದಾರರ ಬದಲಿಯಾಗಿಲ್ಲ.",
+    privacy_sec2_title: "2. ವೆಚ್ಚದ ಪಾರದರ್ಶಕತೆ ಮತ್ತು ₹0 ಪ್ಲಾಟ್‌ಫಾರ್ಮ್ ಶುಲ್ಕ",
+    privacy_sec2_desc: "ತುರ್ತು ಸಹಾಯವನ್ನು ಕೋರಲು CareOn ನಾಗರಿಕರಿಂದ ಯಾವುದೇ ಕಮಿಷನ್ ಅಥವಾ ಪ್ಲಾಟ್‌ಫಾರ್ಮ್ ಶುಲ್ಕವನ್ನು ವಿಧಿಸುವುದಿಲ್ಲ. ಪ್ಲಾಟ್‌ಫಾರ್ಮ್ ಸಂಪನ್ಮೂಲಗಳು ಲಭ್ಯವಿಲ್ಲದಿದ್ದರೆ ಮತ್ತು ಬಾಹ್ಯ ಖಾಸಗಿ ಪೂರೈಕೆದಾರರನ್ನು ಸಂಪರ್ಕಿಸಿದರೆ, ಸಂಯೋಜಕರು ಪಾರದರ್ಶಕವಾಗಿ ದರಪಟ್ಟಿಯನ್ನು ಪ್ರದರ್ಶಿಸುತ್ತಾರೆ ಮತ್ತು ಪಾವತಿಸಿದ ನೆರವನ್ನು ರವಾನಿಸುವ ಮೊದಲು ಬಳಕೆದಾರರ ಸಮ್ಮತಿಯನ್ನು ಕೋರುತ್ತಾರೆ.",
+    privacy_sec3_title: "3. ಡೇಟಾ ಉಳಿಸಿಕೊಳ್ಳುವಿಕೆ ಮತ್ತು ಜವಾಬ್ದಾರಿಯುತ ನಿರ್ವಹಣೆ",
+    privacy_sec3_item1: "ಸಂಬಂಧಿತ ತಜ್ಞರ ಸಹಾಯವನ್ನು ಸಂಯೋಜಿಸಲು ಮಾತ್ರ ಸಂಪರ್ಕ ವಿವರಗಳು ಮತ್ತು ನಿರ್ದೇಶಾಂಕಗಳನ್ನು ಸಂಗ್ರಹಿಸಲಾಗುತ್ತದೆ.",
+    privacy_sec3_item2: "ಪಾಸ್‌ವರ್ಡ್‌ಗಳನ್ನು PBKDF2-HMAC-SHA256 ಸಾಲ್ಟ್‌ಗಳೊಂದಿಗೆ ಎನ್‌ಕ್ರಿಪ್ಟ್ ಮಾಡಲಾಗಿದೆ.",
+    privacy_sec3_item3: "ಡೆಮೊ ಪ್ರಾತ್ಯಕ್ಷಿಕೆಗಳಲ್ಲಿರುವ ಎಲ್ಲಾ ಫೋನ್ ಸಂಖ್ಯೆಗಳು ಸುರಕ್ಷಿತ ಕಾಲ್ಪನಿಕ ಸಂಖ್ಯೆಗಳಾಗಿವೆ.",
+    privacy_sec3_item4: "ಸಾಮಾನ್ಯ ಬಳಕೆದಾರರು ಮತ್ತೊಬ್ಬ ಬಳಕೆದಾರರ ಖಾಸಗಿ ಘಟನೆ ವಿವರಗಳನ್ನು ವೀಕ್ಷಿಸಲು ಸಾಧ್ಯವಿಲ್ಲ.",
+    privacy_sec3_item5: "ನಿರ್ವಾಹಕರು ಆಡಿಟ್ ಲಾಗಿಂಗ್‌ನೊಂದಿಗೆ ಪಾತ್ರ-ರಕ್ಷಿತ ಕಮಾಂಡ್ ಸೆಂಟರ್ ಪ್ರವೇಶವನ್ನು ಹೊಂದಿದ್ದಾರೆ.",
+    privacy_sec4_title: "4. ಸಹಾರಾ ತುರ್ತು ಸಹವರ್ತಿ ಮಿತಿಗಳು",
+    privacy_sec4_desc: "ಸಹಾರಾ ಒಂದು ನಿಯಮ-ಆಧಾರಿತ AI ಸಹವರ್ತಿಯಾಗಿದ್ದು, ಇದು ಬೆಂಬಲ ಮಾರ್ಗದರ್ಶನ ಮತ್ತು ತುರ್ತು ವಿನಂತಿಗಳನ್ನು ಟ್ರ್ಯಾಕ್ ಮಾಡಲು ಸಹಾಯ ಮಾಡುತ್ತದೆ. ಸಹಾರಾ ವೈದ್ಯಕೀಯ ಪರಿಸ್ಥಿತಿಗಳನ್ನು ರೋಗನಿರ್ಣಯ ಮಾಡುವುದಿಲ್ಲ, ಔಷಧಿಗಳನ್ನು ಶಿಫಾರಸು ಮಾಡುವುದಿಲ್ಲ ಅಥವಾ ಆಗಮನದ ಸಮಯವನ್ನು ಊಹಿಸುವುದಿಲ್ಲ. ತಕ್ಷಣದ ಜೀವ ಬೆದರಿಕೆಗಳಿಗಾಗಿ, ನಾಗರಿಕರನ್ನು ಅಧಿಕೃತ ತುರ್ತು ಸಹಾಯವಾಣಿಗೆ (112 / 108) ನಿರ್ದೇಶಿಸಲಾಗುತ್ತದೆ.",
+
+    // Notification Drawer
+    notification_centre_title: "ಅಧಿಸೂಚನಾ ಕೇಂದ್ರ",
+    no_notifications_desc: "ಇನ್ನೂ ಯಾವುದೇ ಅಧಿಸೂಚನೆಗಳಿಲ್ಲ. ನೈಜ ಸಮಯದಲ್ಲಿ ನವೀಕರಣಗಳು ಇಲ್ಲಿ ಕಾಣಿಸಿಕೊಳ್ಳುತ್ತವೆ.",
+    mark_read: "ಓದಿದೆ ಎಂದು ಗುರುತಿಸಿ",
+    dismiss: "ವಜಾಗೊಳಿಸಿ",
+    view_in_drawer: "ಬೆಲ್‌ನಲ್ಲಿ ವೀಕ್ಷಿಸಿ",
+    refresh_failed: "ಸರ್ವರ್‌ನಿಂದ ಲೈವ್ ಡೇಟಾ ರಿಫ್ರೆಶ್ ಮಾಡಲು ವಿಫಲವಾಗಿದೆ.",
+    updated_just_now: "ಈಗಷ್ಟೇ ನವೀಕರಿಸಲಾಗಿದೆ",
+    acknowledge_alert: "ದೃಢೀಕರಿಸಿ ಮತ್ತು ಮ್ಯೂಟ್ ಮಾಡಿ",
+    new_emergency_alert: "🚨 ಹೊಸ ತುರ್ತು ಎಚ್ಚರಿಕೆ: ತಕ್ಷಣದ ಕ್ರಮ ಅಗತ್ಯ",
+    alert_acknowledged: "ಎಚ್ಚರಿಕೆಯನ್ನು ದೃಢೀಕರಿಸಲಾಗಿದೆ ಮತ್ತು ಮ್ಯೂಟ್ ಮಾಡಲಾಗಿದೆ.",
+    sound_enabled: "ಧ್ವನಿ: ಆನ್",
+    sound_disabled: "ಧ್ವನಿ: ಆಫ್",
+    view_incident_triage: "ವೀಕ್ಷಿಸಿ ಮತ್ತು ಪರಿಶೀಲಿಸಿ",
+
+    // Admin Dashboard Sections & Cards
+    active_incident_queue_title: "ಸಕ್ರಿಯ ತುರ್ತು ಆದ್ಯತಾ ಸರದಿ",
+    btn_view_all: "ಎಲ್ಲವನ್ನೂ ವೀಕ್ಷಿಸಿ",
+    fleet_availability_title: "ವಾಹನ ಲಭ್ಯತೆ ಮತ್ತು ತಕ್ಷಣದ ಕೊರತೆಗಳು",
+    fleet_categories_label: "ವಾಹನ ವರ್ಗಗಳು:",
+    critical_shortage_detected: "⚠️ ಗಂಭೀರ ಕೊರತೆ ಕಂಡುಬಂದಿದೆ:",
+    incident_mgmt_title: "ಘಟನೆ ನಿರ್ವಹಣೆ ಮತ್ತು ಪರಿಶೀಲನಾ ಸರದಿ",
+    duplicate_flag_badge: "ನಕಲಿ ಗುರುತು",
+    fleet_mgmt_title: "ತುರ್ತು ವಾಹನ ನಿರ್ವಹಣೆ",
+    fleet_mgmt_desc: "ವಾಹನಗಳ ಲಭ್ಯತೆ, ನಿರ್ವಹಣಾ ಸ್ಥಿತಿ ಮತ್ತು ಸಕ್ರಿಯ ನಿಯೋಜನೆಗಳನ್ನು ಮೇಲ್ವಿಚಾರಣೆ ಮಾಡಿ. ಡೇಟಾಬೇಸ್ ವಹಿವಾಟು ಮಟ್ಟದಲ್ಲಿ ಡಬಲ್-ನಿಯೋಜನೆಯನ್ನು ತಡೆಯಲಾಗುತ್ತದೆ.",
+    smart_allocation_engine_title: "ಸ್ಮಾರ್ಟ್ ಸಂಪನ್ಮೂಲ ಹಂಚಿಕೆ ಎಂಜಿನ್",
+    smart_allocation_engine_desc: "ಸಂಘರ್ಷ ತಡೆಗಟ್ಟುವಿಕೆಯನ್ನು ಕಟ್ಟುನಿಟ್ಟಾಗಿ ಜಾರಿಗೊಳಿಸುವಾಗ ತುರ್ತುಸ್ಥಿತಿ, ಸಾಮರ್ಥ್ಯ ಹೊಂದಾಣಿಕೆ ಮತ್ತು ಪ್ರಯಾಣದ ಸಮಯವನ್ನು ಮೌಲ್ಯಮಾಪನ ಮಾಡುತ್ತದೆ.",
+    active_shortages_mgmt_title: "ಸಕ್ರಿಯ ಸಂಪನ್ಮೂಲ ಕೊರತೆ ನಿರ್ವಹಣೆ",
+    active_shortages_mgmt_desc: "ನಗರದ ವಾಹನ ಸಂಪನ್ಮೂಲಗಳು ಖಾಲಿಯಾದಾಗ, ಬಾಹ್ಯ ಪಾಲುದಾರ ಆಸ್ಪತ್ರೆಗಳು ಅಥವಾ ಖಾಸಗಿ ಆಂಬ್ಯುಲೆನ್ಸ್‌ಗಳನ್ನು ಸಂಪರ್ಕಿಸಲು CareOn ಶಿಫಾರಸು ಮಾಡುತ್ತದೆ.",
+    no_active_shortages_msg: "✓ ಈ ಸಮಯದಲ್ಲಿ ಯಾವುದೇ ವಾಹನ ಕೊರತೆ ಇಲ್ಲ. ಎಲ್ಲಾ ಕರೆಗಳಿಗೆ ಪ್ರತಿಕ್ರಿಯಾ ವಾಹನಗಳು ಲಭ್ಯವಿದೆ.",
+    external_providers_dir_title: "ನೋಂದಾಯಿತ ಪಾಲುದಾರರು ಮತ್ತು ಬಾಹ್ಯ ಪೂರೈಕೆದಾರರ ಡೈರೆಕ್ಟರಿ",
+    external_providers_dir_desc: "CareOn ಪಾಲುದಾರ-ಮೊದಲ ತಂತ್ರದೊಂದಿಗೆ ಕಾರ್ಯನಿರ್ವಹಿಸುತ್ತದೆ. ಬಾಹ್ಯ ಪೂರೈಕೆದಾರರ ದರಪಟ್ಟಿಗೆ ನಾಗರಿಕರ ಒಪ್ಪಿಗೆ ಅಗತ್ಯವಿದೆ.",
+    registered_partner_badge: "ನೋಂದಾಯಿತ ಪಾಲುದಾರ",
+    fallback_dir_badge: "ಪರ್ಯಾಯ ಡೈರೆಕ್ಟರಿ",
+    live_map_dispatch_title: "ಲೈವ್ ಭೌಗೋಳಿಕ ರವಾನೆ ಮತ್ತು ಟ್ರ್ಯಾಕಿಂಗ್",
+    live_map_dispatch_desc: "ಸಕ್ರಿಯ ತುರ್ತು ಪಿನ್‌ಗಳು, ಲಭ್ಯವಿರುವ ವಾಹನಗಳು ಮತ್ತು ಪಾಲುದಾರ ಸೌಲಭ್ಯಗಳನ್ನು ತೋರಿಸುವ ಓಪನ್‌ಸ್ಟ್ರೀಟ್‌ಮ್ಯಾಪ್ ನಕ್ಷೆ.",
+    simulation_expo_title: "🎯 ಸಂಪನ್ಮೂಲ ಕೊರತೆ ಸವಾಲು — ಸಂವಾದಾತ್ಮಕ ಮಾರ್ಗದರ್ಶಿ",
+    simulation_expo_desc: "ಈ ಸಂವಾದಾತ್ಮಕ ಮಾರ್ಗದರ್ಶಿಯು CareOn ನ ಪ್ರಮುಖ ಸಮನ್ವಯ ಸಾಮರ್ಥ್ಯಗಳನ್ನು ಪ್ರದರ್ಶಿಸುತ್ತದೆ: ಬಹು-ಘಟನೆ ಆದ್ಯತೆ, ಸಂಘರ್ಷ ತಡೆಗಟ್ಟುವಿಕೆ, ಕೊರತೆ ಪತ್ತೆ ಮತ್ತು ಬಾಹ್ಯ ಪೂರೈಕೆದಾರರ ಸಮನ್ವಯ.",
+    trust_review_title: "ವರದಿದಾರರ ಪರಿಶೀಲನೆ ಮತ್ತು ನಂಬಿಕೆ ವಿಮರ್ಶೆ",
+    trust_review_desc: "ದುರುಪಯೋಗವನ್ನು ತಡೆಯಲು CareOn ನಂಬಿಕೆಯ ಅಂಶಗಳನ್ನು (ದೂರವಾಣಿ ಸ್ವರೂಪ, ಒಟಿಪಿ, ನಕಲುಗಳು, ಇತಿಹಾಸ) ಮೌಲ್ಯಮಾಪನ ಮಾಡುತ್ತದೆ.",
+    disaster_mgmt_title: "🌊 ವಿಪತ್ತು ನಿರ್ವಹಣೆ ಮತ್ತು ಸಾಮೂಹಿಕ ಅಪಘಾತ ವಿಸ್ತರಣೆ",
+    disaster_mgmt_desc: "ನಗರ ಪ್ರವಾಹ ಅಥವಾ ಕಟ್ಟಡ ಕುಸಿತಕ್ಕೆ ಸಾಮಗ್ರಿಗಳ (ಆಹಾರ, ಕುಡಿಯುವ ನೀರು, ಡೇರೆಗಳು) ಮೇಲ್ವಿಚಾರಣೆ ಮತ್ತು ಸಮನ್ವಯ.",
+    available_relief_assets_title: "ಲಭ್ಯವಿರುವ ಪರಿಹಾರ ಸ್ವತ್ತುಗಳು",
+    ml_predictor_title: "📊 ನಿಯಮ-ಆಧಾರಿತ ಸಂಪನ್ಮೂಲ ಕೊರತೆ ಅಪಾಯ ಮುನ್ಸೂಚಕ",
+    ml_predictor_desc: "ವಲಯ, ದಿನದ ಸಮಯ ಮತ್ತು ಸಕ್ರಿಯ ವಾಹನಗಳ ಆಧಾರದ ಮೇಲೆ ಬೇಡಿಕೆಯ ಹೆಚ್ಚಳವನ್ನು ಲೆಕ್ಕಾಚಾರ ಮಾಡುತ್ತದೆ.",
+    ml_predictor_notice: "ಸೂಚನೆ: ಸಂಯೋಜಕರ ನಿರ್ಧಾರ ಬೆಂಬಲಕ್ಕಾಗಿ ನಿಯಮ-ಆಧಾರಿತ ಬೇಡಿಕೆ ಅಂದಾಜು ಮಾದರಿ. ಅಧಿಕೃತ ಪುರಸಭೆಯ ತುರ್ತು ಮುನ್ಸೂಚನೆಯಲ್ಲ.",
+
+    // Badges & Verifications
+    flagged_duplicate_badge: "ಹತ್ತಿರದ ನಕಲಿ ಎಂದು ಗುರುತಿಸಲಾಗಿದೆ",
+    unique_incident_badge: "✓ ಅನನ್ಯ ಘಟನೆ",
+    genuine_incident_badge: "ನೈಜ ಘಟನೆ",
+    awaiting_otp_label: "ಒಟಿಪಿಗಾಗಿ ಕಾಯಲಾಗುತ್ತಿದೆ",
+    verified_label: "✓ ದೃಢೀಕರಿಸಲಾಗಿದೆ",
+
+    // KPIs
+    kpi_avg_rating: "ಸರಾಸರಿ ಸಂಯೋಜಕರ ರೇಟಿಂಗ್",
+    kpi_from_reviews: "14 ಪರಿಶೀಲಿಸಿದ ವಿಮರ್ಶೆಗಳಿಂದ",
+    kpi_avg_eta: "ಅಂದಾಜು ಸರಾಸರಿ ಆಗಮನ ಸಮಯ (ETA)",
+    kpi_eta_context: "1.25x ಸಂಚಾರ ಅಂಶದೊಂದಿಗೆ ನಗರ ಕಾರಿಡಾರ್",
+    kpi_conflict_rate: "ಸಂಘರ್ಷ ತಡೆಗಟ್ಟುವಿಕೆ ದರ",
+    kpi_zero_double: "0 ಡಬಲ್-ನಿಯೋಜನೆಗಳು ದಾಖಲಾಗಿವೆ",
+
+    // Admin Details Modal
+    lbl_category: "ವರ್ಗ",
+    lbl_description: "ವಿವರಣೆ",
+    lbl_location: "ಸ್ಥಳ",
+    lbl_casualties: "ಬಲಿಪಶುಗಳು / ಸಂತ್ರಸ್ತರು",
+    lbl_help_requested: "ವಿನಂತಿಸಿದ ಸಹಾಯ",
+    lbl_contact: "ಸಂಪರ್ಕ",
+    lbl_initial_priority_reason: "ಆರಂಭಿಕ ಆದ್ಯತೆಯ ಕಾರಣ",
+    lbl_coordinator_priority_adj: "ಸಂಯೋಜಕರ ಆದ್ಯತೆ ಹೊಂದಾಣಿಕೆ",
+    lbl_available_fleet_units: "ಲಭ್ಯವಿರುವ ವಾಹನ ಘಟಕಗಳು (ನೇರ ನಿಯೋಜನೆ):",
+
+    // Table Headers
+    th_verified: "ದೃಢೀಕರಿಸಲಾಗಿದೆ",
+    th_incident_code: "ಘಟನೆ ಕೋಡ್",
+    th_contact_person: "ಸಂಪರ್ಕ ವ್ಯಕ್ತಿ",
+    th_phone_number: "ದೂರವಾಣಿ ಸಂಖ್ಯೆ",
+    th_otp_status: "ಒಟಿಪಿ ಸ್ಥಿತಿ",
+    th_duplicate_check: "ನಕಲಿ ಪರಿಶೀಲನೆ",
+    th_trust_decision: "ನಂಬಿಕೆ ನಿರ್ಧಾರ",
+    th_zone: "ಭೌಗೋಳಿಕ ವಲಯ",
+    th_predicted_risk: "ಅಂದಾಜು ಕೊರತೆ ಅಪಾಯ",
+    th_risk_score: "ಅಪಾಯ ಸ್ಕೋರ್",
+    th_resource_in_demand: "ಬೇಡಿಕೆಯಲ್ಲಿರುವ ಸಂಪನ್ಮೂಲ",
+    th_time_context: "ಸಮಯದ ಸಂದರ್ಭ",
+    th_recommended_action: "ಶಿಫಾರಸು ಮಾಡಿದ ಸಂಯೋಜಕರ ಕ್ರಮ",
+
+    // Buttons
+    btn_details: "ವಿವರಗಳು",
+    btn_mark_available: "ಲಭ್ಯವಿದೆ ಎಂದು ಗುರುತಿಸಿ",
+    btn_set_maintenance: "ನಿರ್ವಹಣೆಗೆ ನಿಗದಿಪಡಿಸಿ",
+    btn_simulate_partner_contact: "ಪಾಲುದಾರ ಸಂಪರ್ಕವನ್ನು ಅನುಕರಿಸಿ",
+    btn_simulate_contact_quote: "ಸಂಪರ್ಕ ಮತ್ತು ದರಪಟ್ಟಿ ಅನುಕರಿಸಿ",
+    btn_pause_movement: "⏸ ಚಲನೆ ಅನುಕರಣೆ ವಿರಾಮಗೊಳಿಸಿ",
+    btn_simulate_movement: "▶ ಲೈವ್ ರವಾನೆ ಚಲನೆ ಅನುಕರಿಸಿ",
+    btn_reset_scenario: "↺ ಸನ್ನಿವೇಶವನ್ನು ಹಂತ 1 ಕ್ಕೆ ಮರುಹೊಂದಿಸಿ",
+    btn_assign_prefix: "+ ನಿಯೋಜಿಸಿ",
+    btn_dispatch_relief_van: "ವಿಪತ್ತು ಪರಿಹಾರ ಸರಬರಾಜು ವ್ಯಾನ್ 01 ರವಾನಿಸಿ",
+    btn_save_priority_change: "ಆದ್ಯತೆ ಬದಲಾವಣೆ ಉಳಿಸಿ",
+
+    // Simulation Steps
+    sim_step1_title: "ಹಂತ 1: ಏಕಕಾಲದಲ್ಲಿ ಅನೇಕ ತುರ್ತುಸ್ಥಿತಿಗಳು",
+    sim_step1_desc: "ಮೈಸೂರಿನಲ್ಲಿ ಮೂರು ಏಕಕಾಲೀನ ತುರ್ತುಸ್ಥಿತಿಗಳು ಸಕ್ರಿಯವಾಗಿವೆ (ಸಯ್ಯಾಜಿ ರಾವ್ ರಸ್ತೆ ಹೃದಯಾಘಾತ, ಕುವೆಂಪುನಗರ ರಸ್ತೆ ಅಪಘಾತ, ಮತ್ತು ಗೋಕುಲಂ ಬೆಂಕಿ ಅವಘಡ).",
+    sim_step2_title: "ಹಂತ 2: ಸೀಮಿತ ವಾಹನಗಳು (ಕೇವಲ 1 ಆಂಬ್ಯುಲೆನ್ಸ್ ಲಭ್ಯ)",
+    sim_step2_desc: "ಆಂಬ್ಯುಲೆನ್ಸ್ 01 ಅನ್ನು CARE-2026-101 ಗೆ ನಿಯೋಜಿಸಲಾಗಿದೆ. ಆಂಬ್ಯುಲೆನ್ಸ್ 03 ನಿರ್ವಹಣೆಯಲ್ಲಿದೆ. ಕೇವಲ ಸಿಟಿಕೇರ್ ಆಂಬ್ಯುಲೆನ್ಸ್ 02 ಮಾತ್ರ ಸಕ್ರಿಯವಾಗಿದೆ.",
+    sim_step3_title: "ಹಂತ 3: ಹಂಚಿಕೆಯನ್ನು ಚಲಾಯಿಸಿ ಮತ್ತು ಸಂಘರ್ಷ ತಡೆಗಟ್ಟುವಿಕೆಯನ್ನು ಪ್ರದರ್ಶಿಸಿ",
+    sim_step3_desc: "ಸ್ಮಾರ್ಟ್ ಹಂಚಿಕೆದಾರರು ಉಳಿದ ಆಂಬ್ಯುಲೆನ್ಸ್ ಅನ್ನು ಅತ್ಯುನ್ನತ ಆದ್ಯತೆಯ ಕರೆಗೆ ನಿಯೋಜಿಸುತ್ತಾರೆ. ಸಿಸ್ಟಮ್ ಆಕ್ರಮಿತ ವಾಹನವನ್ನು ಮತ್ತೊಂದು ಘಟನೆಗೆ ನಿಯೋಜಿಸುವುದನ್ನು ನಿರ್ಬಂಧಿಸುತ್ತದೆ.",
+    sim_step4_title: "ಹಂತ 4: ಕೊರತೆ ಎಚ್ಚರಿಕೆ ಮತ್ತು ಪಾಲುದಾರರ ವಿಚಾರಣೆ",
+    sim_step4_desc: "CARE-2026-103 ಗಂಭೀರ ವಾಹನ ಕೊರತೆಯನ್ನು ಎದುರಿಸುತ್ತದೆ. ನೋಂದಾಯಿತ ಪಾಲುದಾರರನ್ನು ಸಂಪರ್ಕಿಸಿ ಮತ್ತು ದರಪಟ್ಟಿಯನ್ನು (₹1,500) ದಾಖಲಿಸಿ.",
+
+    // Quotation & Tracking Labels
+    lbl_ext_quotation: "ಬಾಹ್ಯ ಪಾಲುದಾರರ ದರಪಟ್ಟಿ",
+    lbl_subsidy_amount: "ಸಹಾಯಧನ / ಎನ್‌ಜಿಒ ಪ್ರಾಯೋಜಕತ್ವ",
+    lbl_net_payable: "ಸೇವಾ ಪೂರೈಕೆದಾರರಿಗೆ ಪಾವತಿಸಬೇಕಾದ ಮೊತ್ತ",
+    contact_label: "ಸಂಪರ್ಕ",
+    mins_label: "ನಿಮಿಷಗಳು",
+
+    // Badges & Common
+    urgent_badge: "ತುರ್ತು",
+    live_badge: "ಲೈವ್",
+    ai_badge: "24/7 AI",
+    sahara_safe_companion_desc: "ಸಹಾರಾ ಸಮನ್ವಯ ಬೆಂಬಲವನ್ನು ಒದಗಿಸುತ್ತದೆ. ತಕ್ಷಣದ ಜೀವ ಬೆದರಿಕೆಯ ಸಂದರ್ಭದಲ್ಲಿ ನೇರವಾಗಿ 112 ಕರೆ ಮಾಡಿ.",
+    backend_service_status: "ಬ್ಯಾಕೆಂಡ್ ಸೇವಾ ಸ್ಥಿತಿ",
+    role_admin: "ನಿರ್ವಾಹಕರು",
+    role_user: "ಬಳಕೆದಾರರು",
+    language_selector: "ಭಾಷಾ ಆಯ್ಕೆಗಾರ",
+    national_helpline_label: "ರಾಷ್ಟ್ರೀಯ ಸಹಾಯವಾಣಿ",
+    coordination_email_label: "ಸಮನ್ವಯ",
+    mysuru_command_region: "ಮೈಸೂರು ಕಮಾಂಡ್ ಪ್ರದೇಶ, ಕರ್ನಾಟಕ, ಭಾರತ",
+
+    // Map Picker & Legend
+    map_picker_hint: "📍 ನಿಖರವಾದ ಮೈಸೂರು ನಿರ್ದೇಶಾಂಕಗಳನ್ನು ಆಯ್ಕೆ ಮಾಡಲು ನಕ್ಷೆಯನ್ನು ಕ್ಲಿಕ್ ಮಾಡಿ ಅಥವಾ ಪಿನ್ ಎಳೆಯಿರಿ",
+    lat_label: "ಅಕ್ಷಾಂಶ",
+    lon_label: "ರೇಖಾಂಶ",
+    map_legend_incidents: "ತುರ್ತು ಘಟನೆಗಳು",
+    map_legend_available: "ಲಭ್ಯವಿರುವ ವಾಹನಗಳು",
+    map_legend_dispatched: "ರವಾನಿಸಲಾದ ಘಟಕಗಳು",
+    map_legend_partners: "ಪಾಲುದಾರ ಆಸ್ಪತ್ರೆಗಳು ಮತ್ತು ಎನ್‌ಜಿಒಗಳು",
+    map_simulation_active: "ವಾಹನ ಚಲನೆ ಸಕ್ರಿಯವಾಗಿದೆ",
+    map_center_label: "ಮೈಸೂರು ನಗರ ಪ್ರದೇಶ (12.3052° N, 76.6552° E)",
+
+    // Notification Titles & System Terms
+    "Emergency Request Received": "ತುರ್ತು ವಿನಂತಿ ಸ್ವೀಕರಿಸಲಾಗಿದೆ",
+    "Ambulance Dispatched": "ಆಂಬ್ಯುಲೆನ್ಸ್ ರವಾನಿಸಲಾಗಿದೆ",
+    "Assistance Search Started": "ನೆರವು ಹುಡುಕಾಟ ಪ್ರಾರಂಭವಾಗಿದೆ",
+    "Provider Contacted": "ಪೂರೈಕೆದಾರರನ್ನು ಸಂಪರ್ಕಿಸಲಾಗಿದೆ",
+    "Provider Quoted": "ಪೂರೈಕೆದಾರರು ದರಪಟ್ಟಿ ನೀಡಿದ್ದಾರೆ",
+    "Consent Accepted": "ಸಮ್ಮತಿಯನ್ನು ಸ್ವೀಕರಿಸಲಾಗಿದೆ",
+    "Incident Resolved": "ಘಟನೆ ಪರಿಹರಿಸಲಾಗಿದೆ",
+    "Request Cancelled": "ವಿನಂತಿ ರದ್ದುಗೊಂಡಿದೆ",
+    "Cancellation Acknowledged": "ರದ್ದತಿಯನ್ನು ಅಂಗೀಕರಿಸಲಾಗಿದೆ",
+    "Emergency OTP Verified": "ತುರ್ತು ಒಟಿಪಿ ಪರಿಶೀಲಿಸಲಾಗಿದೆ",
+    "Medical Tele-triage Callback Requested": "ವೈದ್ಯಕೀಯ ಟೆಲಿ-ಟ್ರಯಾಜ್ ಕಾಲ್‌ಬ್ಯಾಕ್ ಕೋರಲಾಗಿದೆ",
+    "Doctor Callback Status Updated": "ವೈದ್ಯರ ಕಾಲ್‌ಬ್ಯಾಕ್ ಸ್ಥಿತಿ ನವೀಕರಿಸಲಾಗಿದೆ",
+    "New Incident Reported": "ಹೊಸ ತುರ್ತು ಘಟನೆ ವರದಿಯಾಗಿದೆ",
+    "Incident Needs Review": "ಘಟನೆಯ ಪರಿಶೀಲನೆ ಅಗತ್ಯವಿದೆ",
+    "Shortage Alert": "ಸಂಪನ್ಮೂಲ ಕೊರತೆ ಎಚ್ಚರಿಕೆ",
+    "Duplicate Flagged": "ನಕಲಿ ಎಂದು ಗುರುತಿಸಲಾಗಿದೆ",
+    "Urgent Action Required": "ತುರ್ತು ಕ್ರಮ ಅಗತ್ಯವಿದೆ",
+    "Under Maintenance": "ನಿರ್ವಹಣೆಯಲ್ಲಿದೆ",
+    "Available": "ಲಭ್ಯವಿದೆ",
+    "Assigned": "ನಿಯೋಜಿಸಲಾಗಿದೆ",
+    "Dispatched": "ರವಾನಿಸಲಾಗಿದೆ",
+    "System": "ವ್ಯವಸ್ಥೆ",
+    "Coordinator": "ಸಂಯೋಜಕರು",
+    "Reporter": "ವರದಿದಾರ",
+
+
+    // Stage 5 & 6: Sahara Voice & Personalized Greetings
+    voice_input_tooltip: "ಧ್ವನಿ ಇನ್ಪುಟ್ (ಸಹಾರಾ ಜೊತೆ ಮಾತನಾಡಿ)",
+    voice_listening: "ಆಲಿಸುತ್ತಿದೆ... ಈಗ ಮಾತನಾಡಿ",
+    voice_unsupported: "ಈ ಬ್ರೌಸರ್‌ನಲ್ಲಿ ಧ್ವನಿ ಇನ್‌ಪುಟ್ ಬೆಂಬಲಿಸುವುದಿಲ್ಲ",
+    voice_permission_error: "ಮೈಕ್ರೋಫೋನ್ ಪ್ರವೇಶವನ್ನು ನಿರಾಕರಿಸಲಾಗಿದೆ ಅಥವಾ ಲಭ್ಯವಿಲ್ಲ",
+    personalized_greeting_prefix: "ನಮಸ್ಕಾರ",
+
+    // Stage 5 & 6: Simulated In-App OTP Verification
+    otp_verification_title: "ತುರ್ತು ಸಂಪರ್ಕ ಪರಿಶೀಲನೆ (ಸಿಮ್ಯುಲೇಟೆಡ್ ಇನ್-ಆ್ಯಪ್ ಒಟಿಪಿ)",
+    otp_verification_desc: "ನಿಮ್ಮ ಸಂಪರ್ಕ ಸಂಖ್ಯೆಗಾಗಿ ಸುರಕ್ಷಿತ ಪರಿಶೀಲನಾ ಕೋಡ್ ರಚಿಸಲಾಗಿದೆ. ಈ ವರದಿಯನ್ನು ಖಚಿತಪಡಿಸಲು ಕೆಳಗೆ 6 ಅಂಕಿಯ ಕೋಡ್ ನಮೂದಿಸಿ.",
+    simulated_otp_display: "ಸಿಮ್ಯುಲೇಟೆಡ್ ಕೋಡ್:",
+    enter_otp_placeholder: "6 ಅಂಕಿಯ ಕೋಡ್ ನಮೂದಿಸಿ",
+    btn_verify_otp: "ಕೋಡ್ ಪರಿಶೀಲಿಸಿ",
+    btn_request_new_otp: "ಹೊಸ ಕೋಡ್ ಕೋರಿ",
+    otp_verified_badge: "✓ ಫೋನ್ ಸಂಪರ್ಕ ಪರಿಶೀಲಿಸಲಾಗಿದೆ",
+    otp_verifying: "ಪರಿಶೀಲಿಸಲಾಗುತ್ತಿದೆ...",
+    otp_success_msg: "ತುರ್ತು ಸಂಪರ್ಕ ಫೋನ್ ಯಶಸ್ವಿಯಾಗಿ ಪರಿಶೀಲಿಸಲಾಗಿದೆ.",
+
+    // Stage 5 & 6: Doctor Tele-Triage Callback
+    doctor_callback_title: "ವೈದ್ಯರ ಟೆಲಿ-ಟ್ರಯಾಜ್ ಕಾಲ್ಬ್ಯಾಕ್",
+    doctor_callback_desc: "ಪ್ರತಿಕ್ರಿಯಾ ತಂಡ ಸಮನ್ವಯಗೊಳ್ಳುತ್ತಿರುವಾಗ ಆನ್-ಕಾಲ್ ವೈದ್ಯಕೀಯ ಸಲಹೆಗಾರರೊಂದಿಗೆ ಟೆಲಿ-ಟ್ರಯಾಜ್ ಸಮಾಲೋಚನೆಗಾಗಿ ವಿನಂತಿಸಿ.",
+    btn_request_callback: "ವೈದ್ಯರ ಕಾಲ್ಬ್ಯಾಕ್ ವಿನಂತಿಸಿ",
+    chief_complaint_label: "ಮುಖ್ಯ ಲಕ್ಷಣಗಳು / ತುರ್ತು ಸಮಸ್ಯೆ",
+    chief_complaint_placeholder: "ರೋಗಿಯ ಸ್ಥಿತಿಯನ್ನು ವಿವರಿಸಿ (ಉದಾ. ಎದೆ ಬಿಗಿತ, ಉಸಿರಾಟದ ತೊಂದರೆ)...",
+    callback_disclaimer: "ವೈದ್ಯರ ಕಾಲ್ಬ್ಯಾಕ್ ತುರ್ತು ಮಾರ್ಗದರ್ಶನ ನೀಡುತ್ತದೆ. ಜೀವಕ್ಕೆ ಅಪಾಯಕಾರಿ ತುರ್ತು ಪರಿಸ್ಥಿತಿಗಾಗಿ ತಕ್ಷಣ 112 ಕ್ಕೆ ಕರೆ ಮಾಡಿ.",
+    callback_status_pending: "ಕಾಲ್ಬ್ಯಾಕ್ ವಿನಂತಿಸಲಾಗಿದೆ (ಪರಿಶೀಲನೆ ಬಾಕಿ ಇದೆ)",
+    callback_status_in_progress: "ಕಾಲ್ಬ್ಯಾಕ್ ಪ್ರಗತಿಯಲ್ಲಿದೆ (ವೈದ್ಯರು ಸಂಪರ್ಕಿಸುತ್ತಿದ್ದಾರೆ)",
+    callback_status_contacted: "ವೈದ್ಯಕೀಯ ಸಲಹೆಗಾರರು ನಾಗರಿಕರನ್ನು ಸಂಪರ್ಕಿಸಿದ್ದಾರೆ",
+    callback_status_completed: "ಟೆಲಿ-ಟ್ರಯಾಜ್ ಸಮಾಲೋಚನೆ ಪೂರ್ಣಗೊಂಡಿದೆ",
+    tab_doctor_callbacks: "🩺 ವೈದ್ಯರ ಕಾಲ್ಬ್ಯಾಕ್‌ಗಳು",
+    th_chief_complaint: "ಮುಖ್ಯ ಲಕ್ಷಣ",
+    th_callback_status: "ಕಾಲ್ಬ್ಯಾಕ್ ಸ್ಥಿತಿ",
+    btn_mark_in_progress: "ಪ್ರಗತಿಯಲ್ಲಿದೆ ಎಂದು ಗುರುತಿಸಿ",
+    btn_mark_contacted: "ಸಂಪರ್ಕಿಸಲಾಗಿದೆ ಎಂದು ಗುರುತಿಸಿ",
+    btn_mark_completed: "ಪೂರ್ಣಗೊಂಡಿದೆ ಎಂದು ಗುರುತಿಸಿ",
+
+    // Stage 5 & 6: Official Direct Emergency Line
+    direct_emergency_line: "ಅಧಿಕೃತ ತುರ್ತು ಸೇವೆಗಳು",
+
+    // Arrival Tracker
+    arrival_tracker_title: "ನೆರವು ಮಾರ್ಗದಲ್ಲಿದೆ!",
+    arrival_tracker_subtitle: "ನಿಮ್ಮ ತುರ್ತು ವಾಹನ ರವಾನೆಯಾಗಿದ್ದು, ನಿಮ್ಮ ಸ್ಥಳದತ್ತ ಬರುತ್ತಿದೆ.",
+    arrival_tracker_eta: "ಅಂದಾಜು ಆಗಮನ",
+    arrival_tracker_mins: "ನಿಮಿಷಗಳು",
+    arrival_tracker_unit: "ನಿಯೋಜಿತ ವಾಹನ",
+    arrival_tracker_demo_badge: "ಡೆಮೊ ಸಿಮ್ಯುಲೇಶನ್",
+    arrival_tracker_live_badge: "ಲೈವ್ GPS",
+    arrival_confirm_btn: "ನೆರವು ತಲುಪಿದೆ ಎಂದು ದೃಢೀಕರಿಸಿ",
+    arrival_confirm_dialog: "ತುರ್ತು ಸಹಾಯಕರು ನಿಮ್ಮ ಸ್ಥಳಕ್ಕೆ ತಲುಪಿದ್ದಾರೆಯೇ?",
+    arrival_stage_received: "ವಿನಂತಿ ಸ್ವೀಕರಿಸಲಾಗಿದೆ",
+    arrival_stage_dispatched: "ವಾಹನ ರವಾನಿಸಲಾಗಿದೆ",
+    arrival_stage_enroute: "ಮಾರ್ಗದಲ್ಲಿದೆ",
+    arrival_stage_arrived: "ಸ್ಥಳಕ್ಕೆ ತಲುಪಿದೆ",
+    arrival_tracker_map_preview: "ಲೈವ್ ಮಾರ್ಗ ಮುನ್ನೋಟ",
+    enlarge_map_btn: "ನಕ್ಷೆಯನ್ನು ದೊಡ್ಡದಾಗಿಸಿ",
+    close_map_btn: "ನಕ್ಷೆಯನ್ನು ಮುಚ್ಚಿ",
+    enlarged_map_title: "ತುರ್ತು ಪ್ರತಿಕ್ರಿಯೆ ಮಾರ್ಗ ಮತ್ತು ಟ್ರ್ಯಾಕರ್",
+    stay_safe_title: "ಸಹಾಯ ಬರುವವರೆಗೆ ಸುರಕ್ಷಿತವಾಗಿರಿ",
+    safety_tips_paused: "ಸಂವಾದದಲ್ಲಿ ವಿರಾಮಗೊಳಿಸಲಾಗಿದೆ",
+    safety_tip_med_1: "ವ್ಯಕ್ತಿಯನ್ನು ಆರಾಮವಾಗಿರಿಸಿ ಮತ್ತು ಗಂಭೀರ ಗಾಯವಾಗಿದ್ದರೆ ಅನಗತ್ಯ ಚಲನೆಯನ್ನು ತಪ್ಪಿಸಿ.",
+    safety_tip_med_2: "ವ್ಯಕ್ತಿಯ ಸುತ್ತಲೂ ಶುದ್ಧ ಗಾಳಿಯನ್ನು ಖಚಿತಪಡಿಸಿಕೊಳ್ಳಿ ಮತ್ತು ಬಿಗಿಯಾದ ಬಟ್ಟೆಯನ್ನು ಸಡಿಲಗೊಳಿಸಿ.",
+    safety_tip_med_3: "ಶಾಂತರಾಗಿರಿ, ನಿಮ್ಮ ಫೋನ್ ಲೈನ್ ಮುಕ್ತವಾಗಿಡಿ ಮತ್ತು ವೈದ್ಯಕೀಯ ವಿವರಗಳನ್ನು ಸಿದ್ಧವಾಗಿಡಿ.",
+    safety_tip_fire_1: "ಹೊಗೆ ಮತ್ತು ಬೆಂಕಿಯಿಂದ ತಕ್ಷಣ ದೂರ ಸರಿಯಿರಿ. ಲಿಫ್ಟ್‌ಗಳನ್ನು ಬಳಸಬೇಡಿ.",
+    safety_tip_fire_2: "ಹೊಗೆಯ ಕೆಳಗೆ ತಗ್ಗಿರಿ, ಅಲ್ಲಿ ಗಾಳಿಯು ಹೆಚ್ಚು ಸ್ವಚ್ಛವಾಗಿರುತ್ತದೆ.",
+    safety_tip_fire_3: "ವಸ್ತುಗಳನ್ನು ತರಲು ಸುಡುತ್ತಿರುವ ಕಟ್ಟಡಕ್ಕೆ ಎಂದಿಗೂ ಹಿಂತಿರುಗಬೇಡಿ.",
+    safety_tip_road_1: "ಚಲಿಸುವ ವಾಹನಗಳಿಂದ ದೂರವಿರಿ ಮತ್ತು ಸುರಕ್ಷಿತ ಪಾದಚಾರಿ ಮಾರ್ಗದಲ್ಲಿ ನಿರೀಕ್ಷಿಸಿ.",
+    safety_tip_road_2: "ಸಾಧ್ಯವಾದರೆ ಬರುವ ವಾಹನಗಳಿಗೆ ಎಚ್ಚರಿಕೆ ನೀಡಲು ವಾಹನದ ಹಜಾರ್ಡ್ ದೀಪಗಳನ್ನು ಆನ್ ಮಾಡಿ.",
+    safety_tip_road_3: "ಬೆಂಕಿ ಅಥವಾ ತಕ್ಷಣದ ಅಪಾಯವಿಲ್ಲದಿದ್ದರೆ ಗಂಭೀರವಾಗಿ ಗಾಯಗೊಂಡವರನ್ನು ಚಲಿಸಬೇಡಿ.",
+    safety_tip_flood_1: "ತಕ್ಷಣವೇ ಎತ್ತರದ ಪ್ರದೇಶಕ್ಕೆ ಹೋಗಿ ಮತ್ತು ಪ್ರವಾಹದ ನೀರಿನಲ್ಲಿ ನಡೆಯುವುದು ಅಥವಾ ವಾಹನ ಚಲಾಯಿಸುವುದನ್ನು ತಪ್ಪಿಸಿ.",
+    safety_tip_flood_2: "ಬಿದ್ದಿರುವ ವಿದ್ಯುತ್ ಕಂಬಗಳು, ತಂತಿಗಳು ಮತ್ತು ಹಾನಿಗೊಳಗಾದ ಗೋಡೆಗಳಿಂದ ದೂರವಿರಿ.",
+    safety_tip_flood_3: "ಪಾರುಗಾಣಿಕಾ ತಂಡಕ್ಕಾಗಿ ಕಾಯುತ್ತಿರುವಾಗ ಟಾರ್ಚ್, ಕುಡಿಯುವ ನೀರು ಮತ್ತು ಚಾರ್ಜ್ ಮಾಡಿದ ಫೋನ್ ಸಿದ್ಧವಾಗಿಡಿ.",
+    safety_tip_rescue_1: "ಶಿಥಿಲಗೊಂಡ ರಚನೆಗಳು ಮತ್ತು ಬೀಳುವ ಅವಶೇಷಗಳಿಂದ ದೂರವಿರುವ ಸ್ಥಿರ ಸ್ಥಳದಲ್ಲಿರಿ.",
+    safety_tip_rescue_2: "ಸಿಲುಕಿಕೊಂಡಿದ್ದರೆ ಶಬ್ದ ಮಾಡಿ ಅಥವಾ ಬೆಳಕಿನ ಸಂಕೇತ ನೀಡಿ, ಅನಗತ್ಯ ಕೂಗಾಟದಿಂದ ಶಕ್ತಿ ವ್ಯರ್ಥ ಮಾಡಬೇಡಿ.",
+    safety_tip_rescue_3: "ಬರುವ ರಕ್ಷಣಾ ತಂಡಕ್ಕೆ ಪ್ರವೇಶ ಮಾರ್ಗಗಳನ್ನು ಮುಕ್ತವಾಗಿಡಿ.",
+    safety_tip_gen_1: "ಸಹಾಯ ಬರುವವರೆಗೆ ಸಾಧ್ಯವಾದರೆ ಉತ್ತಮ ಬೆಳಕಿರುವ ಸುರಕ್ಷಿತ ಸ್ಥಳದಲ್ಲಿರಿ.",
+    safety_tip_gen_2: "ತುರ್ತು ತಂಡ ಅಥವಾ ಸಂಯೋಜಕರು ಸಂಪರ್ಕಿಸಲು ನಿಮ್ಮ ಫೋನ್ ಲೈನ್ ಅನ್ನು ಮುಕ್ತವಾಗಿಡಿ.",
+    safety_tip_gen_3: "ವಾಹನವನ್ನು ಗಮನಿಸಲು ಮತ್ತು ತಂಡವನ್ನು ನಿಖರ ಸ್ಥಳಕ್ಕೆ ನಿರ್ದೇಶಿಸಲು ಯಾರಾದರೂ ಕಾದುನೋಡಲಿ.",
+
+    // Call a Doctor
+    call_doctor_title: "ವೈದ್ಯರಿಗೆ ಕರೆ ಮಾಡಿ",
+    call_doctor_subtitle: "ವೈದ್ಯಕೀಯ ಸಲಹೆಗಾರರೊಂದಿಗೆ ಸಂಪರ್ಕ ಸಾಧಿಸಿ ಅಥವಾ ತಕ್ಷಣದ ಕಾಲ್‌ಬ್ಯಾಕ್ ಕೋರಿ.",
+    call_doctor_btn: "ತುರ್ತು ವೈದ್ಯರ ಕರೆಗೆ ವಿನಂತಿಸಿ",
+    call_doctor_direct_108: "108 ವೈದ್ಯಕೀಯ ಆಂಬ್ಯುಲೆನ್ಸ್‌ಗೆ ಕರೆ ಮಾಡಿ",
+    call_doctor_notes_placeholder: "ಐಚ್ಛಿಕ: ರೋಗಿಯ ಸ್ಥಿತಿ ಅಥವಾ ಲಕ್ಷಣಗಳನ್ನು ಸಂಕ್ಷಿಪ್ತವಾಗಿ ಬರೆಯಿರಿ",
+    call_doctor_success: "ವೈದ್ಯರ ಕರೆ ವಿನಂತಿಯನ್ನು ಸಲ್ಲಿಸಲಾಗಿದೆ. ವೈದ್ಯರು ಶೀಘ್ರದಲ್ಲೇ ನಿಮ್ಮನ್ನು ಸಂಪರ್ಕಿಸುತ್ತಾರೆ.",
+    doctor_calling_unavailable: "ವೈದ್ಯರ ಕರೆ ಸೇವೆ ಪ್ರಸ್ತುತ ಲಭ್ಯವಿಲ್ಲ. ತುರ್ತು ಸಂದರ್ಭಗಳಲ್ಲಿ ನೇರವಾಗಿ 112 ಗೆ ಕರೆ ಮಾಡಿ.",
+
+    // Coordinator Persistent Notifications
+    admin_notifications_title: "ಸಂಯೋಜಕರ ಎಚ್ಚರಿಕೆಗಳು",
+    admin_notifications_mark_all: "ಎಲ್ಲವನ್ನೂ ಓದಲಾಗಿದೆ ಎಂದು ಗುರುತಿಸಿ",
+    admin_notifications_empty: "ಇನ್ನೂ ಯಾವುದೇ ಸಂಯೋಜಕ ಅಧಿಸೂಚನೆಗಳಿಲ್ಲ.",
+
+    // Multi-factor Smart Allocation
+    alloc_score_label: "ವಿಶ್ವಾಸಾರ್ಹತೆ ಸ್ಕೋರ್",
+    alloc_auto_dispatch: "ಸ್ವಯಂ-ರವಾನೆಗೆ ಸುರಕ್ಷಿತ",
+    alloc_admin_review: "ಸಂಯೋಜಕರ ಪರಿಶೀಲನೆ ಅಗತ್ಯವಿದೆ",
+    alloc_algorithm_badge: "ನಿಯಮ-ಆಧಾರಿತ ಬಹು-ಅಂಶ ಸ್ಕೋರಿಂಗ್ ಎಂಜಿನ್",
   },
 };
 
@@ -1354,29 +2200,308 @@ export const translations = {
 export function useTranslation(lang = 'en') {
   const dict = translations[lang] || translations.en;
 
+  const translateDynamicMessage = (str, targetLang) => {
+    if (!str || typeof str !== 'string' || targetLang === 'en') return null;
+
+    // Dynamic backend timeline & notification patterns
+    // 1. Emergency request received / Assigned Incident Code
+    let m = str.match(/^Emergency request received\. Unique Tracking ID: ([\w-]+)\.?$/i) ||
+            str.match(/^Emergency report received\. Assigned Incident Code ([\w-]+)\.?$/i);
+    if (m) {
+      return targetLang === 'hi'
+        ? `आपातकालीन रिपोर्ट प्राप्त हुई। विशिष्ट ट्रैकिंग कोड: ${m[1]}।`
+        : `ತುರ್ತು ವರದಿ ಸ್ವೀಕರಿಸಲಾಗಿದೆ. ವಿಶಿಷ್ಟ ಟ್ರ್ಯಾಕಿಂಗ್ ಕೋಡ್: ${m[1]}.`;
+    }
+
+    // 2. Incident confirmed by phone contact with Demo User
+    m = str.match(/^Incident confirmed by phone contact with (.+?)\.?$/i);
+    if (m) {
+      return targetLang === 'hi'
+        ? `${m[1]} के साथ फोन संपर्क द्वारा घटना की पुष्टि की गई।`
+        : `${m[1]} ಅವರೊಂದಿಗೆ ದೂರವಾಣಿ ಸಂಪರ್ಕದ ಮೂಲಕ ಘಟನೆಯನ್ನು ದೃಢೀಕರಿಸಲಾಗಿದೆ.`;
+    }
+
+    // 3. Resource assigned to incident
+    m = str.match(/^(.+?) assigned to incident\.?$/i);
+    if (m) {
+      return targetLang === 'hi'
+        ? `${m[1]} को आपातकाल के लिए सौंपा गया।`
+        : `${m[1]} ಅನ್ನು ಘಟನೆಗೆ ನಿಯೋಜಿಸಲಾಗಿದೆ.`;
+    }
+
+    // 4. Resource en route with siren activated. ETA X mins
+    m = str.match(/^(.+?) en route with siren activated\. ETA (\d+) mins\.?$/i);
+    if (m) {
+      return targetLang === 'hi'
+        ? `${m[1]} सायरन के साथ रवाना है। अनुमानित समय ~${m[2]} मिनट।`
+        : `${m[1]} ಸೈರನ್‌ನೊಂದಿಗೆ ಸಾಗುತ್ತಿದೆ. ಅಂದಾಜು ಆಗಮನ ಸಮಯ ~${m[2]} ನಿಮಿಷಗಳು.`;
+    }
+
+    // 5. Paramedics stabilized jogger and safely discharged onsite
+    if (/^Paramedics stabilized jogger and safely discharged onsite\.?$/i.test(str)) {
+      return targetLang === 'hi'
+        ? "पैरामेडिक्स ने व्यक्ति की स्थिति स्थिर की और सुरक्षित रूप से मौके पर प्राथमिक उपचार पूरा किया।"
+        : "ಪ್ಯಾರಾಮೆಡಿಕ್ಸ್ ವ್ಯಕ್ತಿಯನ್ನು ಉಪಚರಿಸಿ ಸ್ಥಳದಲ್ಲೇ ಸ್ಥಿರಗೊಳಿಸಿದರು.";
+    }
+
+    // 6. Contact, Resource has been dispatched to your location. ETA ~Z mins.
+    m = str.match(/^(.+?), (.+?) has been dispatched to your location\. ETA ~(\d+) mins\.?$/i);
+    if (m) {
+      return targetLang === 'hi'
+        ? `${m[1]}, ${m[2]} को आपके स्थान के लिए रवाना कर दिया गया है। अनुमानित समय ~${m[3]} मिनट।`
+        : `${m[1]}, ${m[2]} ಅನ್ನು ನಿಮ್ಮ ಸ್ಥಳಕ್ಕೆ ರವಾನಿಸಲಾಗಿದೆ. ಅಂದಾಜು ಆಗಮನ ಸಮಯ ~${m[3]} ನಿಮಿಷಗಳು.`;
+    }
+
+    // 7. Contact, resource has been dispatched to location
+    m = str.match(/^(.+?), (.+?) has been dispatched to (.+?)\.?$/i);
+    if (m) {
+      return targetLang === 'hi'
+        ? `${m[1]}, ${m[2]} को ${m[3]} के लिए रवाना कर दिया गया है।`
+        : `${m[1]}, ${m[2]} ಅನ್ನು ${m[3]} ಗೆ ರವಾನಿಸಲಾಗಿದೆ.`;
+    }
+
+    // 7. Contact, your request has been received...
+    m = str.match(/^(.+?), your request has been received\. Our coordinator will review the details\.?$/i);
+    if (m) {
+      return targetLang === 'hi'
+        ? `${m[1]}, आपका अनुरोध प्राप्त हो गया है। हमारे समन्वयक शीघ्र विवरण की समीक्षा करेंगे।`
+        : `${m[1]}, ನಿಮ್ಮ ವಿನಂತಿಯನ್ನು ಸ್ವೀಕರಿಸಲಾಗಿದೆ. ನಮ್ಮ ಸಂಯೋಜಕರು ಶೀಘ್ರದಲ್ಲೇ ಪರಿಶೀಲಿಸುತ್ತಾರೆ.`;
+    }
+
+    // 8. Phone contact verified via emergency OTP
+    m = str.match(/^Phone contact verified via emergency OTP (?:by reporter|for) (.+?)\.?$/i);
+    if (m) {
+      return targetLang === 'hi'
+        ? `नागरिक ${m[1]} द्वारा आपातकालीन ओटीपी के माध्यम से फ़ोन संपर्क सत्यापित किया गया।`
+        : `ನಾಗರಿಕ ${m[1]} ರವರಿಂದ ತುರ್ತು ಒಟಿಪಿ ಮೂಲಕ ದೂರವಾಣಿ ಸಂಪರ್ಕ ದೃಢೀಕರಿಸಲಾಗಿದೆ.`;
+    }
+
+    // 9. Your emergency contact has been verified. Coordinator is assigning assistance
+    if (/^Your emergency contact has been verified\. Coordinator is assigning assistance\.?$/i.test(str)) {
+      return targetLang === 'hi'
+        ? "आपका आपातकालीन संपर्क सत्यापित हो गया है। समन्वयक सहायता आवंटित कर रहे हैं।"
+        : "ನಿಮ್ಮ ತುರ್ತು ಸಂಪರ್ಕವನ್ನು ಪರಿಶೀಲಿಸಲಾಗಿದೆ. ಸಂಯೋಜಕರು ನೆರವು ನಿಯೋಜಿಸುತ್ತಿದ್ದಾರೆ.";
+    }
+
+    // 10. Medical tele-triage / doctor callback requested
+    m = str.match(/^(?:Medical tele-triage callback|Doctor call) requested (?:by reporter|for) (.+?)\.\s*Status:\s*(.+?)\.?$/i);
+    if (m) {
+      return targetLang === 'hi'
+        ? `नागरिक ${m[1]} द्वारा डॉक्टर परामर्श का अनुरोध किया गया। स्थिति: ${m[2]}।`
+        : `ನಾಗರಿಕ ${m[1]} ರವರಿಂದ ವೈದ್ಯರ ನೆರವು ಕೋರಲಾಗಿದೆ. ಸ್ಥಿತಿ: ${m[2]}.`;
+    }
+
+    // 11. Reporter / Citizen requested medical callback
+    m = str.match(/^(?:Reporter|Citizen)\s+(.+?)\s+requested (?:a medical callback|doctor assistance):\s*(.+?)\.?$/i);
+    if (m) {
+      return targetLang === 'hi'
+        ? `नागरिक ${m[1]} ने डॉक्टर परामर्श का अनुरोध किया: ${m[2]}`
+        : `ನಾಗರಿಕ ${m[1]} ರವರು ವೈದ್ಯರ ನೆರವು ಕೋರಿದ್ದಾರೆ: ${m[2]}`;
+    }
+
+    // 12. Doctor callback request status updated
+    m = str.match(/^Doctor callback request status updated to '(.+?)' by (.+?)\.?(?: Notes: (.+))?$/i);
+    if (m) {
+      const notesPart = m[3] ? (targetLang === 'hi' ? ` (नोट्स: ${m[3]})` : ` (ಟಿಪ್ಪಣಿ: ${m[3]})`) : '';
+      return targetLang === 'hi'
+        ? `${m[2]} द्वारा डॉक्टर कॉलबैक अनुरोध स्थिति बदलकर '${m[1]}' कर दी गई।${notesPart}`
+        : `${m[2]} ರವರಿಂದ ವೈದ್ಯರ ಕಾಲ್‌ಬ್ಯಾಕ್ ವಿನಂತಿಯ ಸ್ಥಿತಿಯನ್ನು '${m[1]}' ಗೆ ನವೀಕರಿಸಲಾಗಿದೆ.${notesPart}`;
+    }
+
+    // 13. Your medical tele-triage callback request for incident #X has been marked as 'Y'
+    m = str.match(/^Your medical tele-triage callback request for incident #(\d+) has been marked as '(.+?)'\.?$/i);
+    if (m) {
+      return targetLang === 'hi'
+        ? `घटना #${m[1]} के लिए आपका मेडिकल कॉलबैक अनुरोध '${m[2]}' चिह्नित किया गया है।`
+        : `ಘಟನೆ #${m[1]} ಗಾಗಿ ನಿಮ್ಮ ವೈದ್ಯಕೀಯ ಕಾಲ್‌ಬ್ಯಾಕ್ ವಿನಂತಿಯನ್ನು '${m[2]}' ಎಂದು ಗುರುತಿಸಲಾಗಿದೆ.`;
+    }
+
+    // 14. Priority adjusted from X to Y. Reason: Z
+    m = str.match(/^Priority adjusted from (.+?) to (.+?)\. Reason: (.+?)$/i);
+    if (m) {
+      return targetLang === 'hi'
+        ? `प्राथमिकता ${m[1]} से बदलकर ${m[2]} की गई। कारण: ${m[3]}`
+        : `ಆದ್ಯತೆಯನ್ನು ${m[1]} ರಿಂದ ${m[2]} ಗೆ ಹೊಂದಿಸಲಾಗಿದೆ. ಕಾರಣ: ${m[3]}`;
+    }
+
+    // 15. Request cancelled by X. Reason: Y. Resources flagged for safe release.
+    m = str.match(/^Request cancelled by (.+?)\. Reason: (.+?)\. Resources flagged for safe release\.?$/i);
+    if (m) {
+      return targetLang === 'hi'
+        ? `${m[1]} द्वारा अनुरोध रद्द किया गया। कारण: ${m[2]}। संसाधन सुरक्षित रूप से मुक्त किए गए।`
+        : `${m[1]} ರವರಿಂದ ವಿನಂತಿ ರದ್ದುಗೊಂಡಿದೆ. ಕಾರಣ: ${m[2]}. ವಾಹನಗಳನ್ನು ಸುರಕ್ಷಿತವಾಗಿ ಬಿಡುಗಡೆ ಮಾಡಲಾಗಿದೆ.`;
+    }
+
+    // 16. Reporter cancelled CODE (Reason: X). Please confirm safe resource release.
+    m = str.match(/^Reporter cancelled ([\w-]+) \(Reason: (.+?)\)\. Please confirm safe resource release\.?$/i);
+    if (m) {
+      return targetLang === 'hi'
+        ? `रिपोर्टर ने ${m[1]} रद्द किया (कारण: ${m[2]})। कृपया संसाधन मुक्ति की पुष्टि करें।`
+        : `ವರದಿದಾರರು ${m[1]} ರದ್ದುಗೊಳಿಸಿದ್ದಾರೆ (ಕಾರಣ: ${m[2]}). ದಯವಿಟ್ಟು ಸಂಪನ್ಮೂಲ ಬಿಡುಗಡೆಯನ್ನು ದೃಢೀಕರಿಸಿ.`;
+    }
+
+    // 17. Coordinator acknowledged cancellation. All assigned resources safely released to available fleet.
+    if (/^Coordinator acknowledged cancellation\. All assigned resources safely released to available fleet\.?$/i.test(str)) {
+      return targetLang === 'hi'
+        ? "समन्वयक ने रद्दीकरण स्वीकार किया। सभी सौंपे गए संसाधन उपलब्ध बेड़े में सुरक्षित रूप से मुक्त किए गए।"
+        : "ಸಂಯೋಜಕರು ರದ್ದತಿಯನ್ನು ಅಂಗೀಕರಿಸಿದ್ದಾರೆ. ನಿಯೋಜಿಸಲಾದ ಎಲ್ಲಾ ವಾಹನಗಳು ಮರಳಿ ಲಭ್ಯವಿವೆ.";
+    }
+
+    // 18. Incident safely resolved. Field teams returned to base.
+    if (/^Incident safely resolved\. Field teams returned to base\.?$/i.test(str)) {
+      return targetLang === 'hi'
+        ? "आपातकाल सुरक्षित रूप से हल हो गया। फील्ड टीमें बेस पर लौट आईं।"
+        : "ತುರ್ತು ಪರಿಸ್ಥಿತಿ ಸುರಕ್ಷಿತವಾಗಿ ಪರಿಹರಿಸಲಾಗಿದೆ. ರಕ್ಷಣಾ ತಂಡಗಳು ಬೇಸ್‌ಗೆ ಮರಳಿವೆ.";
+    }
+
+    // 19. Contact, your request CODE has been resolved. We hope you are safe.
+    m = str.match(/^(.+?), your request ([\w-]+) has been resolved\. We hope you are safe\.?$/i);
+    if (m) {
+      return targetLang === 'hi'
+        ? `${m[1]}, आपका अनुरोध ${m[2]} सुरक्षित रूप से हल हो गया है। आशा है कि आप सुरक्षित हैं।`
+        : `${m[1]}, ನಿಮ್ಮ ವಿನಂತಿ ${m[2]} ಯಶಸ್ವಿಯಾಗಿ ಪರಿಹರಿಸಲಾಗಿದೆ. ನೀವು ಸುರಕ್ಷಿತವಾಗಿರುವಿರಿ ಎಂದು ನಾವು ಭಾವಿಸುತ್ತೇವೆ.`;
+    }
+
+    // 20. Resource X (Y) confirmed and dispatched. Estimated ETA ~Z mins.
+    m = str.match(/^Resource (.+?) \((.+?)\) confirmed and dispatched\. Estimated ETA ~(\d+) mins\.?$/i);
+    if (m) {
+      return targetLang === 'hi'
+        ? `संसाधन ${m[1]} (${m[2]}) की पुष्टि की गई और रवाना किया गया। अनुमानित समय ~${m[3]} मिनट।`
+        : `ಸಂಪನ್ಮೂಲ ${m[1]} (${m[2]}) ದೃಢೀಕರಿಸಿ ರವಾನಿಸಲಾಗಿದೆ. ಅಂದಾಜು ಆಗಮನ ಸಮಯ ~${m[3]} ನಿಮಿಷಗಳು.`;
+    }
+
+    // 21. Contact, Resource has been dispatched to your location. ETA ~Z mins.
+    m = str.match(/^(.+?), (.+?) has been dispatched to your location\. ETA ~(\d+) mins\.?$/i);
+    if (m) {
+      return targetLang === 'hi'
+        ? `${m[1]}, ${m[2]} को आपके स्थान के लिए रवाना कर दिया गया है। अनुमानित समय ~${m[3]} मिनट।`
+        : `${m[1]}, ${m[2]} ಅನ್ನು ನಿಮ್ಮ ಸ್ಥಳಕ್ಕೆ ರವಾನಿಸಲಾಗಿದೆ. ಅಂದಾಜು ಆಗಮನ ಸಮಯ ~${m[3]} ನಿಮಿಷಗಳು.`;
+    }
+
+    // 22. Coordinator contacted external partner X (Y)
+    m = str.match(/^Coordinator contacted external partner (.+?) \((.+?)\)\.?$/i);
+    if (m) {
+      return targetLang === 'hi'
+        ? `समन्वयक ने बाहरी साझेदार ${m[1]} (${m[2]}) से संपर्क किया।`
+        : `ಸಂಯೋಜಕರು ಬಾಹ್ಯ ಪಾಲುದಾರ ${m[1]} (${m[2]}) ಅನ್ನು ಸಂಪರ್ಕಿಸಿದ್ದಾರೆ.`;
+    }
+
+    // 23. External provider quoted ₹X. Awaiting user approval.
+    m = str.match(/^External provider quoted ₹([\d,]+)\. Awaiting user approval\.?$/i);
+    if (m) {
+      return targetLang === 'hi'
+        ? `बाहरी प्रदाता ने ₹${m[1]} का उद्धरण दिया। उपयोगकर्ता अनुमोदन की प्रतीक्षा है।`
+        : `ಬಾಹ್ಯ ಪೂರೈಕೆದಾರರು ₹${m[1]} ದರಪಟ್ಟಿಯನ್ನು ನೀಡಿದ್ದಾರೆ. ಬಳಕೆದಾರರ ಅನುಮೋದನೆಗಾಗಿ ಕಾಯಲಾಗುತ್ತಿದೆ.`;
+    }
+
+    // 24. A partner provider is available for ₹X. Please review and approve in your tracking page.
+    m = str.match(/^A partner provider is available for ₹([\d,]+)\. Please review and approve in your tracking page\.?$/i);
+    if (m) {
+      return targetLang === 'hi'
+        ? `₹${m[1]} में एक साझेदार प्रदाता उपलब्ध है। कृपया अपने ट्रैकिंग पृष्ठ पर समीक्षा करें और स्वीकृति दें।`
+        : `₹${m[1]} ದರದಲ್ಲಿ ಪಾಲುದಾರ ಪೂರೈಕೆದಾರರು ಲಭ್ಯವಿದ್ದಾರೆ. ದಯವಿಟ್ಟು ನಿಮ್ಮ ಟ್ರ್ಯಾಕಿಂಗ್ ಪುಟದಲ್ಲಿ ಅನುಮೋದಿಸಿ.`;
+    }
+
+    // 25. User accepted provider quote (₹X). External dispatch confirmed.
+    m = str.match(/^User accepted provider quote \(₹([\d,]+)\)\. External dispatch confirmed\.?$/i);
+    if (m) {
+      return targetLang === 'hi'
+        ? `उपयोगकर्ता ने प्रदाता उद्धरण (₹${m[1]}) स्वीकार किया। बाहरी प्रेषण की पुष्टि की गई।`
+        : `ಬಳಕೆದಾರರು ಪೂರೈಕೆದಾರರ ದರಪಟ್ಟಿಯನ್ನು (₹${m[1]}) ಒಪ್ಪಿಕೊಂಡಿದ್ದಾರೆ. ಬಾಹ್ಯ ರವಾನೆ ದೃಢೀಕರಿಸಲಾಗಿದೆ.`;
+    }
+
+    // 26. Request CODE: MSG
+    m = str.match(/^Request ([\w-]+): (.+)$/i);
+    if (m) {
+      const sub = translateDynamicMessage(m[2], targetLang) || m[2];
+      return targetLang === 'hi'
+        ? `अनुरोध ${m[1]}: ${sub}`
+        : `ವಿನಂತಿ ${m[1]}: ${sub}`;
+    }
+
+    // 27. Emergency Verification Code (CODE)
+    m = str.match(/^Emergency Verification Code \(([\w-]+)\)$/i);
+    if (m) {
+      return targetLang === 'hi'
+        ? `आपातकालीन सत्यापन कोड (${m[1]})`
+        : `ತುರ್ತು ಪರಿಶೀಲನಾ ಕೋಡ್ (${m[1]})`;
+    }
+
+    // 28. Your CareOn verification code is: OTP. Enter this code in the verification box to continue. (In-App Demo OTP)
+    m = str.match(/^Your CareOn verification code is:\s*(\d{6})\.\s*Enter this code in the verification box to continue\.\s*\(In-App Demo OTP\)$/i);
+    if (m) {
+      return targetLang === 'hi'
+        ? `आपका CareOn सत्यापन कोड है: ${m[1]}। जारी रखने के लिए इस कोड को सत्यापन बॉक्स में दर्ज करें। (इन-ऐप डेमो ओटीपी)`
+        : `ನಿಮ್ಮ CareOn ಪರಿಶೀಲನಾ ಕೋಡ್: ${m[1]}. ಮುಂದುವರಿಯಲು ಪರಿಶೀಲನಾ ಪೆಟ್ಟಿಗೆಯಲ್ಲಿ ಈ ಕೋಡ್ ಅನ್ನು ನಮೂದಿಸಿ. (ಇನ್-ಆಪ್ ಡೆಮೊ ಒಟಿಪಿ)`;
+    }
+
+    // 29. Invalid verification code. Attempts remaining: X.
+    m = str.match(/^Invalid verification code\.\s*Attempts remaining:\s*(\d+)\.?$/i);
+    if (m) {
+      return targetLang === 'hi'
+        ? `अमान्य सत्यापन कोड। शेष प्रयास: ${m[1]}।`
+        : `ಅಮಾನ್ಯ ಪರಿಶೀಲನಾ ಕೋಡ್. ಉಳಿದಿರುವ ಪ್ರಯತ್ನಗಳು: ${m[1]}.`;
+    }
+
+    // 30. Maximum verification attempts exceeded (5/5). Please request a new emergency verification code.
+    if (/^Maximum verification attempts exceeded.*$/i.test(str)) {
+      return targetLang === 'hi'
+        ? "अधिकतम सत्यापन प्रयास पार हो गए (5/5)। कृपया एक नया आपातकालीन सत्यापन कोड अनुरोध करें।"
+        : "ಗರಿಷ್ಠ ಪರಿಶೀಲನಾ ಪ್ರಯತ್ನಗಳನ್ನು ಮೀರಿದೆ (5/5). ದಯವಿಟ್ಟು ಹೊಸ ತುರ್ತು ಪರಿಶೀಲನಾ ಕೋಡ್ ಅನ್ನು ವಿನಂತಿಸಿ.";
+    }
+
+    // 31. Emergency verification code has expired. Please request a new code.
+    if (/^Emergency verification code has expired.*$/i.test(str)) {
+      return targetLang === 'hi'
+        ? "आपातकालीन सत्यापन कोड समाप्त हो गया है। कृपया एक नया कोड अनुरोध करें।"
+        : "ತುರ್ತು ಪರಿಶೀಲನಾ ಕೋಡ್ ಮುಕ್ತಾಯಗೊಂಡಿದೆ. ದಯವಿಟ್ಟು ಹೊಸ ಕೋಡ್ ಅನ್ನು ವಿನಂತಿಸಿ.";
+    }
+
+    // 32. Incident is already verified. Reusing verification code is not allowed.
+    if (/^Incident is already verified.*$/i.test(str)) {
+      return targetLang === 'hi'
+        ? "घटना पहले ही सत्यापित हो चुकी है। सत्यापन कोड का पुन: उपयोग करने की अनुमति नहीं है।"
+        : "ಘಟನೆಯನ್ನು ಈಗಾಗಲೇ ಪರಿಶೀಲಿಸಲಾಗಿದೆ. ಪರಿಶೀಲನಾ ಕೋಡ್ ಅನ್ನು ಮರುಬಳಕೆ ಮಾಡಲು ಅನುಮತಿಸಲಾಗುವುದಿಲ್ಲ.";
+    }
+
+    return null;
+  };
+
   const translateFn = (key, fallback = '') => {
     if (!key && key !== 0) return fallback || '';
     if (typeof key !== 'string') return String(key);
 
-    const keyLower = key.toLowerCase();
-    const keyUpper = key.toUpperCase();
+    const trimmed = key.trim();
+    const keyLower = trimmed.toLowerCase();
+    const keyUpper = trimmed.toUpperCase();
 
     // 1. Exact or case-insensitive match in active dictionary
-    if (dict?.[key] !== undefined && dict[key] !== '') return dict[key];
+    if (dict?.[trimmed] !== undefined && dict[trimmed] !== '') return dict[trimmed];
     if (dict?.[keyLower] !== undefined && dict[keyLower] !== '') return dict[keyLower];
     if (dict?.[keyUpper] !== undefined && dict[keyUpper] !== '') return dict[keyUpper];
 
-    // 2. Exact or case-insensitive match in English dictionary
-    if (translations.en?.[key] !== undefined && translations.en[key] !== '') return translations.en[key];
+    // Check status_ or cat_ or priority_ prefixes in active dictionary
+    if (dict?.[`status_${keyLower.replace(/ /g, '_')}`] !== undefined) return dict[`status_${keyLower.replace(/ /g, '_')}`];
+    if (dict?.[`cat_${keyLower.replace(/ /g, '_')}`] !== undefined) return dict[`cat_${keyLower.replace(/ /g, '_')}`];
+    if (dict?.[`priority_${keyLower.replace(/ /g, '_')}`] !== undefined) return dict[`priority_${keyLower.replace(/ /g, '_')}`];
+
+    // 2. Dynamic message pattern translation for Hindi and Kannada
+    if (lang === 'hi' || lang === 'kn') {
+      const dynamicResult = translateDynamicMessage(trimmed, lang);
+      if (dynamicResult) return dynamicResult;
+    }
+
+    // 3. Exact or case-insensitive match in English dictionary
+    if (translations.en?.[trimmed] !== undefined && translations.en[trimmed] !== '') return translations.en[trimmed];
     if (translations.en?.[keyLower] !== undefined && translations.en[keyLower] !== '') return translations.en[keyLower];
     if (translations.en?.[keyUpper] !== undefined && translations.en[keyUpper] !== '') return translations.en[keyUpper];
 
-    // 3. Explicit fallback parameter provided
+    // 4. Explicit fallback parameter provided
     if (fallback !== undefined && fallback !== '') return fallback;
 
-    // 4. Humanize internal identifiers (snake_case or SCREAMING_SNAKE_CASE) to clean Title Case
-    if (key.includes('_') || (key.length > 3 && key === keyUpper)) {
-      return key
+    // 5. Humanize internal identifiers (snake_case or SCREAMING_SNAKE_CASE) to clean Title Case
+    if (trimmed.includes('_') || (trimmed.length > 3 && trimmed === keyUpper)) {
+      return trimmed
         .replace(/_/g, ' ')
         .toLowerCase()
         .replace(/\b\w/g, (c) => c.toUpperCase());

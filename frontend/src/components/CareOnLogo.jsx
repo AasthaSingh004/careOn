@@ -5,7 +5,7 @@ import React from 'react';
  * A minimal, modern, professional SVG logo featuring a teal shield
  * containing a clean white location pin with a medical cross at its centre.
  */
-export default function CareOnLogo({ size = 36, className = '', color = '#0d9488' }) {
+export default function CareOnLogo({ size = 36, className = '', color = '#F04438' }) {
   return (
     <svg
       width={size}

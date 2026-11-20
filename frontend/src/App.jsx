@@ -3,6 +3,7 @@ import Header from './components/Header';
 import Footer from './components/Footer';
 import SaharaChatbot from './components/SaharaChatbot';
 import NotificationDrawer from './components/NotificationDrawer';
+import NotificationToast from './components/NotificationToast';
 
 // Pages
 import Home from './pages/Home';
@@ -58,6 +59,42 @@ function getPathFromTab(tab) {
   }
 }
 
+export const SUPPORTED_LANGS = ['en', 'hi', 'kn'];
+
+export function getInitialLanguage() {
+  if (typeof window === 'undefined') return 'en';
+  try {
+    const stored = localStorage.getItem('careon_lang');
+    if (stored && SUPPORTED_LANGS.includes(stored)) {
+      return stored;
+    }
+    localStorage.setItem('careon_lang', 'en');
+    return 'en';
+  } catch {
+    return 'en';
+  }
+}
+
+export function getSeenToastIds() {
+  if (typeof window === 'undefined') return [];
+  try {
+    const stored = localStorage.getItem('careon_seen_toast_ids');
+    return stored ? JSON.parse(stored) : [];
+  } catch {
+    return [];
+  }
+}
+
+export function addSeenToastId(id) {
+  if (typeof window === 'undefined') return;
+  try {
+    const seen = getSeenToastIds();
+    if (!seen.includes(id)) {
+      localStorage.setItem('careon_seen_toast_ids', JSON.stringify([...seen, id]));
+    }
+  } catch {}
+}
+
 export default function App() {
   const [health, setHealth] = useState(null);
   const [stats, setStats] = useState({ total: 5, pending: 2, responded: 2, resolved: 1, critical: 2 });
@@ -68,8 +105,10 @@ export default function App() {
     return 'home';
   });
   const [activeIncidentCode, setActiveIncidentCode] = useState('CARE-2026-101');
-  const [lang, setLang] = useState(() => localStorage.getItem('careon_lang') || 'en');
+  const [initialSimulatedOtp, setInitialSimulatedOtp] = useState(null);
+  const [lang, setLang] = useState(getInitialLanguage);
   const [notifications, setNotifications] = useState([]);
+  const [activeToasts, setActiveToasts] = useState([]);
   const [showNotifications, setShowNotifications] = useState(false);
 
   // Independent Dual Sessions
@@ -86,8 +125,13 @@ export default function App() {
   }, []);
 
   const handleLangChange = (newLang) => {
-    setLang(newLang);
-    localStorage.setItem('careon_lang', newLang);
+    const normalized = SUPPORTED_LANGS.includes(newLang) ? newLang : 'en';
+    setLang(normalized);
+    try {
+      localStorage.setItem('careon_lang', normalized);
+    } catch (err) {
+      console.error('Error saving language preference:', err);
+    }
   };
 
   const loadSystemData = useCallback(async () => {
@@ -100,6 +144,25 @@ export default function App() {
       setHealth(healthData);
       setStats(statsData);
       setNotifications(notifs);
+
+      // Check for new unread notifications to display as dismissible toasts
+      if (typeof window !== 'undefined') {
+        const storedSeen = localStorage.getItem('careon_seen_toast_ids');
+        if (storedSeen === null) {
+          localStorage.setItem('careon_seen_toast_ids', JSON.stringify(notifs.map((n) => n.id)));
+        } else {
+          const seen = getSeenToastIds();
+          const newlyArrived = notifs.filter((n) => !n.is_read && !seen.includes(n.id));
+          if (newlyArrived.length > 0) {
+            setActiveToasts((prev) => {
+              const existingIds = new Set(prev.map((t) => t.id));
+              const toAdd = newlyArrived.filter((n) => !existingIds.has(n.id));
+              return [...prev, ...toAdd];
+            });
+            newlyArrived.forEach((n) => addSeenToastId(n.id));
+          }
+        }
+      }
     } catch (err) {
       console.error('Error fetching system data:', err);
     }
@@ -147,8 +210,48 @@ export default function App() {
     handleNavigate('admin_login');
   };
 
-  const handleEmergencySubmitted = (code) => {
+  // Listen for OTP generation events (e.g. from TrackRequest "Request New Code")
+  useEffect(() => {
+    const handleOtpGenerated = (e) => {
+      const { code, otp } = e.detail || {};
+      if (otp) {
+        const toastCode = code || activeIncidentCode;
+        const otpToast = {
+          id: `otp-${Date.now()}-${toastCode}`,
+          title: `Emergency Verification Code (${toastCode})`,
+          message: `Your CareOn verification code is: ${otp}. Enter this code in the verification box to continue. (In-App Demo OTP)`,
+          type: 'alert',
+          created_at: new Date().toISOString(),
+          is_read: false,
+        };
+        setActiveToasts((prev) => [otpToast, ...prev.filter((t) => !String(t.id).startsWith('otp-'))]);
+        loadSystemData();
+      }
+    };
+    window.addEventListener('careon-otp-generated', handleOtpGenerated);
+    return () => window.removeEventListener('careon-otp-generated', handleOtpGenerated);
+  }, [activeIncidentCode, loadSystemData]);
+
+  const handleEmergencySubmitted = (code, simulatedOtp = null) => {
+    const updatedUser = getStoredUserSession();
+    if (updatedUser && !userSession) {
+      setUserSession(updatedUser);
+    }
     setActiveIncidentCode(code);
+    setInitialSimulatedOtp(simulatedOtp);
+
+    if (simulatedOtp) {
+      const otpToast = {
+        id: `otp-${Date.now()}-${code}`,
+        title: `Emergency Verification Code (${code})`,
+        message: `Your CareOn verification code is: ${simulatedOtp}. Enter this code in the verification box to continue. (In-App Demo OTP)`,
+        type: 'alert',
+        created_at: new Date().toISOString(),
+        is_read: false,
+      };
+      setActiveToasts((prev) => [otpToast, ...prev.filter((t) => !String(t.id).startsWith('otp-'))]);
+    }
+
     handleNavigate('user_track', code);
     loadSystemData();
   };
@@ -158,6 +261,16 @@ export default function App() {
     setNotifications((prev) =>
       prev.map((n) => (n.id === id ? { ...n, is_read: true } : n))
     );
+  };
+
+  const handleDismissToast = (id) => {
+    // Dismiss the visible toast without deleting from notification bell history
+    setActiveToasts((prev) => prev.filter((t) => t.id !== id));
+  };
+
+  const handleMarkReadFromToast = async (id) => {
+    await handleMarkAsRead(id);
+    setActiveToasts((prev) => prev.filter((t) => t.id !== id));
   };
 
   const unreadCount = notifications.filter((n) => !n.is_read).length;
@@ -179,10 +292,10 @@ export default function App() {
         onLogoutAdmin={handleLogoutAdmin}
       />
 
-      <main className="container" style={{ flex: 1, padding: '1rem 0' }}>
+      <main className="container" style={{ flex: 1, width: '100%', boxSizing: 'border-box' }}>
         {/* Public Home */}
         {currentTab === 'home' && (
-          <Home lang={lang} onNavigate={handleNavigate} />
+          <Home lang={lang} onNavigate={handleNavigate} currentUser={userSession} />
         )}
 
         {/* User Portal Pages */}
@@ -223,6 +336,7 @@ export default function App() {
           <TrackRequest
             lang={lang}
             initialIncidentCode={activeIncidentCode}
+            initialSimulatedOtp={initialSimulatedOtp}
             onNavigate={handleNavigate}
           />
         )}
@@ -246,7 +360,7 @@ export default function App() {
 
         {/* Privacy & Legal */}
         {currentTab === 'privacy' && (
-          <PrivacyPolicy />
+          <PrivacyPolicy lang={lang} />
         )}
       </main>
 
@@ -260,6 +374,15 @@ export default function App() {
         onClose={() => setShowNotifications(false)}
         notifications={notifications}
         onMarkAsRead={handleMarkAsRead}
+        lang={lang}
+      />
+
+      <NotificationToast
+        toasts={activeToasts}
+        onDismiss={handleDismissToast}
+        onMarkAsRead={handleMarkReadFromToast}
+        onOpenDrawer={() => setShowNotifications(true)}
+        lang={lang}
       />
 
       <Footer lang={lang} onTabChange={handleNavigate} />

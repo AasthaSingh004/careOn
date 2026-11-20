@@ -98,22 +98,68 @@ def evaluate_allocation_for_incident(
         )
         eta = calculate_eta_minutes(distance)
 
-        # Scoring: lower distance is better, category priority matching
+        # Multi-factor explainable scoring:
+        # 1. Proximity score (0 to 1, higher is closer)
+        norm_dist = max(0.0, 1.0 - (distance / 20.0))
+
+        # 2. Capability match score (0 to 1)
         preferred = CATEGORY_PREFERRED_RESOURCES.get(incident.category, [])
-        category_rank = preferred.index(res.category) if res.category in preferred else 99
-        score = distance * 2.0 + (category_rank * 5.0)
+        if res.category in preferred:
+            rank = preferred.index(res.category)
+            cap_score = max(0.5, 1.0 - (rank * 0.15))
+        else:
+            cap_score = 0.70
+
+        # 3. Fleet buffer: remaining matching resources
+        buffer_count = len([
+            r for r in available_resources
+            if r.id != res.id and r.status == "Available" and resource_matches_incident(r, incident)
+        ])
+        buffer_score = min(1.0, buffer_count / 3.0)
+
+        # Weighted confidence score (0.0 to 1.0)
+        confidence = round(0.40 * norm_dist + 0.35 * cap_score + 0.25 * buffer_score, 2)
+
+        # Legacy score sorting (lower is better for rank sorting)
+        sort_score = distance * 2.0 + ((1.0 - cap_score) * 10.0)
 
         candidates.append({
             "resource": res,
             "distance_km": distance,
             "eta_minutes": eta,
-            "score": score,
+            "score": sort_score,
+            "confidence_score": confidence,
+            "buffer_count": buffer_count,
+            "norm_dist": norm_dist,
+            "cap_score": cap_score,
         })
 
     if candidates:
         candidates.sort(key=lambda c: c["score"])
         best = candidates[0]
         res = best["resource"]
+        conf = best["confidence_score"]
+        buffer_count = best["buffer_count"]
+
+        # Safe auto-dispatch rule: routine priority, high confidence, safe fleet buffer
+        is_routine = incident.priority in ["Low", "Medium"]
+        is_safe_auto_dispatch = (conf >= 0.85) and is_routine and (buffer_count >= 2)
+
+        reasons = []
+        if incident.priority in ["Critical", "High"]:
+            reasons.append(f"{incident.priority} severity mandates coordinator oversight")
+        if buffer_count < 2:
+            reasons.append(f"narrow fleet reserve ({buffer_count} units left)")
+        if best["distance_km"] > 8.0:
+            reasons.append(f"non-optimal proximity ({best['distance_km']} km)")
+        if conf < 0.85:
+            reasons.append(f"confidence score ({int(conf * 100)}%) is below automated threshold")
+
+        decision_reason = (
+            f"Routine safe dispatch: nearest unit with matching capabilities and safe fleet buffer ({buffer_count} units)."
+            if is_safe_auto_dispatch
+            else f"Coordinator review required: {', '.join(reasons) if reasons else 'Manual confirmation required'}."
+        )
 
         return {
             "has_allocation": True,
@@ -125,9 +171,22 @@ def evaluate_allocation_for_incident(
             "resource_category": res.category,
             "distance_km": best["distance_km"],
             "eta_minutes": best["eta_minutes"],
+            "confidence_score": conf,
+            "confidence_percent": int(conf * 100),
+            "fleet_buffer": buffer_count,
+            "auto_dispatch_recommended": is_safe_auto_dispatch,
+            "requires_admin_approval": not is_safe_auto_dispatch,
+            "algorithm_type": "Explainable Multi-Factor Scoring (Rule-Based Heuristic)",
+            "decision_reason": decision_reason,
+            "factors": {
+                "distance_km": best["distance_km"],
+                "capability_rating": round(best["cap_score"], 2),
+                "fleet_buffer_units": buffer_count,
+            },
             "explanation": (
                 f"Recommended: {res.name} ({res.category}) — available, matching required capabilities, "
-                f"located {best['distance_km']} km away with estimated ETA ~{best['eta_minutes']} mins."
+                f"located {best['distance_km']} km away with estimated ETA ~{best['eta_minutes']} mins. "
+                f"Confidence: {int(conf * 100)}%. {decision_reason}"
             ),
             "shortage": None,
         }
@@ -153,6 +212,19 @@ def evaluate_allocation_for_incident(
         "resource_name": None,
         "resource_category": None,
         "distance_km": None,
+        "eta_minutes": None,
+        "confidence_score": 0.0,
+        "confidence_percent": 0,
+        "fleet_buffer": 0,
+        "auto_dispatch_recommended": False,
+        "requires_admin_approval": True,
+        "algorithm_type": "Explainable Multi-Factor Scoring (Rule-Based Heuristic)",
+        "decision_reason": "Shortage detected: no active government resources available matching requirements.",
+        "factors": {
+            "distance_km": None,
+            "capability_rating": 0.0,
+            "fleet_buffer_units": 0,
+        },
         "eta_minutes": None,
         "explanation": f"Shortage Alert: No available {preferred_types} in active fleet for {incident.category}.",
         "shortage": {

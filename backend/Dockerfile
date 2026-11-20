@@ -18,12 +18,12 @@ WORKDIR /app
 RUN mkdir -p /data
 
 # Install dependencies first for optimal Docker layer caching
-COPY backend/requirements.txt /app/requirements.txt
+COPY requirements.txt /app/requirements.txt
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
 # Copy backend application source and tests
-COPY backend/ /app/
+COPY . /app/
 
 # Expose backend service port
 EXPOSE 8000

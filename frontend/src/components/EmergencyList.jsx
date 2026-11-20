@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { formatISTTime } from '../utils/date';
 
 export default function EmergencyList({
   emergencies,
@@ -60,10 +61,7 @@ export default function EmergencyList({
 
                 <div className="item-meta">
                   Alert ID #{item.id} • Registered:{' '}
-                  {new Date(item.created_at).toLocaleTimeString([], {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })}
+                  {formatISTTime(item.created_at)}
                 </div>
               </div>
 

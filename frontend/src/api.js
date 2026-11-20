@@ -229,7 +229,71 @@ export async function verifyIncidentOtp(incidentId, otp, scope = 'auto') {
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new Error(err.detail || 'Verification failed. Use demo OTP 123456');
+    throw new Error(err.detail || 'Emergency verification failed. Please check the code or request a new code.');
+  }
+  return res.json();
+}
+
+export async function requestIncidentOtp(incidentId, scope = 'auto') {
+  const res = await fetch(`${API_BASE}/incidents/${incidentId}/request-otp`, {
+    method: 'POST',
+    headers: getAuthHeaders(scope),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || 'Failed to request emergency verification code');
+  }
+  return res.json();
+}
+
+export async function fetchSystemConfig() {
+  const res = await fetch(`${API_BASE}/config`);
+  if (!res.ok) throw new Error('Failed to fetch system configuration');
+  return res.json();
+}
+
+export async function requestDoctorCallback(incidentId, data, scope = 'auto') {
+  const res = await fetch(`${API_BASE}/incidents/${incidentId}/doctor-callback`, {
+    method: 'POST',
+    headers: getAuthHeaders(scope),
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || 'Failed to request doctor callback');
+  }
+  return res.json();
+}
+
+export async function fetchIncidentDoctorCallbacks(incidentId, scope = 'auto') {
+  const res = await fetch(`${API_BASE}/incidents/${incidentId}/doctor-callback`, {
+    headers: getAuthHeaders(scope),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || 'Failed to fetch doctor callbacks');
+  }
+  return res.json();
+}
+
+export async function fetchAdminDoctorCallbacks(statusFilter = null) {
+  const url = `${API_BASE}/admin/doctor-callbacks${statusFilter ? `?status=${encodeURIComponent(statusFilter)}` : ''}`;
+  const res = await fetch(url, {
+    headers: getAuthHeaders('admin'),
+  });
+  if (!res.ok) throw new Error('Failed to fetch doctor callbacks');
+  return res.json();
+}
+
+export async function updateDoctorCallbackStatus(callbackId, data) {
+  const res = await fetch(`${API_BASE}/admin/doctor-callbacks/${callbackId}`, {
+    method: 'PATCH',
+    headers: getAuthHeaders('admin'),
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || 'Failed to update doctor callback status');
   }
   return res.json();
 }
@@ -288,6 +352,18 @@ export async function resolveIncident(incidentId, notes = '') {
     headers: getAuthHeaders('admin'),
   });
   if (!res.ok) throw new Error('Failed to resolve incident');
+  return res.json();
+}
+
+export async function confirmArrival(incidentId, notes = '') {
+  const res = await fetch(`${API_BASE}/incidents/${incidentId}/confirm-arrival?notes=${encodeURIComponent(notes)}`, {
+    method: 'POST',
+    headers: getAuthHeaders('user'),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || 'Failed to confirm arrival');
+  }
   return res.json();
 }
 
@@ -415,6 +491,33 @@ export async function markNotificationAsRead(id, scope = 'auto') {
   return res.ok;
 }
 
+export async function fetchAdminNotifications(unreadOnly = false) {
+  const url = unreadOnly
+    ? `${API_BASE}/admin/notifications?unread_only=true`
+    : `${API_BASE}/admin/notifications`;
+  const res = await fetch(url, {
+    headers: getAuthHeaders('admin'),
+  });
+  if (!res.ok) return [];
+  return res.json();
+}
+
+export async function markAdminNotificationAsRead(id) {
+  const res = await fetch(`${API_BASE}/admin/notifications/${id}/read`, {
+    method: 'PATCH',
+    headers: getAuthHeaders('admin'),
+  });
+  return res.ok;
+}
+
+export async function markAllAdminNotificationsAsRead() {
+  const res = await fetch(`${API_BASE}/admin/notifications/mark-all-read`, {
+    method: 'POST',
+    headers: getAuthHeaders('admin'),
+  });
+  return res.ok;
+}
+
 export async function submitFeedback(payload) {
   const res = await fetch(`${API_BASE}/feedback`, {
     method: 'POST',
@@ -439,11 +542,16 @@ export async function fetchFeedbackList() {
 // ==============================================================================
 // Chatbot & Simulation & Analytics
 // ==============================================================================
-export async function sendChatMessage(message, sessionId = 'careon_user_session') {
+export async function sendChatMessage(message, sessionId = 'careon_user_session', userName = null, lang = 'en') {
   const res = await fetch(`${API_BASE}/chatbot/message`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ message, session_id: sessionId }),
+    body: JSON.stringify({
+      message,
+      session_id: sessionId,
+      user_name: userName || undefined,
+      lang: lang || 'en',
+    }),
   });
   if (!res.ok) throw new Error('Chatbot service unavailable');
   return res.json();

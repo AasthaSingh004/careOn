@@ -2,9 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from '../translations';
 import CareOnLogo from './CareOnLogo';
 import {
-  Shield,
   AlertTriangle,
-  Search,
   Bell,
   User,
   LogOut,
@@ -39,20 +37,20 @@ export default function Header({
   const activeUser = isAdminView ? (adminSession || userSession) : (userSession || adminSession);
 
   return (
-    <header className="header-root" style={{ background: '#092c35', borderBottom: '1px solid #134e4a', position: 'sticky', top: 0, zIndex: 100 }}>
-      <div className="header-inner" style={{ maxWidth: 1280, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.75rem 1.25rem' }}>
+    <header className="header-root" style={{ background: '#FFFFFF', borderBottom: '1px solid #DCE5EB', position: 'sticky', top: 0, zIndex: 1000, boxShadow: '0 1px 3px rgba(16, 24, 40, 0.05)' }}>
+      <div className="header-inner">
         {/* Brand */}
         <div
           className="brand-section"
           onClick={() => onTabChange?.('home')}
-          style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.75rem' }}
+          style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 10 }}
         >
-          <CareOnLogo size={38} />
+          <CareOnLogo size={36} />
           <div>
-            <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#ffffff', letterSpacing: '-0.02em', lineHeight: 1.1 }}>
+            <div style={{ fontSize: '1.35rem', fontWeight: 800, color: '#171C24', letterSpacing: '-0.03em', lineHeight: 1.1 }}>
               {t('brand_name')}
             </div>
-            <div style={{ fontSize: '0.75rem', color: '#99f6e4', fontWeight: 500 }}>
+            <div className="brand-tagline" style={{ fontSize: '0.75rem', color: '#667085', fontWeight: 500 }}>
               {/* Keep hidden test hook for test compatibility */}
               <span style={{ display: 'none' }}>Hospital Emergency Response</span>
               {t('brand_tagline')}
@@ -61,10 +59,19 @@ export default function Header({
         </div>
 
         {/* Navigation Tabs */}
-        <nav className="nav-links" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+        <nav className="nav-links">
           <button
             className={`nav-tab-btn ${currentTab === 'home' ? 'active' : ''}`}
             onClick={() => onTabChange?.('home')}
+            style={{
+              padding: '8px 14px',
+              borderRadius: 8,
+              fontSize: '0.9rem',
+              fontWeight: currentTab === 'home' ? 700 : 600,
+              color: currentTab === 'home' ? '#171C24' : '#344252',
+              background: currentTab === 'home' ? '#F5F6F7' : 'transparent',
+              border: currentTab === 'home' ? '1px solid #DCE5EB' : '1px solid transparent',
+            }}
           >
             {t('nav_home')}
           </button>
@@ -73,24 +80,35 @@ export default function Header({
             className={`nav-tab-btn emergency-cta ${currentTab === 'user_report' || currentTab === 'report' ? 'active' : ''}`}
             onClick={() => onTabChange?.('user_report')}
             style={{
-              background: '#e11d48',
-              color: '#ffffff',
+              background: '#F04438',
+              color: '#FFFFFF',
               fontWeight: 700,
-              padding: '0.45rem 0.9rem',
+              padding: '8px 16px',
               borderRadius: 8,
               border: 'none',
               display: 'inline-flex',
               alignItems: 'center',
-              gap: 6
+              gap: 6,
+              boxShadow: '0 2px 6px rgba(240, 68, 56, 0.25)',
+              cursor: 'pointer'
             }}
           >
-            <AlertTriangle size={15} />
+            <AlertTriangle size={16} />
             <span>{t('nav_report')}</span>
           </button>
 
           <button
             className={`nav-tab-btn ${currentTab === 'user_track' || currentTab === 'track' ? 'active' : ''}`}
             onClick={() => onTabChange?.('user_track')}
+            style={{
+              padding: '8px 14px',
+              borderRadius: 8,
+              fontSize: '0.9rem',
+              fontWeight: (currentTab === 'user_track' || currentTab === 'track') ? 700 : 600,
+              color: (currentTab === 'user_track' || currentTab === 'track') ? '#171C24' : '#344252',
+              background: (currentTab === 'user_track' || currentTab === 'track') ? '#F5F6F7' : 'transparent',
+              border: (currentTab === 'user_track' || currentTab === 'track') ? '1px solid #DCE5EB' : '1px solid transparent',
+            }}
           >
             {t('nav_track')}
           </button>
@@ -103,6 +121,15 @@ export default function Header({
               } else {
                 onTabChange?.('user_login');
               }
+            }}
+            style={{
+              padding: '8px 14px',
+              borderRadius: 8,
+              fontSize: '0.9rem',
+              fontWeight: currentTab === 'user_dashboard' ? 700 : 600,
+              color: currentTab === 'user_dashboard' ? '#171C24' : '#344252',
+              background: currentTab === 'user_dashboard' ? '#F5F6F7' : 'transparent',
+              border: currentTab === 'user_dashboard' ? '1px solid #DCE5EB' : '1px solid transparent',
             }}
           >
             {t('citizen_portal') || 'Citizen Portal'}
@@ -117,29 +144,41 @@ export default function Header({
                 onTabChange?.('admin_login');
               }
             }}
-            style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
+            style={{
+              padding: '8px 14px',
+              borderRadius: 8,
+              fontSize: '0.9rem',
+              fontWeight: currentTab?.startsWith('admin') ? 700 : 600,
+              color: currentTab?.startsWith('admin') ? '#171C24' : '#344252',
+              background: currentTab?.startsWith('admin') ? '#F5F6F7' : 'transparent',
+              border: currentTab?.startsWith('admin') ? '1px solid #DCE5EB' : '1px solid transparent',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6
+            }}
           >
-            <ShieldCheck size={15} />
+            <ShieldCheck size={16} />
             <span>{t('nav_admin')}</span>
           </button>
         </nav>
 
         {/* Header Actions */}
-        <div className="header-actions" style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
+        <div className="header-actions" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           {/* Health indicator */}
           <div
             style={{
               display: 'flex',
               alignItems: 'center',
               gap: 6,
-              fontSize: '0.75rem',
-              padding: '4px 10px',
-              background: 'rgba(255,255,255,0.08)',
+              fontSize: '0.775rem',
+              padding: '5px 10px',
+              background: '#F5F6F7',
+              border: '1px solid #DCE5EB',
               borderRadius: 6,
-              color: '#e2e8f0',
+              color: '#171C24',
               cursor: 'pointer'
             }}
-            title="Backend Service Status"
+            title={t('backend_service_status', 'Backend Service Status')}
             onClick={onRefresh}
           >
             <span
@@ -147,35 +186,37 @@ export default function Header({
                 width: 8,
                 height: 8,
                 borderRadius: '50%',
-                backgroundColor: isHealthy ? '#22c55e' : '#f59e0b',
-                boxShadow: isHealthy ? '0 0 6px #22c55e' : 'none',
+                backgroundColor: isHealthy ? '#12B76A' : '#F79009',
+                boxShadow: isHealthy ? '0 0 6px rgba(18, 183, 106, 0.4)' : 'none',
               }}
             />
-            <span style={{ fontWeight: 600 }}>{isHealthy ? t('system_online', 'System Online (LIVE)') : t('system_connecting', 'System Connecting...')}</span>
+            <span className="header-health-text" style={{ fontWeight: 600 }}>{isHealthy ? t('system_online', 'System Online (LIVE)') : t('system_connecting', 'System Connecting...')}</span>
           </div>
 
           {/* Language Selector */}
           <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
-            <Globe size={15} style={{ position: 'absolute', left: 8, color: '#99f6e4', pointerEvents: 'none' }} />
+            <Globe size={15} style={{ position: 'absolute', left: 10, color: '#667085', pointerEvents: 'none' }} />
             <select
               className="lang-select"
               value={lang}
               onChange={(e) => onLangChange?.(e.target.value)}
-              aria-label="Language Selector"
+              aria-label={t('language_selector', 'Language Selector')}
               style={{
-                background: 'rgba(255, 255, 255, 0.1)',
-                color: '#ffffff',
-                border: '1px solid rgba(255, 255, 255, 0.2)',
+                background: '#FFFFFF',
+                color: '#171C24',
+                border: '1px solid #DCE5EB',
                 borderRadius: 8,
-                padding: '0.4rem 0.6rem 0.4rem 1.8rem',
+                padding: '6px 12px 6px 32px',
                 fontSize: '0.85rem',
                 fontWeight: 600,
-                cursor: 'pointer'
+                cursor: 'pointer',
+                boxSizing: 'border-box',
+                outline: 'none'
               }}
             >
-              <option value="en" style={{ background: '#092c35', color: '#fff' }}>English</option>
-              <option value="hi" style={{ background: '#092c35', color: '#fff' }}>हिन्दी (Hindi)</option>
-              <option value="kn" style={{ background: '#092c35', color: '#fff' }}>ಕನ್ನಡ (Kannada)</option>
+              <option value="en">English</option>
+              <option value="hi">हिन्दी (Hindi)</option>
+              <option value="kn">ಕನ್ನಡ (Kannada)</option>
             </select>
           </div>
 
@@ -186,15 +227,15 @@ export default function Header({
             title={t('notifications_title') || 'Notifications'}
             aria-label="Notifications"
             style={{
-              background: 'rgba(255, 255, 255, 0.1)',
-              border: 'none',
+              background: '#F5F6F7',
+              border: '1px solid #DCE5EB',
               borderRadius: 8,
               width: 36,
               height: 36,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              color: '#ffffff',
+              color: '#171C24',
               cursor: 'pointer',
               position: 'relative'
             }}
@@ -205,10 +246,10 @@ export default function Header({
                 position: 'absolute',
                 top: -4,
                 right: -4,
-                background: '#e11d48',
-                color: '#ffffff',
+                background: '#F04438',
+                color: '#FFFFFF',
                 fontSize: '0.7rem',
-                fontWeight: 700,
+                fontWeight: 800,
                 borderRadius: 10,
                 padding: '1px 5px',
                 minWidth: 16,
@@ -225,51 +266,52 @@ export default function Header({
               <button
                 onClick={() => setShowAuthDropdown(!showAuthDropdown)}
                 style={{
-                  background: 'rgba(255, 255, 255, 0.15)',
-                  border: '1px solid rgba(255, 255, 255, 0.25)',
+                  background: '#F5F6F7',
+                  border: '1px solid #DCE5EB',
                   borderRadius: 8,
-                  padding: '0.4rem 0.75rem',
-                  color: '#ffffff',
+                  padding: '6px 12px',
+                  color: '#171C24',
                   fontSize: '0.85rem',
                   fontWeight: 600,
                   display: 'flex',
                   alignItems: 'center',
-                  gap: 6,
+                  gap: 8,
                   cursor: 'pointer'
                 }}
               >
-                <User size={15} />
-                <span>{activeUser.name || 'User'}</span>
+                <User size={16} />
+                <span>{activeUser.name || activeUser.full_name || 'User'}</span>
                 <span style={{
                   fontSize: '0.7rem',
-                  background: activeUser.role === 'admin' ? '#f59e0b' : '#0d9488',
-                  color: '#ffffff',
-                  padding: '1px 5px',
+                  background: activeUser.role === 'admin' ? '#FEF0C7' : '#E8EEF2',
+                  color: activeUser.role === 'admin' ? '#B54708' : '#344252',
+                  border: activeUser.role === 'admin' ? '1px solid #FEDF89' : '1px solid #DCE5EB',
+                  padding: '1px 6px',
                   borderRadius: 4,
                   fontWeight: 700
                 }}>
-                  {activeUser.role === 'admin' ? 'Admin' : 'User'}
+                  {activeUser.role === 'admin' ? t('role_admin', 'Admin') : t('role_user', 'User')}
                 </span>
-                <ChevronDown size={14} />
+                <ChevronDown size={14} color="#667085" />
               </button>
 
               {showAuthDropdown && (
                 <div style={{
                   position: 'absolute',
-                  top: '110%',
+                  top: '115%',
                   right: 0,
-                  background: '#ffffff',
-                  color: '#0f172a',
+                  background: '#FFFFFF',
+                  color: '#171C24',
                   borderRadius: 10,
-                  boxShadow: '0 10px 25px rgba(0,0,0,0.15)',
-                  border: '1px solid #e2e8f0',
-                  padding: '0.75rem',
-                  minWidth: 200,
+                  boxShadow: '0 10px 25px -4px rgba(16, 24, 40, 0.12)',
+                  border: '1px solid #DCE5EB',
+                  padding: '8px',
+                  minWidth: 210,
                   zIndex: 200
                 }}>
-                  <div style={{ padding: '0.25rem 0.5rem 0.5rem 0.5rem', borderBottom: '1px solid #f1f5f9', marginBottom: '0.5rem' }}>
-                    <p style={{ margin: 0, fontWeight: 700, fontSize: '0.875rem' }}>{activeUser.name}</p>
-                    <p style={{ margin: 0, color: '#64748b', fontSize: '0.75rem' }}>{activeUser.email}</p>
+                  <div style={{ padding: '6px 8px 10px 8px', borderBottom: '1px solid #DCE5EB', marginBottom: '6px' }}>
+                    <p style={{ margin: 0, fontWeight: 700, fontSize: '0.875rem', color: '#171C24' }}>{activeUser.name}</p>
+                    <p style={{ margin: 0, color: '#667085', fontSize: '0.775rem' }}>{activeUser.email}</p>
                   </div>
 
                   {activeUser.role === 'admin' ? (
@@ -282,20 +324,23 @@ export default function Header({
                         style={{
                           width: '100%',
                           textAlign: 'left',
-                          padding: '0.4rem 0.5rem',
+                          padding: '8px 10px',
                           background: 'none',
                           border: 'none',
                           cursor: 'pointer',
                           display: 'flex',
                           alignItems: 'center',
-                          gap: 6,
+                          gap: 8,
                           fontSize: '0.85rem',
                           fontWeight: 600,
-                          color: '#0f172a'
+                          color: '#171C24',
+                          borderRadius: 6
                         }}
+                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#F5F6F7'}
+                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                       >
                         <LayoutDashboard size={15} />
-                        <span>Command Centre</span>
+                        <span>{t('command_centre_title', 'Command Centre')}</span>
                       </button>
                       <button
                         onClick={() => {
@@ -305,17 +350,20 @@ export default function Header({
                         style={{
                           width: '100%',
                           textAlign: 'left',
-                          padding: '0.4rem 0.5rem',
+                          padding: '8px 10px',
                           background: 'none',
                           border: 'none',
                           cursor: 'pointer',
                           display: 'flex',
                           alignItems: 'center',
-                          gap: 6,
+                          gap: 8,
                           fontSize: '0.85rem',
                           fontWeight: 600,
-                          color: '#e11d48'
+                          color: '#F04438',
+                          borderRadius: 6
                         }}
+                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#FEE4E2'}
+                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                       >
                         <LogOut size={15} />
                         <span>{t('logout_btn')}</span>
@@ -331,17 +379,20 @@ export default function Header({
                         style={{
                           width: '100%',
                           textAlign: 'left',
-                          padding: '0.4rem 0.5rem',
+                          padding: '8px 10px',
                           background: 'none',
                           border: 'none',
                           cursor: 'pointer',
                           display: 'flex',
                           alignItems: 'center',
-                          gap: 6,
+                          gap: 8,
                           fontSize: '0.85rem',
                           fontWeight: 600,
-                          color: '#0f172a'
+                          color: '#171C24',
+                          borderRadius: 6
                         }}
+                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#F5F6F7'}
+                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                       >
                         <LayoutDashboard size={15} />
                         <span>{t('my_dashboard') || 'My Dashboard'}</span>
@@ -354,17 +405,20 @@ export default function Header({
                         style={{
                           width: '100%',
                           textAlign: 'left',
-                          padding: '0.4rem 0.5rem',
+                          padding: '8px 10px',
                           background: 'none',
                           border: 'none',
                           cursor: 'pointer',
                           display: 'flex',
                           alignItems: 'center',
-                          gap: 6,
+                          gap: 8,
                           fontSize: '0.85rem',
                           fontWeight: 600,
-                          color: '#e11d48'
+                          color: '#F04438',
+                          borderRadius: 6
                         }}
+                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#FEE4E2'}
+                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                       >
                         <LogOut size={15} />
                         <span>{t('logout_btn')}</span>
@@ -375,24 +429,24 @@ export default function Header({
               )}
             </div>
           ) : (
-            <div style={{ display: 'flex', gap: '0.4rem' }}>
+            <div style={{ display: 'flex', gap: 6 }}>
               <button
                 onClick={() => onTabChange?.('user_login')}
                 style={{
-                  background: 'rgba(255, 255, 255, 0.15)',
-                  border: '1px solid rgba(255, 255, 255, 0.25)',
+                  background: '#F5F6F7',
+                  border: '1px solid #DCE5EB',
                   borderRadius: 8,
-                  padding: '0.4rem 0.75rem',
-                  color: '#ffffff',
-                  fontSize: '0.825rem',
+                  padding: '6px 12px',
+                  color: '#171C24',
+                  fontSize: '0.85rem',
                   fontWeight: 600,
                   display: 'flex',
                   alignItems: 'center',
-                  gap: 5,
+                  gap: 6,
                   cursor: 'pointer'
                 }}
               >
-                <LogIn size={14} />
+                <LogIn size={15} />
                 <span>{t('login_link')}</span>
               </button>
             </div>

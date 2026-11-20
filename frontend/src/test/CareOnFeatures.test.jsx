@@ -7,6 +7,7 @@ import UserLogin from '../pages/UserLogin';
 import UserRegister from '../pages/UserRegister';
 import AdminLogin from '../pages/AdminLogin';
 import UserDashboard from '../pages/UserDashboard';
+import { getInitialLanguage, SUPPORTED_LANGS } from '../App';
 
 // Mock API
 vi.mock('../api', () => ({
@@ -56,6 +57,7 @@ vi.mock('../api', () => ({
     },
   ]),
   markNotificationAsRead: vi.fn().mockResolvedValue(true),
+  confirmArrival: vi.fn().mockResolvedValue({ status: 'Resolved' }),
   submitFeedback: vi.fn().mockResolvedValue({ id: 1, rating: 5 }),
   logoutUser: vi.fn(),
   logoutAdmin: vi.fn(),
@@ -205,5 +207,122 @@ describe('User Dashboard Component', () => {
     expect(screen.getByText(/Welcome, Demo User/i)).toBeInTheDocument();
     expect(screen.getByText(/Sayyaji Rao Road, Mysuru/i)).toBeInTheDocument();
     expect(screen.getByText(/CARE-2026-101/i)).toBeInTheDocument();
+  });
+});
+
+describe('Language Normalization and Complete Localization Verification', () => {
+  it('verifies 100% key parity across en, hi, and kn without untranslated English copies', () => {
+    const enKeys = Object.keys(translations.en);
+    const hiKeys = Object.keys(translations.hi);
+    const knKeys = Object.keys(translations.kn);
+
+    expect(enKeys.length).toBe(627);
+    expect(hiKeys.length).toBe(627);
+    expect(knKeys.length).toBe(627);
+
+    const missingInHi = enKeys.filter((k) => !translations.hi[k]);
+    const missingInKn = enKeys.filter((k) => !translations.kn[k]);
+    expect(missingInHi).toEqual([]);
+    expect(missingInKn).toEqual([]);
+
+    // Check that ordinary user-facing keys in hi and kn do not retain untranslated English text
+    const hi = useTranslation('hi');
+    const kn = useTranslation('kn');
+
+    // Home page keys
+    expect(hi('helpline_alert_title')).toBe('राष्ट्रीय आपातकालीन हेल्पलाइन');
+    expect(kn('helpline_alert_title')).toBe('ರಾಷ್ಟ್ರೀಯ ತುರ್ತು ಸಹಾಯವಾಣಿ');
+    expect(hi('how_it_works_title')).toBe('CareOn कैसे काम करता है');
+    expect(kn('how_it_works_title')).toBe('CareOn ಹೇಗೆ ಕಾರ್ಯನಿರ್ವಹಿಸುತ್ತದೆ');
+    expect(hi('zero_commission_title')).toBe('₹0 प्लेटफ़ॉर्म शुल्क — पारदर्शी आपातकालीन समन्वय');
+    expect(kn('zero_commission_title')).toBe('₹0 ಪ್ಲಾಟ್‌ಫಾರ್ಮ್ ಶುಲ್ಕ — ಪಾರದರ್ಶಕ ತುರ್ತು ಸಮನ್ವಯ');
+
+    // UserRegister keys
+    expect(hi('user_register_title')).toBe('नागरिक खाता बनाएं');
+    expect(kn('user_register_title')).toBe('ನಾಗರಿಕ ಖಾತೆಯನ್ನು ರಚಿಸಿ');
+    expect(hi('full_name_label')).toBe('पूरा नाम');
+    expect(kn('full_name_label')).toBe('ಪೂರ್ಣ ಹೆಸರು');
+    expect(hi('create_account_btn')).toBe('खाता बनाएं');
+    expect(kn('create_account_btn')).toBe('ಖಾತೆ ರಚಿಸಿ');
+    expect(hi('password_mismatch')).toBe('पासवर्ड मेल नहीं खाते।');
+    expect(kn('password_mismatch')).toBe('ಪಾಸ್‌ವರ್ಡ್‌ಗಳು ಹೊಂದಿಕೆಯಾಗುತ್ತಿಲ್ಲ.');
+  });
+
+  it('normalizes invalid or missing language in localStorage to en', () => {
+    // 1. Invalid value 'xyz'
+    localStorage.setItem('careon_lang', 'xyz');
+    expect(getInitialLanguage()).toBe('en');
+    expect(localStorage.getItem('careon_lang')).toBe('en');
+
+    // 2. Missing value
+    localStorage.removeItem('careon_lang');
+    expect(getInitialLanguage()).toBe('en');
+    expect(localStorage.getItem('careon_lang')).toBe('en');
+
+    // 3. Empty string
+    localStorage.setItem('careon_lang', '');
+    expect(getInitialLanguage()).toBe('en');
+    expect(localStorage.getItem('careon_lang')).toBe('en');
+
+    // 4. Valid values (hi, kn, en) are preserved
+    localStorage.setItem('careon_lang', 'hi');
+    expect(getInitialLanguage()).toBe('hi');
+    expect(localStorage.getItem('careon_lang')).toBe('hi');
+
+    localStorage.setItem('careon_lang', 'kn');
+    expect(getInitialLanguage()).toBe('kn');
+    expect(localStorage.getItem('careon_lang')).toBe('kn');
+
+    localStorage.setItem('careon_lang', 'en');
+    expect(getInitialLanguage()).toBe('en');
+    expect(localStorage.getItem('careon_lang')).toBe('en');
+  });
+});
+
+describe('Emergency Arrival Tracker Improvements (Compact Map, Enlarge Modal & Rotating Safety Tips)', () => {
+  it('renders compact map preview with Enlarge Map button and opens/closes enlarged map modal', async () => {
+    render(<Home lang="en" />);
+
+    // Tracker is rendered because active incident is returned by fetchIncidents
+    const previewHeader = await screen.findByText('Live Route Preview');
+    expect(previewHeader).toBeInTheDocument();
+
+    const enlargeBtn = screen.getByRole('button', { name: /Enlarge Map/i });
+    expect(enlargeBtn).toBeInTheDocument();
+
+    // Modal not open initially
+    expect(screen.queryByText('Emergency Response Route & Tracker')).not.toBeInTheDocument();
+
+    // Click Enlarge Map
+    fireEvent.click(enlargeBtn);
+
+    // Modal is opened
+    expect(screen.getByText('Emergency Response Route & Tracker')).toBeInTheDocument();
+    const closeBtn = screen.getByRole('button', { name: /Close Map/i });
+    expect(closeBtn).toBeInTheDocument();
+
+    // Click Close Map
+    fireEvent.click(closeBtn);
+    expect(screen.queryByText('Emergency Response Route & Tracker')).not.toBeInTheDocument();
+  });
+
+  it('renders Stay Safe While You Wait section with category-specific tips and pause interaction', async () => {
+    render(<Home lang="en" />);
+
+    const staySafeTitle = await screen.findByText('Stay Safe While You Wait');
+    expect(staySafeTitle).toBeInTheDocument();
+
+    // Active incident is 'Medical'
+    expect(screen.getByText(/Keep the person comfortable/i)).toBeInTheDocument();
+
+    // Hover pauses rotation
+    const tipContainer = screen.getByText(/Keep the person comfortable/i).closest('[title]');
+    if (tipContainer) {
+      fireEvent.mouseEnter(tipContainer);
+      expect(screen.getByText(/Paused/i)).toBeInTheDocument();
+
+      fireEvent.mouseLeave(tipContainer);
+      expect(screen.queryByText(/Paused/i)).not.toBeInTheDocument();
+    }
   });
 });

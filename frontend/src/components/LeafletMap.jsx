@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import { MapPin, Navigation, AlertTriangle, ShieldCheck, RefreshCw, ZoomIn, ZoomOut } from 'lucide-react';
+import { useTranslation } from '../translations';
 
 export default function LeafletMap({
   incidents = [],
@@ -15,12 +16,18 @@ export default function LeafletMap({
   selectedLocation = null,
   onLocationSelect,
   height = '420px',
+  lang = 'en',
+  activeRoute = null, // { origin: [lat, lon], destination: [lat, lon], label: 'Ambulance AMB-01' }
+  routePolyline = null,
+  isLiveGps = false,
 }) {
+  const { t } = useTranslation(lang);
   const mapContainerRef = useRef(null);
   const mapInstanceRef = useRef(null);
   const incidentsLayerRef = useRef(null);
   const resourcesLayerRef = useRef(null);
   const providersLayerRef = useRef(null);
+  const routesLayerRef = useRef(null);
   const selectionMarkerRef = useRef(null);
 
   const [activeSimulationStep, setActiveSimulationStep] = useState(0);
@@ -65,6 +72,7 @@ export default function LeafletMap({
       incidentsLayerRef.current = L.layerGroup().addTo(map);
       resourcesLayerRef.current = L.layerGroup().addTo(map);
       providersLayerRef.current = L.layerGroup().addTo(map);
+      routesLayerRef.current = L.layerGroup().addTo(map);
 
       // Invalidate size on container resize (handles tab switching without map breakage)
       const resizeObserver = new ResizeObserver(() => {
@@ -368,8 +376,108 @@ export default function LeafletMap({
     });
   }, [providers]);
 
+  // Update Routes and Moving Vehicle along route
+  useEffect(() => {
+    if (!routesLayerRef.current) return;
+    try {
+      routesLayerRef.current.clearLayers();
+    } catch {}
+
+    // 1. Draw route polyline if specified directly or from activeRoute
+    let points = routePolyline;
+    if (!points && activeRoute?.origin && activeRoute?.destination) {
+      const [lat1, lon1] = activeRoute.origin;
+      const [lat2, lon2] = activeRoute.destination;
+      // Generate 10 smooth interpolation points
+      points = [];
+      for (let i = 0; i <= 10; i++) {
+        const tVal = i / 10;
+        points.push([
+          lat1 + (lat2 - lat1) * tVal,
+          lon1 + (lon2 - lon1) * tVal,
+        ]);
+      }
+    }
+
+    if (points && points.length > 1) {
+      try {
+        const line = L.polyline(points, {
+          color: '#F04438',
+          weight: 4,
+          opacity: 0.85,
+          dashArray: '6, 8',
+        });
+        routesLayerRef.current.addLayer(line);
+      } catch (err) {
+        // Fallback for headless environments without SVG/Canvas renderer
+      }
+
+      try {
+        // Animate vehicle marker along the points
+        const currentIdx = activeSimulationStep % points.length;
+        const vehiclePos = points[currentIdx];
+
+        const vehicleIcon = L.divIcon({
+          className: 'careon-moving-vehicle-icon',
+          html: `
+            <div style="
+              background: #F04438;
+              color: #ffffff;
+              width: 30px;
+              height: 30px;
+              border-radius: 50%;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              border: 2px solid #ffffff;
+              box-shadow: 0 0 12px rgba(240, 68, 56, 0.5);
+              font-size: 14px;
+            ">
+              🚑
+            </div>
+          `,
+          iconSize: [30, 30],
+          iconAnchor: [15, 15],
+        });
+
+        const vehicleMarker = L.marker(vehiclePos, { icon: vehicleIcon });
+        vehicleMarker.bindPopup(`<strong>${activeRoute?.label || 'Assigned Ambulance'}</strong><br/>En Route (~Step ${currentIdx + 1}/11)`);
+        routesLayerRef.current.addLayer(vehicleMarker);
+      } catch (err) {
+        // Fallback for headless environments
+      }
+    }
+  }, [routePolyline, activeRoute, activeSimulationStep]);
+
   return (
     <div style={{ position: 'relative', width: '100%' }}>
+      {/* Floating Demo Simulation / Live GPS Watermark Badge */}
+      {(isSimulationActive || activeRoute) && (
+        <div
+          style={{
+            position: 'absolute',
+            top: 12,
+            left: 12,
+            zIndex: 1000,
+            backgroundColor: isLiveGps ? 'rgba(22, 101, 52, 0.95)' : 'rgba(30, 41, 59, 0.9)',
+            color: '#ffffff',
+            padding: '5px 12px',
+            borderRadius: 6,
+            fontSize: '11px',
+            fontWeight: 800,
+            letterSpacing: '0.05em',
+            boxShadow: '0 4px 10px rgba(0,0,0,0.25)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+            fontFamily: 'monospace',
+          }}
+        >
+          <span style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: isLiveGps ? '#4ade80' : '#f59e0b' }} />
+          <span>{isLiveGps ? '[LIVE GPS TRACKING]' : '[DEMO SIMULATION]'}</span>
+        </div>
+      )}
+
       {/* Simulation Movement Banner */}
       {isSimulationActive && (
         <div
@@ -392,7 +500,7 @@ export default function LeafletMap({
           }}
         >
           <span style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: '#22c55e' }} />
-          <span>Vehicle Movement Active (Step {activeSimulationStep + 1}/10)</span>
+          <span>{t('map_simulation_active', 'Vehicle Movement Active')} (Step {activeSimulationStep + 1}/10)</span>
         </div>
       )}
 
@@ -412,7 +520,7 @@ export default function LeafletMap({
             justifyContent: 'space-between',
           }}
         >
-          <span>📍 Click or drag pin to select exact emergency location in Mysuru</span>
+          <span>{t('map_picker_hint', '📍 Click map or drag pin to select exact Mysuru coordinates')}</span>
           <span style={{ fontSize: '11px', color: '#64748b' }}>Center: Mysuru, Karnataka</span>
         </div>
       )}
@@ -450,22 +558,22 @@ export default function LeafletMap({
       >
         <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           <span style={{ width: 12, height: 12, borderRadius: '50%', backgroundColor: '#e11d48' }} />
-          Emergency Incidents
+          {t('map_legend_incidents', 'Emergency Incidents')}
         </span>
         <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           <span style={{ width: 12, height: 12, borderRadius: 3, backgroundColor: '#10b981' }} />
-          Available Fleet
+          {t('map_legend_available', 'Available Fleet')}
         </span>
         <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           <span style={{ width: 12, height: 12, borderRadius: 3, backgroundColor: '#2563eb' }} />
-          Dispatched Units
+          {t('map_legend_dispatched', 'Dispatched Units')}
         </span>
         <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           <span style={{ width: 12, height: 12, borderRadius: '50%', backgroundColor: '#8b5cf6' }} />
-          Partner Hospitals & NGOs
+          {t('map_legend_partners', 'Partner Hospitals & NGOs')}
         </span>
         <span style={{ marginLeft: 'auto', fontSize: '11px', color: '#64748b' }}>
-          Mysuru City Region (12.3052° N, 76.6552° E)
+          {t('map_center_label', 'Mysuru City Region (12.3052° N, 76.6552° E)')}
         </span>
       </div>
     </div>

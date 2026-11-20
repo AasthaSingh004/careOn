@@ -48,31 +48,32 @@ export default function UserLogin({ lang = 'en', onLoginSuccess, onNavigate }) {
 
   return (
     <div style={{ maxWidth: 460, margin: '2.5rem auto', padding: '0 1rem' }}>
-      <div className="card" style={{ padding: '2rem', borderRadius: 16, border: '1px solid #e2e8f0', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.06)' }}>
+      <div className="card" style={{ backgroundColor: '#FFFFFF', padding: '2.25rem', borderRadius: 16, border: '1px solid #DCE5EB', boxShadow: '0 4px 16px rgba(0, 0, 0, 0.04)' }}>
         <div style={{ textAlign: 'center', marginBottom: '1.75rem' }}>
           <div style={{ display: 'inline-flex', marginBottom: '0.75rem' }}>
-            <CareOnLogo size={52} />
+            <CareOnLogo size={52} color="#F04438" />
           </div>
-          <h2 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#134e4a', margin: '0 0 0.5rem 0' }}>
+          <h2 style={{ fontSize: '1.6rem', fontWeight: 800, color: '#171C24', margin: '0 0 0.4rem 0' }}>
             {t('user_login_title')}
           </h2>
-          <p style={{ color: '#64748b', fontSize: '0.9rem', margin: 0 }}>
+          <p style={{ color: '#344252', fontSize: '0.9rem', margin: 0 }}>
             {t('user_login_subtitle')}
           </p>
         </div>
 
         {error && (
           <div style={{
-            background: '#fef2f2',
-            border: '1px solid #fecaca',
-            color: '#991b1b',
+            background: '#FEE4E2',
+            border: '1px solid #FECDCA',
+            color: '#B42318',
             padding: '0.75rem 1rem',
             borderRadius: 8,
             marginBottom: '1.25rem',
             display: 'flex',
             alignItems: 'center',
             gap: 8,
-            fontSize: '0.875rem'
+            fontSize: '0.875rem',
+            fontWeight: 600
           }}>
             <AlertCircle size={18} style={{ flexShrink: 0 }} />
             <span>{error}</span>
@@ -81,16 +82,17 @@ export default function UserLogin({ lang = 'en', onLoginSuccess, onNavigate }) {
 
         {success && (
           <div style={{
-            background: '#f0fdf4',
-            border: '1px solid #bbf7d0',
-            color: '#166534',
+            background: '#ECFDF3',
+            border: '1px solid #A6F4C5',
+            color: '#027A48',
             padding: '0.75rem 1rem',
             borderRadius: 8,
             marginBottom: '1.25rem',
             display: 'flex',
             alignItems: 'center',
             gap: 8,
-            fontSize: '0.875rem'
+            fontSize: '0.875rem',
+            fontWeight: 700
           }}>
             <CheckCircle2 size={18} style={{ flexShrink: 0 }} />
             <span>{success}</span>
@@ -99,15 +101,15 @@ export default function UserLogin({ lang = 'en', onLoginSuccess, onNavigate }) {
 
         <form onSubmit={handleSubmit}>
           <div className="form-group" style={{ marginBottom: '1.25rem' }}>
-            <label style={{ display: 'block', fontWeight: 600, fontSize: '0.875rem', marginBottom: '0.35rem', color: '#334155' }}>
+            <label style={{ display: 'block', fontWeight: 700, fontSize: '0.9rem', marginBottom: '0.4rem', color: '#171C24' }}>
               {t('email_label')}
             </label>
             <div style={{ position: 'relative' }}>
-              <User size={18} style={{ position: 'absolute', left: 12, top: 12, color: '#94a3b8' }} />
+              <User size={18} style={{ position: 'absolute', left: 12, top: 12, color: '#667085' }} />
               <input
                 type="email"
                 className="input-field"
-                style={{ width: '100%', paddingLeft: '2.5rem', boxSizing: 'border-box' }}
+                style={{ width: '100%', paddingLeft: '2.5rem', boxSizing: 'border-box', border: '1px solid #DCE5EB', borderRadius: 8, padding: '0.75rem 0.75rem 0.75rem 2.5rem', backgroundColor: '#FFFFFF', color: '#171C24' }}
                 placeholder={t('email_placeholder')}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -118,15 +120,15 @@ export default function UserLogin({ lang = 'en', onLoginSuccess, onNavigate }) {
           </div>
 
           <div className="form-group" style={{ marginBottom: '1.5rem' }}>
-            <label style={{ display: 'block', fontWeight: 600, fontSize: '0.875rem', marginBottom: '0.35rem', color: '#334155' }}>
+            <label style={{ display: 'block', fontWeight: 700, fontSize: '0.9rem', marginBottom: '0.4rem', color: '#171C24' }}>
               {t('password_label')}
             </label>
             <div style={{ position: 'relative' }}>
-              <Lock size={18} style={{ position: 'absolute', left: 12, top: 12, color: '#94a3b8' }} />
+              <Lock size={18} style={{ position: 'absolute', left: 12, top: 12, color: '#667085' }} />
               <input
                 type="password"
                 className="input-field"
-                style={{ width: '100%', paddingLeft: '2.5rem', boxSizing: 'border-box' }}
+                style={{ width: '100%', paddingLeft: '2.5rem', boxSizing: 'border-box', border: '1px solid #DCE5EB', borderRadius: 8, padding: '0.75rem 0.75rem 0.75rem 2.5rem', backgroundColor: '#FFFFFF', color: '#171C24' }}
                 placeholder={t('password_placeholder')}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -139,7 +141,7 @@ export default function UserLogin({ lang = 'en', onLoginSuccess, onNavigate }) {
           <button
             type="submit"
             className="btn btn-primary"
-            style={{ width: '100%', padding: '0.75rem', fontSize: '1rem', fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
+            style={{ width: '100%', padding: '0.85rem', fontSize: '1rem', fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: '#171C24', color: '#FFFFFF', borderRadius: 8, border: 'none', cursor: 'pointer' }}
             disabled={loading}
           >
             {loading ? t('loading') : (
@@ -154,43 +156,43 @@ export default function UserLogin({ lang = 'en', onLoginSuccess, onNavigate }) {
         {/* Quick Demo Credentials */}
         <div style={{
           marginTop: '1.5rem',
-          padding: '0.85rem',
+          padding: '0.95rem',
           borderRadius: 8,
-          background: '#f8fafc',
-          border: '1px dashed #cbd5e1',
+          background: '#F5F6F7',
+          border: '1px dashed #DCE5EB',
           textAlign: 'center'
         }}>
-          <p style={{ margin: '0 0 0.5rem 0', fontSize: '0.8rem', color: '#64748b' }}>
+          <p style={{ margin: '0 0 0.5rem 0', fontSize: '0.825rem', color: '#344252' }}>
             {t('demo_account_hint')}
           </p>
           <button
             type="button"
             className="btn btn-outline"
             onClick={handleFillDemo}
-            style={{ fontSize: '0.8rem', padding: '0.35rem 0.75rem' }}
+            style={{ fontSize: '0.825rem', padding: '0.4rem 0.85rem', borderColor: '#DCE5EB', color: '#171C24', background: '#FFFFFF', fontWeight: 700 }}
           >
-            {t('fill_demo_user')} (Demo User)
+            {t('fill_demo_user')}{lang === 'en' ? ' (Demo User)' : <span style={{ display: 'none' }}> (Demo User)</span>}
           </button>
         </div>
 
-        <div style={{ marginTop: '1.5rem', textAlign: 'center', fontSize: '0.875rem', color: '#64748b' }}>
+        <div style={{ marginTop: '1.5rem', textAlign: 'center', fontSize: '0.875rem', color: '#344252' }}>
           <span>{t('no_account_prompt')} </span>
           <button
             type="button"
             onClick={() => onNavigate('user_register')}
-            style={{ background: 'none', border: 'none', color: '#0d9488', fontWeight: 600, cursor: 'pointer', padding: 0 }}
+            style={{ background: 'none', border: 'none', color: '#F04438', fontWeight: 700, cursor: 'pointer', padding: 0 }}
           >
             {t('register_link')}
           </button>
         </div>
 
-        <div style={{ marginTop: '1rem', textAlign: 'center', fontSize: '0.8rem', color: '#94a3b8' }}>
+        <div style={{ marginTop: '1rem', textAlign: 'center', fontSize: '0.825rem', color: '#667085' }}>
           <Shield size={14} style={{ display: 'inline', verticalAlign: 'middle', marginRight: 4 }} />
           <span>{t('coordinator_access_hint')} </span>
           <button
             type="button"
             onClick={() => onNavigate('admin_login')}
-            style={{ background: 'none', border: 'none', color: '#475569', textDecoration: 'underline', cursor: 'pointer', padding: 0 }}
+            style={{ background: 'none', border: 'none', color: '#171C24', textDecoration: 'underline', cursor: 'pointer', padding: 0, fontWeight: 600 }}
           >
             {t('admin_login_link')}
           </button>

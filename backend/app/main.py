@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import text
 
 from app import __version__
-from app.database import engine, Base, get_db
+from app.database import engine, Base, get_db, run_db_migrations
 from app.models import User, Incident, Resource, Assignment, ExternalProvider, ProviderEnquiry, Notification, Feedback
 from app.auth import (
     get_current_user,
@@ -29,7 +29,13 @@ from app.schemas import (
     IncidentPriorityUpdate,
     IncidentCancel,
     IncidentResponse,
+    IncidentCreateResponse,
+    RequestOTPResponse,
+    DoctorCallbackCreate,
+    DoctorCallbackUpdateStatus,
+    DoctorCallbackResponse,
     IncidentDetailResponse,
+    SystemConfigResponse,
     # Resources
     ResourceCreate,
     ResourceUpdate,
@@ -67,8 +73,9 @@ from app.chatbot.sahara import process_sahara_message
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Ensure tables exist and seed demo data on startup
+    # Ensure tables exist, execute non-destructive column migrations, and seed demo data on startup
     Base.metadata.create_all(bind=engine)
+    run_db_migrations(engine)
     db = next(get_db())
     try:
         crud.seed_demo_data(db)
@@ -155,6 +162,17 @@ def health_check(db: Session = Depends(get_db)):
     )
 
 
+@app.get("/api/config", response_model=SystemConfigResponse, tags=["System"])
+def get_system_config():
+    """Retrieve public system configuration and emergency disclaimers."""
+    return SystemConfigResponse(
+        official_emergency_number="112",
+        official_emergency_disclaimer=(
+            "CareOn is an emergency coordination decision-support tool, not a replacement for government emergency services (112 / 108)."
+        ),
+    )
+
+
 # ==============================================================================
 # Auth Routes
 # ==============================================================================
@@ -204,7 +222,7 @@ def get_me(current_user: User = Depends(get_current_user)):
 # ==============================================================================
 # Incident Routes
 # ==============================================================================
-@app.post("/api/incidents", response_model=IncidentResponse, status_code=status.HTTP_201_CREATED, tags=["Incidents"])
+@app.post("/api/incidents", response_model=IncidentCreateResponse, status_code=status.HTTP_201_CREATED, tags=["Incidents"])
 def report_incident(
     payload: IncidentCreate,
     current_user: Optional[User] = Depends(get_optional_user),
@@ -212,7 +230,12 @@ def report_incident(
 ):
     """Public / user emergency reporting endpoint."""
     user_id = current_user.id if current_user else None
-    return crud.create_incident(db, payload, user_id=user_id)
+    incident, raw_otp = crud.create_incident(db, payload, user_id=user_id)
+    # The simulated OTP is returned only to the authenticated reporter in the immediate creation flow
+    simulated_otp = raw_otp if current_user else None
+    resp = IncidentCreateResponse.model_validate(incident)
+    resp.simulated_otp = simulated_otp
+    return resp
 
 
 @app.get("/api/incidents", response_model=List[IncidentResponse], tags=["Incidents"])
@@ -265,33 +288,184 @@ def get_incident_details(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Access denied: You cannot view another user's private emergency incident.",
         )
-    return item
-    """Retrieve full incident details by numeric ID or incident code (e.g. CARE-2026-101)."""
-    item = crud.get_incident_by_id_or_code(db, identifier)
-    if not item:
+    is_authorized = bool(
+        current_user and (current_user.role == "admin" or (item.user_id and item.user_id == current_user.id))
+    )
+    resp = IncidentDetailResponse.model_validate(item)
+    if not is_authorized:
+        sanitized_cbs = []
+        for cb in resp.doctor_callback_requests:
+            cb_dict = cb.model_dump()
+            cb_dict["contact_phone"] = None
+            sanitized_cbs.append(DoctorCallbackResponse.model_validate(cb_dict))
+        resp.doctor_callback_requests = sanitized_cbs
+    return resp
+
+
+@app.post("/api/incidents/{incident_id}/request-otp", response_model=RequestOTPResponse, tags=["Incidents"])
+def request_new_otp(
+    incident_id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """
+    Generate or retrieve a fresh simulated OTP for the authenticated reporter.
+    Restricted strictly to the authenticated reporter of the incident.
+    """
+    incident = crud.get_incident_by_id_or_code(db, str(incident_id))
+    if not incident:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Incident #{incident_id} not found.")
+    if incident.user_id != current_user.id and current_user.role != "admin":
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Incident '{identifier}' not found.",
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Access denied: Only the incident reporter can request an emergency verification OTP.",
         )
-    return item
+    if incident.is_verified:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Incident is already verified.",
+        )
+    raw_otp, expires_at = crud.regenerate_incident_otp(db, incident)
+
+    # In-App Emergency Verification OTP notification
+    otp_notif = Notification(
+        user_id=incident.user_id,
+        incident_id=incident.id,
+        title=f"Emergency Verification Code ({incident.incident_code})",
+        message=f"Your CareOn verification code is: {raw_otp}. Enter this code in the verification box to continue. (In-App Demo OTP)",
+        type="alert",
+        target_role="user",
+    )
+    db.add(otp_notif)
+    db.commit()
+
+    return RequestOTPResponse(
+        incident_id=incident.id,
+        incident_code=incident.incident_code,
+        simulated_otp=raw_otp,
+        expires_at=expires_at,
+    )
 
 
 @app.post("/api/incidents/{incident_id}/verify", response_model=IncidentResponse, tags=["Incidents"])
 def verify_incident_otp(
     incident_id: int,
     payload: IncidentVerify,
-    current_user: Optional[User] = Depends(get_optional_user),
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    """Verify phone contact via demo OTP."""
-    actor = current_user.name if current_user else "Reporter"
-    updated = crud.verify_incident(db, incident_id, payload.otp, verified_by=actor)
-    if not updated:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid OTP code. Use demo code '123456'.",
-        )
+    """Verify phone contact via emergency OTP. Restricted to the authenticated incident reporter."""
+    updated, outcome = crud.verify_incident(db, incident_id, payload.otp, current_user=current_user)
+    if outcome == "not_found":
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Incident #{incident_id} not found.")
+    if outcome == "unauthorized":
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Authentication required to verify emergency incident.")
+    if outcome == "forbidden":
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied: Only the incident reporter can verify this emergency incident.")
+    if outcome == "already_verified":
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Incident is already verified. Reusing verification code is not allowed.")
+    if outcome == "attempts_exceeded":
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Maximum verification attempts exceeded (5/5). Please request a new emergency verification code.")
+    if outcome == "expired":
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Emergency verification code has expired. Please request a new code.")
+    if outcome.startswith("invalid_otp"):
+        remaining = outcome.split(":")[-1]
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Invalid verification code. Attempts remaining: {remaining}.")
     return updated
+
+
+# ==============================================================================
+# Doctor Callback Routes
+# ==============================================================================
+@app.post("/api/incidents/{incident_id}/doctor-callback", response_model=DoctorCallbackResponse, status_code=status.HTTP_201_CREATED, tags=["Doctor Callback"])
+def request_doctor_callback(
+    incident_id: int,
+    payload: DoctorCallbackCreate,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Request an on-call medical tele-triage callback. Restricted to authenticated incident reporter."""
+    incident = crud.get_incident_by_id_or_code(db, str(incident_id))
+    if not incident:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Incident #{incident_id} not found.")
+    if incident.user_id != current_user.id and current_user.role != "admin":
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied: Only the incident reporter can request a doctor callback.")
+
+    contact_name = payload.contact_name or current_user.name
+    contact_phone = payload.contact_phone or current_user.phone
+    cb_req = crud.create_doctor_callback_request(
+        db=db,
+        incident_id=incident.id,
+        user_id=current_user.id,
+        contact_name=contact_name,
+        contact_phone=contact_phone,
+        chief_complaint=payload.chief_complaint,
+    )
+    resp = DoctorCallbackResponse.model_validate(cb_req)
+    resp.incident_code = incident.incident_code
+    return resp
+
+
+@app.get("/api/incidents/{incident_id}/doctor-callback", response_model=List[DoctorCallbackResponse], tags=["Doctor Callback"])
+def get_incident_doctor_callbacks(
+    incident_id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """View doctor callback requests for a specific incident. Restricted to incident reporter or coordinator."""
+    incident = crud.get_incident_by_id_or_code(db, str(incident_id))
+    if not incident:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Incident #{incident_id} not found.")
+    if current_user.role != "admin" and incident.user_id != current_user.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied: You cannot view callback requests for this incident.")
+    items = crud.get_incident_doctor_callbacks(db, incident.id)
+    results = []
+    for item in items:
+        r = DoctorCallbackResponse.model_validate(item)
+        r.incident_code = incident.incident_code
+        results.append(r)
+    return results
+
+
+@app.get("/api/admin/doctor-callbacks", response_model=List[DoctorCallbackResponse], tags=["Doctor Callback"])
+def list_all_doctor_callbacks(
+    status_filter: Optional[str] = Query(None, alias="status"),
+    admin: User = Depends(get_current_admin),
+    db: Session = Depends(get_db),
+):
+    """Admin-only: list all doctor callback requests with pending triage visibility."""
+    items = crud.get_doctor_callbacks(db, status_filter=status_filter)
+    results = []
+    for item in items:
+        r = DoctorCallbackResponse.model_validate(item)
+        if item.incident:
+            r.incident_code = item.incident.incident_code
+        results.append(r)
+    return results
+
+
+@app.patch("/api/admin/doctor-callbacks/{callback_id}", response_model=DoctorCallbackResponse, tags=["Doctor Callback"])
+def update_doctor_callback(
+    callback_id: int,
+    payload: DoctorCallbackUpdateStatus,
+    admin: User = Depends(get_current_admin),
+    db: Session = Depends(get_db),
+):
+    """Admin-only: update doctor callback triage status and clinical notes."""
+    updated = crud.update_doctor_callback_status(
+        db=db,
+        callback_id=callback_id,
+        status=payload.status,
+        admin_notes=payload.admin_notes,
+        assigned_to=payload.assigned_to,
+        actor=admin.name,
+    )
+    if not updated:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Doctor callback request not found.")
+    resp = DoctorCallbackResponse.model_validate(updated)
+    if updated.incident:
+        resp.incident_code = updated.incident.incident_code
+    return resp
 
 
 @app.patch("/api/incidents/{incident_id}/status", response_model=IncidentResponse, tags=["Incidents"])
@@ -395,6 +569,28 @@ def resolve_incident_endpoint(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Incident #{incident_id} not found.",
         )
+    return updated
+
+
+@app.post("/api/incidents/{incident_id}/confirm-arrival", response_model=IncidentResponse, tags=["Incidents"])
+def confirm_arrival_endpoint(
+    incident_id: int,
+    notes: Optional[str] = Query(None),
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Citizen explicitly confirms emergency assistance has arrived and incident is resolved."""
+    incident = crud.get_incident_by_id_or_code(db, str(incident_id))
+    if not incident:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Incident not found.")
+    if incident.user_id != current_user.id and current_user.role != "admin":
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only the incident reporter can confirm arrival.")
+    updated = crud.resolve_incident(
+        db,
+        incident.id,
+        actor=current_user.name,
+        notes=notes or "Citizen confirmed responder arrived on scene.",
+    )
     return updated
 
 
@@ -634,6 +830,39 @@ def mark_read(notification_id: int, db: Session = Depends(get_db)):
     return {"status": "success"}
 
 
+@app.get("/api/admin/notifications", response_model=List[NotificationResponse], tags=["Notifications"])
+def get_admin_notifications_route(
+    unread_only: bool = Query(False),
+    admin: User = Depends(get_current_admin),
+    db: Session = Depends(get_db),
+):
+    """Retrieve persistent coordinator notifications."""
+    return crud.get_admin_notifications(db, unread_only=unread_only)
+
+
+@app.patch("/api/admin/notifications/{notification_id}/read", tags=["Notifications"])
+def mark_admin_read(
+    notification_id: int,
+    admin: User = Depends(get_current_admin),
+    db: Session = Depends(get_db),
+):
+    """Mark an individual coordinator notification as read."""
+    success = crud.mark_notification_read(db, notification_id)
+    if not success:
+        raise HTTPException(status_code=404, detail="Notification not found.")
+    return {"status": "success"}
+
+
+@app.post("/api/admin/notifications/mark-all-read", tags=["Notifications"])
+def mark_all_admin_read(
+    admin: User = Depends(get_current_admin),
+    db: Session = Depends(get_db),
+):
+    """Mark all coordinator notifications as read."""
+    count = crud.mark_all_admin_notifications_read(db)
+    return {"status": "success", "count": count}
+
+
 @app.post("/api/feedback", response_model=FeedbackResponse, status_code=status.HTTP_201_CREATED, tags=["Feedback"])
 def submit_incident_feedback(
     payload: FeedbackCreate,
@@ -670,7 +899,13 @@ def list_feedback(
 def chat_with_sahara(payload: ChatbotMessageRequest, db: Session = Depends(get_db)):
     """Communicate with Sahara, the caring emergency support companion."""
     session_id = payload.session_id or "default_session"
-    result = process_sahara_message(payload.message, session_id, db)
+    result = process_sahara_message(
+        payload.message,
+        session_id,
+        db,
+        user_name=payload.user_name,
+        lang=payload.lang,
+    )
     return ChatbotMessageResponse(**result)
 
 

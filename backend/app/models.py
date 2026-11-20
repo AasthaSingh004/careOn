@@ -29,10 +29,11 @@ class User(Base):
     trust_score = Column(String(30), nullable=False, default="Unverified")  # Unverified, Mistaken, Confirmed Genuine, Confirmed Misuse
     trust_notes = Column(Text, nullable=True)
     is_flagged = Column(Boolean, default=False)
-    created_at = Column(DateTime, default=utc_now)
+    created_at = Column(DateTime(timezone=True), default=utc_now)
 
     incidents = relationship("Incident", back_populates="user")
     notifications = relationship("Notification", back_populates="user")
+    doctor_callback_requests = relationship("DoctorCallbackRequest", back_populates="user")
 
 
 class Incident(Base):
@@ -64,7 +65,10 @@ class Incident(Base):
     status = Column(String(40), nullable=False, default="Received")
     
     is_verified = Column(Boolean, default=False)
-    verification_otp = Column(String(10), default="123456")
+    verification_otp = Column(String(10), nullable=True, default=None)
+    otp_hash = Column(String(255), nullable=True)
+    otp_expires_at = Column(DateTime(timezone=True), nullable=True)
+    otp_attempts = Column(Integer, nullable=False, default=0)
     is_duplicate = Column(Boolean, default=False)
     duplicate_of_id = Column(Integer, ForeignKey("incidents.id"), nullable=True)
     
@@ -72,8 +76,8 @@ class Incident(Base):
     disaster_details = Column(Text, nullable=True)  # JSON-like or comma separated relief items
     internal_admin_notes = Column(Text, nullable=True)
     
-    created_at = Column(DateTime, default=utc_now)
-    updated_at = Column(DateTime, default=utc_now, onupdate=utc_now)
+    created_at = Column(DateTime(timezone=True), default=utc_now)
+    updated_at = Column(DateTime(timezone=True), default=utc_now, onupdate=utc_now)
 
     user = relationship("User", back_populates="incidents")
     updates = relationship("IncidentUpdate", back_populates="incident", cascade="all, delete-orphan", order_by="IncidentUpdate.created_at.desc()")
@@ -82,6 +86,7 @@ class Incident(Base):
     cancellation = relationship("Cancellation", back_populates="incident", uselist=False, cascade="all, delete-orphan")
     feedback = relationship("Feedback", back_populates="incident", uselist=False, cascade="all, delete-orphan")
     verification_logs = relationship("VerificationLog", back_populates="incident", cascade="all, delete-orphan")
+    doctor_callback_requests = relationship("DoctorCallbackRequest", back_populates="incident", cascade="all, delete-orphan")
 
 
 class IncidentUpdate(Base):
@@ -93,7 +98,7 @@ class IncidentUpdate(Base):
     message = Column(Text, nullable=False)
     actor = Column(String(100), nullable=False, default="System")
     is_public = Column(Boolean, default=True)
-    created_at = Column(DateTime, default=utc_now)
+    created_at = Column(DateTime(timezone=True), default=utc_now)
 
     incident = relationship("Incident", back_populates="updates")
 
@@ -113,7 +118,7 @@ class Resource(Base):
     capacity = Column(Integer, nullable=False, default=1)
     contact_phone = Column(String(30), nullable=False)
     current_assignment_id = Column(Integer, nullable=True)
-    last_updated = Column(DateTime, default=utc_now, onupdate=utc_now)
+    last_updated = Column(DateTime(timezone=True), default=utc_now, onupdate=utc_now)
 
     assignments = relationship("Assignment", back_populates="resource")
 
@@ -126,8 +131,8 @@ class Assignment(Base):
     resource_id = Column(Integer, ForeignKey("resources.id"), nullable=False)
     assigned_by = Column(String(100), nullable=False, default="Coordinator Aastha Singh")
     status = Column(String(30), nullable=False, default="Active")  # Active, Completed, Released, Cancelled
-    assigned_at = Column(DateTime, default=utc_now)
-    released_at = Column(DateTime, nullable=True)
+    assigned_at = Column(DateTime(timezone=True), default=utc_now)
+    released_at = Column(DateTime(timezone=True), nullable=True)
     notes = Column(Text, nullable=True)
 
     incident = relationship("Incident", back_populates="assignments")
@@ -168,7 +173,7 @@ class ProviderEnquiry(Base):
     user_consent = Column(String(30), default="Not Required")
     response_time_minutes = Column(Integer, default=15)
     notes = Column(Text, nullable=True)
-    created_at = Column(DateTime, default=utc_now)
+    created_at = Column(DateTime(timezone=True), default=utc_now)
 
     incident = relationship("Incident", back_populates="provider_enquiries")
     provider = relationship("ExternalProvider", back_populates="enquiries")
@@ -183,8 +188,10 @@ class Notification(Base):
     title = Column(String(150), nullable=False)
     message = Column(Text, nullable=False)
     type = Column(String(30), default="info")  # info, alert, success, warning
+    target_role = Column(String(20), default="user")  # user, admin
+    action_url = Column(String(200), nullable=True)
     is_read = Column(Boolean, default=False)
-    created_at = Column(DateTime, default=utc_now)
+    created_at = Column(DateTime(timezone=True), default=utc_now)
 
     user = relationship("User", back_populates="notifications")
 
@@ -199,7 +206,7 @@ class Cancellation(Base):
     cancelled_by = Column(String(30), default="user")  # "user" or "admin"
     acknowledged_by_admin = Column(Boolean, default=False)
     resources_safely_released = Column(Boolean, default=False)
-    created_at = Column(DateTime, default=utc_now)
+    created_at = Column(DateTime(timezone=True), default=utc_now)
 
     incident = relationship("Incident", back_populates="cancellation")
 
@@ -213,7 +220,7 @@ class Feedback(Base):
     rating = Column(Integer, nullable=False)  # 1 to 5
     tags = Column(String(200), nullable=True)  # comma separated
     comments = Column(Text, nullable=True)
-    created_at = Column(DateTime, default=utc_now)
+    created_at = Column(DateTime(timezone=True), default=utc_now)
 
     incident = relationship("Incident", back_populates="feedback")
 
@@ -227,7 +234,7 @@ class AuditLog(Base):
     entity_id = Column(String(50), nullable=False)
     actor = Column(String(100), nullable=False)
     details = Column(Text, nullable=True)
-    created_at = Column(DateTime, default=utc_now)
+    created_at = Column(DateTime(timezone=True), default=utc_now)
 
 
 class VerificationLog(Base):
@@ -238,9 +245,28 @@ class VerificationLog(Base):
     verified_by = Column(String(100), nullable=False)
     decision = Column(String(50), nullable=False)  # Verified, Flagged Mistake, Flagged Deliberate Misuse, Unverified
     reason = Column(Text, nullable=True)
-    created_at = Column(DateTime, default=utc_now)
+    created_at = Column(DateTime(timezone=True), default=utc_now)
 
     incident = relationship("Incident", back_populates="verification_logs")
+
+
+class DoctorCallbackRequest(Base):
+    __tablename__ = "doctor_callback_requests"
+
+    id = Column(Integer, primary_key=True, index=True)
+    incident_id = Column(Integer, ForeignKey("incidents.id"), nullable=False, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
+    contact_name = Column(String(100), nullable=False)
+    contact_phone = Column(String(30), nullable=False)
+    chief_complaint = Column(Text, nullable=True)
+    status = Column(String(30), nullable=False, default="Pending")  # Pending, In Review, Contacted, Closed, Declined
+    admin_notes = Column(Text, nullable=True)
+    assigned_to = Column(String(100), nullable=True)
+    created_at = Column(DateTime(timezone=True), default=utc_now)
+    updated_at = Column(DateTime(timezone=True), default=utc_now, onupdate=utc_now)
+
+    incident = relationship("Incident", back_populates="doctor_callback_requests")
+    user = relationship("User", back_populates="doctor_callback_requests")
 
 
 class ChatbotLog(Base):
@@ -251,7 +277,7 @@ class ChatbotLog(Base):
     user_message = Column(Text, nullable=False)
     bot_response = Column(Text, nullable=False)
     intent_detected = Column(String(60), nullable=False)
-    created_at = Column(DateTime, default=utc_now)
+    created_at = Column(DateTime(timezone=True), default=utc_now)
 
 
 # Backward-compatibility model for existing tests
@@ -265,5 +291,5 @@ class Emergency(Base):
     priority = Column(String(20), nullable=False, default="High")
     status = Column(String(20), nullable=False, default="Pending")
     description = Column(Text, nullable=True)
-    created_at = Column(DateTime, default=utc_now)
-    updated_at = Column(DateTime, default=utc_now, onupdate=utc_now)
+    created_at = Column(DateTime(timezone=True), default=utc_now)
+    updated_at = Column(DateTime(timezone=True), default=utc_now, onupdate=utc_now)

@@ -1,3 +1,4 @@
+import os
 import re
 from typing import Dict, Any, Optional
 from sqlalchemy.orm import Session
@@ -11,7 +12,13 @@ OFFICIAL_EMERGENCY_DISCLAIMER = (
 )
 
 
-def process_sahara_message(message: str, session_id: str, db: Session) -> Dict[str, Any]:
+def process_sahara_message(
+    message: str,
+    session_id: str,
+    db: Session,
+    user_name: Optional[str] = None,
+    lang: Optional[str] = "en",
+) -> Dict[str, Any]:
     """
     Empathetic, rule-based intent matching for Sahara emergency companion.
     Adheres strictly to medical safety boundaries.
@@ -151,7 +158,10 @@ def process_sahara_message(message: str, session_id: str, db: Session) -> Dict[s
     # Intent 8: Greeting / Friendly hello
     elif any(w in clean_msg for w in ["hello", "hi", "hey", "namaste", "good morning", "good evening"]):
         intent = "greeting"
-        response_text = GREETING
+        if user_name and user_name.strip():
+            response_text = f"Hey {user_name.strip()}! ❤️ I'm Sahara, your caring emergency support companion. Take a gentle breath. We'll figure out the next step together. How can I help you right now?"
+        else:
+            response_text = GREETING
         suggested_actions = [
             {"label": "Request Emergency Help", "action": "report"},
             {"label": "Track My Request", "action": "track_prompt"},
@@ -165,7 +175,7 @@ def process_sahara_message(message: str, session_id: str, db: Session) -> Dict[s
             "I want to make sure you get the right support. ❤️\n\n"
             "• If this is an urgent emergency, tap **'Request Emergency Help'**.\n"
             "• To check an existing incident, tell me your incident code (like `CARE-2026-101`).\n"
-            "• Or speak directly with our command coordinator at **+91 80 2233 4455**."
+            "• For immediate life-threatening danger, dial **112** (Official Emergency Services)."
         )
         suggested_actions = [
             {"label": "Request Emergency Help", "action": "report"},

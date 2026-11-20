@@ -1,5 +1,5 @@
 import os
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, inspect, text
 from sqlalchemy.orm import declarative_base, sessionmaker
 
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./careon.db")
@@ -45,6 +45,67 @@ else:
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()
+
+
+def get_migration_statements(dialect_name: str) -> list:
+    """Return (column_name, sql_statement) pairs tailored for the database dialect."""
+    is_pg = dialect_name == "postgresql"
+    dt_type = "TIMESTAMP WITH TIME ZONE" if is_pg else "DATETIME"
+    return [
+        ("otp_hash", "ALTER TABLE incidents ADD COLUMN otp_hash VARCHAR(255)"),
+        ("otp_expires_at", f"ALTER TABLE incidents ADD COLUMN otp_expires_at {dt_type}"),
+        ("otp_attempts", "ALTER TABLE incidents ADD COLUMN otp_attempts INTEGER DEFAULT 0"),
+    ]
+
+
+def _is_duplicate_column_error(e: Exception) -> bool:
+    """Identify if error is benign race condition where column was already added by concurrent instance."""
+    err_msg = str(e).lower()
+    return (
+        "duplicate column" in err_msg
+        or "already exists" in err_msg
+        or getattr(getattr(e, "orig", None), "pgcode", None) == "42701"
+    )
+
+
+def run_db_migrations(target_engine):
+    """
+    Non-destructive database migration helper.
+    Ensures newly added columns exist in existing tables (SQLite & PostgreSQL).
+    Does not drop or recreate tables.
+    Rethrows unexpected errors so migration failures are visible.
+    """
+    inspector = inspect(target_engine)
+    existing_tables = inspector.get_table_names()
+    if "incidents" in existing_tables:
+        columns = {col["name"] for col in inspector.get_columns("incidents")}
+        dialect_name = getattr(target_engine.dialect, "name", "sqlite")
+        statements = get_migration_statements(dialect_name)
+        for col_name, stmt in statements:
+            if col_name not in columns:
+                try:
+                    with target_engine.begin() as conn:
+                        conn.execute(text(stmt))
+                except Exception as e:
+                    if _is_duplicate_column_error(e):
+                        continue
+                    raise
+
+    if "notifications" in existing_tables:
+        notif_cols = {col["name"] for col in inspector.get_columns("notifications")}
+        notif_statements = [
+            ("target_role", "ALTER TABLE notifications ADD COLUMN target_role VARCHAR(20) DEFAULT 'user'"),
+            ("action_url", "ALTER TABLE notifications ADD COLUMN action_url VARCHAR(200)"),
+        ]
+        for col_name, stmt in notif_statements:
+            if col_name not in notif_cols:
+                try:
+                    with target_engine.begin() as conn:
+                        conn.execute(text(stmt))
+                except Exception as e:
+                    if _is_duplicate_column_error(e):
+                        continue
+                    raise
 
 
 def get_db():

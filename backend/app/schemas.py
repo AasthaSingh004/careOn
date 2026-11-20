@@ -1,6 +1,24 @@
-from datetime import datetime
-from typing import List, Optional, Any, Dict
-from pydantic import BaseModel, Field, ConfigDict
+from datetime import datetime, timezone
+from typing import List, Optional, Any, Dict, Annotated
+from pydantic import BaseModel, Field, ConfigDict, BeforeValidator, PlainSerializer
+
+
+def ensure_utc_datetime(v: Any) -> datetime:
+    if isinstance(v, str):
+        v = datetime.fromisoformat(v.replace("Z", "+00:00"))
+    if isinstance(v, datetime):
+        if v.tzinfo is None:
+            v = v.replace(tzinfo=timezone.utc)
+        else:
+            v = v.astimezone(timezone.utc)
+    return v
+
+
+UTCDateTime = Annotated[
+    datetime,
+    BeforeValidator(ensure_utc_datetime),
+    PlainSerializer(lambda v: v.isoformat().replace("+00:00", "Z"), return_type=str, when_used="json"),
+]
 
 
 # ==============================================================================
@@ -28,7 +46,7 @@ class UserResponse(BaseModel):
     role: str
     trust_score: str
     is_flagged: bool
-    created_at: datetime
+    created_at: UTCDateTime
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -83,7 +101,7 @@ class IncidentUpdateItem(BaseModel):
     message: str
     actor: str
     is_public: bool
-    created_at: datetime
+    created_at: UTCDateTime
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -107,8 +125,8 @@ class AssignmentResponse(BaseModel):
     resource_id: int
     assigned_by: str
     status: str
-    assigned_at: datetime
-    released_at: Optional[datetime] = None
+    assigned_at: UTCDateTime
+    released_at: Optional[UTCDateTime] = None
     notes: Optional[str] = None
     resource: Optional[ResourceSimple] = None
 
@@ -127,7 +145,7 @@ class ProviderEnquiryResponse(BaseModel):
     response_time_minutes: int
     notes: Optional[str] = None
     provider_name: Optional[str] = None
-    created_at: datetime
+    created_at: UTCDateTime
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -137,7 +155,7 @@ class FeedbackResponse(BaseModel):
     rating: int
     tags: Optional[str] = None
     comments: Optional[str] = None
-    created_at: datetime
+    created_at: UTCDateTime
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -161,13 +179,56 @@ class IncidentResponse(BaseModel):
     priority_reason: Optional[str] = None
     status: str
     is_verified: bool
-    verification_otp: Optional[str] = None
     is_duplicate: bool
     is_disaster: bool
     disaster_details: Optional[str] = None
     internal_admin_notes: Optional[str] = None
-    created_at: datetime
-    updated_at: datetime
+    created_at: UTCDateTime
+    updated_at: Optional[UTCDateTime] = None
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class IncidentCreateResponse(IncidentResponse):
+    simulated_otp: Optional[str] = Field(
+        default=None,
+        description="Simulated in-app verification code returned only to the authenticated reporter in the immediate creation/verification flow."
+    )
+
+
+class RequestOTPResponse(BaseModel):
+    incident_id: int
+    incident_code: str
+    simulated_otp: str
+    expires_at: UTCDateTime
+    message: str = "Simulated in-app emergency verification code generated."
+
+
+class DoctorCallbackCreate(BaseModel):
+    chief_complaint: Optional[str] = Field(None, max_length=1000)
+    contact_name: Optional[str] = None
+    contact_phone: Optional[str] = None
+
+
+class DoctorCallbackUpdateStatus(BaseModel):
+    status: str = Field(..., pattern="^(Pending|In Review|Contacted|Closed|Declined)$")
+    admin_notes: Optional[str] = None
+    assigned_to: Optional[str] = None
+
+
+class DoctorCallbackResponse(BaseModel):
+    id: int
+    incident_id: int
+    incident_code: Optional[str] = None
+    user_id: int
+    contact_name: str
+    contact_phone: Optional[str] = None
+    chief_complaint: Optional[str] = None
+    status: str
+    admin_notes: Optional[str] = None
+    assigned_to: Optional[str] = None
+    created_at: UTCDateTime
+    updated_at: UTCDateTime
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -177,6 +238,7 @@ class IncidentDetailResponse(IncidentResponse):
     assignments: List[AssignmentResponse] = []
     provider_enquiries: List[ProviderEnquiryResponse] = []
     feedback: Optional[FeedbackResponse] = None
+    doctor_callback_requests: List[DoctorCallbackResponse] = []
 
 
 # ==============================================================================
@@ -299,8 +361,10 @@ class NotificationResponse(BaseModel):
     title: str
     message: str
     type: str
+    target_role: Optional[str] = "user"
+    action_url: Optional[str] = None
     is_read: bool
-    created_at: datetime
+    created_at: UTCDateTime
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -313,17 +377,26 @@ class FeedbackCreate(BaseModel):
 
 
 # ==============================================================================
-# Chatbot & Simulation
+# Chatbot & System Configuration
 # ==============================================================================
 class ChatbotMessageRequest(BaseModel):
     message: str
     session_id: Optional[str] = "default_session"
+    user_name: Optional[str] = None
+    lang: Optional[str] = "en"
 
 
 class ChatbotMessageResponse(BaseModel):
     reply: str
     intent: str
     suggested_actions: List[Dict[str, Any]] = []
+
+
+class SystemConfigResponse(BaseModel):
+    official_emergency_number: str = "112"
+    official_emergency_disclaimer: str = (
+        "CareOn is an emergency coordination decision-support tool, not a replacement for government emergency services (112 / 108)."
+    )
 
 
 class SimulationRunRequest(BaseModel):
@@ -353,8 +426,8 @@ class EmergencyResponse(BaseModel):
     priority: str
     status: str
     description: Optional[str] = None
-    created_at: datetime
-    updated_at: datetime
+    created_at: UTCDateTime
+    updated_at: UTCDateTime
 
     model_config = ConfigDict(from_attributes=True)
 

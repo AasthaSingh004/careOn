@@ -1,9 +1,12 @@
 import os
 import re
-from datetime import datetime, timezone
-from typing import List, Optional, Dict, Any
+import secrets
+import hmac
+import hashlib
+from datetime import datetime, timezone, timedelta
+from typing import List, Optional, Dict, Any, Tuple
 from sqlalchemy.orm import Session
-from sqlalchemy import func, or_
+from sqlalchemy import func, or_, and_
 
 from app.models import (
     User,
@@ -18,10 +21,11 @@ from app.models import (
     Feedback,
     AuditLog,
     VerificationLog,
+    DoctorCallbackRequest,
     Emergency,  # For legacy compatibility
 )
 from app.schemas import IncidentCreate, EmergencyCreate
-from app.auth import hash_password, verify_password
+from app.auth import hash_password, verify_password, SECRET_KEY
 from app.algorithms.classification import classify_incident
 from app.algorithms.allocation import (
     calculate_haversine_distance,
@@ -32,6 +36,31 @@ from app.algorithms.allocation import (
 
 def utc_now():
     return datetime.now(timezone.utc)
+
+
+def to_utc(dt: Optional[datetime]) -> Optional[datetime]:
+    if dt is None:
+        return None
+    if dt.tzinfo is None:
+        return dt.replace(tzinfo=timezone.utc)
+    return dt.astimezone(timezone.utc)
+
+
+def generate_secure_otp() -> str:
+    """Generate a cryptographically secure 6-digit random emergency verification code."""
+    return f"{secrets.randbelow(900000) + 100000:06d}"
+
+
+def hash_otp(otp: str) -> str:
+    """Hash the 6-digit OTP using HMAC-SHA256 with the application secret key."""
+    return hmac.new(SECRET_KEY.encode("utf-8"), otp.encode("utf-8"), hashlib.sha256).hexdigest()
+
+
+def verify_otp_hash(otp: str, stored_hash: Optional[str]) -> bool:
+    """Verify plain OTP against stored HMAC-SHA256 hash using constant-time comparison."""
+    if not stored_hash or not otp:
+        return False
+    return hmac.compare_digest(hash_otp(otp), stored_hash)
 
 
 # ==============================================================================
@@ -314,7 +343,10 @@ def seed_demo_data(db: Session):
                 priority_reason="Critical priority: Cardiac arrest indicators with loss of consciousness.",
                 status="Team Dispatched",
                 is_verified=True,
-                verification_otp="123456",
+                otp_hash=hash_otp("874219"),
+                otp_expires_at=utc_now() + timedelta(days=1),
+                otp_attempts=0,
+                verification_otp=None,
             ),
             # 2. Road Accident Incident (Pending Verification)
             Incident(
@@ -334,7 +366,10 @@ def seed_demo_data(db: Session):
                 priority_reason="High priority: 2 casualties reported on active roadway.",
                 status="Verification Pending",
                 is_verified=False,
-                verification_otp="4521",
+                otp_hash=hash_otp("652814"),
+                otp_expires_at=utc_now() + timedelta(minutes=10),
+                otp_attempts=0,
+                verification_otp=None,
             ),
             # 3. Fire Incident (Assistance Search / Shortage demo)
             Incident(
@@ -354,7 +389,10 @@ def seed_demo_data(db: Session):
                 priority_reason="Critical priority: Active structure fire with threat of spread.",
                 status="Assistance Search",
                 is_verified=True,
-                verification_otp="7890",
+                otp_hash=hash_otp("419823"),
+                otp_expires_at=utc_now() + timedelta(days=1),
+                otp_attempts=0,
+                verification_otp=None,
             ),
             # 4. Disaster Incident (Relief Coordination)
             Incident(
@@ -376,7 +414,10 @@ def seed_demo_data(db: Session):
                 is_verified=True,
                 is_disaster=True,
                 disaster_details="Drinking water containers (500L), ready-to-eat meals (100 pkts), inflatable rescue rafts.",
-                verification_otp="1122",
+                otp_hash=hash_otp("731940"),
+                otp_expires_at=utc_now() + timedelta(days=1),
+                otp_attempts=0,
+                verification_otp=None,
             ),
             # 5. Resolved Incident with Feedback
             Incident(
@@ -396,7 +437,10 @@ def seed_demo_data(db: Session):
                 priority_reason="Medium priority: Single casualty conscious and stable.",
                 status="Resolved",
                 is_verified=True,
-                verification_otp="3344",
+                otp_hash=hash_otp("582136"),
+                otp_expires_at=utc_now() + timedelta(days=1),
+                otp_attempts=0,
+                verification_otp=None,
             ),
         ]
         db.add_all(incidents)
@@ -420,24 +464,28 @@ def seed_demo_data(db: Session):
                 status="Received",
                 message="Emergency report received. Assigned Incident Code CARE-2026-101.",
                 actor="CareOn System",
+                created_at=utc_now() - timedelta(minutes=15),
             ))
             db.add(IncidentUpdate(
                 incident_id=inc101.id,
                 status="Verified",
                 message="Incident confirmed by phone contact with Demo User.",
                 actor="Coordinator Aastha Singh",
+                created_at=utc_now() - timedelta(minutes=12),
             ))
             db.add(IncidentUpdate(
                 incident_id=inc101.id,
                 status="Assignment Confirmed",
                 message="Rapid LifeSupport Ambulance 01 assigned to incident.",
                 actor="Coordinator Aastha Singh",
+                created_at=utc_now() - timedelta(minutes=8),
             ))
             db.add(IncidentUpdate(
                 incident_id=inc101.id,
                 status="Team Dispatched",
                 message="Rapid LifeSupport Ambulance 01 en route with siren activated. ETA 5 mins.",
                 actor="Coordinator Aastha Singh",
+                created_at=utc_now() - timedelta(minutes=5),
             ))
 
             if demo_reporter_id:
@@ -598,6 +646,10 @@ def create_incident(
     # Title generation
     title = f"{payload.category} Emergency - {payload.location_name}"
 
+    raw_otp = generate_secure_otp()
+    otp_hash = hash_otp(raw_otp)
+    otp_expires_at = utc_now() + timedelta(minutes=10)
+
     incident = Incident(
         incident_code=incident_code,
         user_id=user_id,
@@ -616,7 +668,10 @@ def create_incident(
         priority_reason=priority_reason,
         status="Received",
         is_verified=False,
-        verification_otp="123456",  # Deterministic demo OTP
+        verification_otp=None,
+        otp_hash=otp_hash,
+        otp_expires_at=otp_expires_at,
+        otp_attempts=0,
         is_duplicate=is_duplicate,
         duplicate_of_id=duplicate_of_id,
         is_disaster=payload.is_disaster or False,
@@ -641,12 +696,23 @@ def create_incident(
 
     # User notification
     if user_id:
+        otp_notif = Notification(
+            user_id=user_id,
+            incident_id=incident.id,
+            title=f"Emergency Verification Code ({incident.incident_code})",
+            message=f"Your CareOn verification code is: {raw_otp}. Enter this code in the verification box to continue. (In-App Demo OTP)",
+            type="alert",
+            target_role="user",
+        )
+        db.add(otp_notif)
+
         notif = Notification(
             user_id=user_id,
             incident_id=incident.id,
             title=f"Emergency Request Logged ({incident.incident_code})",
             message=f"{payload.contact_name}, your request has been received. Our coordinator will review the details.",
             type="info",
+            target_role="user",
         )
         db.add(notif)
 
@@ -657,6 +723,8 @@ def create_incident(
         title=f"🚨 New Emergency: {incident.incident_code} ({incident.priority})",
         message=f"{incident.category} in {incident.location_name}. Affected: {incident.affected_people}.",
         type="alert",
+        target_role="admin",
+        action_url=f"/admin/incidents?code={incident.incident_code}",
     )
     db.add(admin_notif)
 
@@ -672,7 +740,7 @@ def create_incident(
     db.commit()
     db.refresh(incident)
 
-    return incident
+    return incident, raw_otp
 
 
 def get_incidents(
@@ -712,57 +780,206 @@ def get_incidents(
 
 
 def get_incident_by_id_or_code(db: Session, identifier: str) -> Optional[Incident]:
-    if identifier.isdigit():
+    if str(identifier).isdigit():
         return db.query(Incident).filter(Incident.id == int(identifier)).first()
-    return db.query(Incident).filter(Incident.incident_code == identifier.upper().strip()).first()
+    return db.query(Incident).filter(Incident.incident_code == str(identifier).upper().strip()).first()
+
+
+def regenerate_incident_otp(db: Session, incident: Incident) -> Tuple[str, datetime]:
+    """Generate a fresh 6-digit verification code with 10-minute expiry."""
+    raw_otp = generate_secure_otp()
+    incident.otp_hash = hash_otp(raw_otp)
+    incident.otp_attempts = 0
+    incident.otp_expires_at = utc_now() + timedelta(minutes=10)
+    db.commit()
+    db.refresh(incident)
+    return raw_otp, incident.otp_expires_at
 
 
 def verify_incident(
     db: Session,
     incident_id: int,
     otp: str,
-    verified_by: str = "Demo User",
-) -> Optional[Incident]:
+    current_user: Optional[User] = None,
+) -> Tuple[Optional[Incident], str]:
+    incident = db.query(Incident).filter(Incident.id == incident_id).with_for_update().first()
+    if not incident:
+        return None, "not_found"
+
+    if not current_user:
+        return None, "unauthorized"
+
+    # Restriction: Must be the authenticated reporter who owns this incident or an admin
+    if incident.user_id and incident.user_id != current_user.id and current_user.role != "admin":
+        return None, "forbidden"
+
+    if incident.is_verified:
+        return None, "already_verified"
+
+    # Enforce maximum 5 verification attempts
+    if incident.otp_attempts >= 5:
+        return None, "attempts_exceeded"
+
+    # Enforce 10-minute expiry
+    if incident.otp_expires_at and utc_now() > to_utc(incident.otp_expires_at):
+        return None, "expired"
+
+    # Verify cryptographic hash
+    if not verify_otp_hash(otp.strip(), incident.otp_hash):
+        db.query(Incident).filter(Incident.id == incident.id).update(
+            {Incident.otp_attempts: Incident.otp_attempts + 1}
+        )
+        db.commit()
+        db.refresh(incident)
+        remaining = max(0, 5 - incident.otp_attempts)
+        return None, f"invalid_otp:{remaining}"
+
+    # OTP is valid -> confirm emergency
+    incident.is_verified = True
+    incident.status = "Verified" if incident.status in ["Received", "Verification Pending"] else incident.status
+    incident.otp_hash = None
+    incident.otp_expires_at = None
+    incident.otp_attempts = 0
+
+    actor = current_user.name
+    update = IncidentUpdate(
+        incident_id=incident.id,
+        status="Verified",
+        message=f"Phone contact verified via emergency OTP for {actor}.",
+        actor=actor,
+    )
+    db.add(update)
+
+    v_log = VerificationLog(
+        incident_id=incident.id,
+        verified_by=actor,
+        decision="Verified",
+        reason="Emergency confirmed via successful OTP verification.",
+    )
+    db.add(v_log)
+
+    if incident.user_id:
+        db.add(Notification(
+            user_id=incident.user_id,
+            incident_id=incident.id,
+            title=f"Verification Complete ({incident.incident_code})",
+            message="Your emergency contact has been verified. Coordinator is assigning assistance.",
+            type="success",
+        ))
+
+    # Admin notification for verified contact
+    db.add(Notification(
+        user_id=None,
+        incident_id=incident.id,
+        title=f"✅ Contact Verified: {incident.incident_code}",
+        message=f"Phone contact verified via emergency OTP for {actor}.",
+        type="success",
+        target_role="admin",
+        action_url=f"/admin/incidents?code={incident.incident_code}",
+    ))
+
+    db.commit()
+    db.refresh(incident)
+    return incident, "success"
+
+
+# ==============================================================================
+# Doctor Callback Requests
+# ==============================================================================
+def create_doctor_callback_request(
+    db: Session,
+    incident_id: int,
+    user_id: int,
+    contact_name: str,
+    contact_phone: str,
+    chief_complaint: Optional[str] = None,
+) -> DoctorCallbackRequest:
     incident = db.query(Incident).filter(Incident.id == incident_id).first()
     if not incident:
+        raise ValueError("Incident not found.")
+
+    complaint_text = (chief_complaint or "").strip() or "Urgent Medical Consultation"
+
+    cb_req = DoctorCallbackRequest(
+        incident_id=incident.id,
+        user_id=user_id,
+        contact_name=contact_name,
+        contact_phone=contact_phone,
+        chief_complaint=complaint_text,
+        status="Pending",
+    )
+    db.add(cb_req)
+
+    # Log on incident timeline
+    update = IncidentUpdate(
+        incident_id=incident.id,
+        status=incident.status,
+        message=f"Doctor call requested for {contact_name}. Status: Pending review.",
+        actor=contact_name,
+    )
+    db.add(update)
+
+    db.commit()
+    db.refresh(cb_req)
+    return cb_req
+
+
+def get_doctor_callbacks(
+    db: Session,
+    status_filter: Optional[str] = None,
+) -> List[DoctorCallbackRequest]:
+    q = db.query(DoctorCallbackRequest)
+    if status_filter:
+        q = q.filter(DoctorCallbackRequest.status == status_filter)
+    return q.order_by(DoctorCallbackRequest.created_at.desc()).all()
+
+
+def get_incident_doctor_callbacks(
+    db: Session,
+    incident_id: int,
+) -> List[DoctorCallbackRequest]:
+    return (
+        db.query(DoctorCallbackRequest)
+        .filter(DoctorCallbackRequest.incident_id == incident_id)
+        .order_by(DoctorCallbackRequest.created_at.desc())
+        .all()
+    )
+
+
+def update_doctor_callback_status(
+    db: Session,
+    callback_id: int,
+    status: str,
+    admin_notes: Optional[str] = None,
+    assigned_to: Optional[str] = None,
+    actor: str = "Coordinator",
+) -> Optional[DoctorCallbackRequest]:
+    req = db.query(DoctorCallbackRequest).filter(DoctorCallbackRequest.id == callback_id).first()
+    if not req:
         return None
 
-    # Check OTP (accept demo standard '123456' or incident specific OTP)
-    if otp in [incident.verification_otp, "123456", "000000"]:
-        incident.is_verified = True
-        incident.status = "Verified" if incident.status in ["Received", "Verification Pending"] else incident.status
+    req.status = status
+    if admin_notes is not None:
+        req.admin_notes = admin_notes
+    if assigned_to is not None:
+        req.assigned_to = assigned_to
 
+    # Log on incident timeline
+    parent_incident = db.query(Incident).filter(Incident.id == req.incident_id).first()
+    if parent_incident:
         update = IncidentUpdate(
-            incident_id=incident.id,
-            status="Verified",
-            message=f"Phone contact verified via local OTP by {verified_by}.",
-            actor=verified_by,
+            incident_id=parent_incident.id,
+            status=parent_incident.status,
+            message=f"Doctor callback request status updated to '{status}' by {actor}." + (f" Notes: {admin_notes}" if admin_notes else ""),
+            actor=actor,
         )
         db.add(update)
 
-        v_log = VerificationLog(
-            incident_id=incident.id,
-            verified_by=verified_by,
-            decision="Verified",
-            reason="Correct demo OTP verification confirmed.",
-        )
-        db.add(v_log)
+    # Doctor callback notifications disabled (no real doctor or clinic connected)
 
-        # Notify
-        if incident.user_id:
-            db.add(Notification(
-                user_id=incident.user_id,
-                incident_id=incident.id,
-                title=f"Verification Complete ({incident.incident_code})",
-                message="Your contact details have been verified. Coordinator is assigning assistance.",
-                type="success",
-            ))
-
-        db.commit()
-        db.refresh(incident)
-        return incident
-
-    return None
+    db.commit()
+    db.refresh(req)
+    return req
 
 
 def update_incident_status(
@@ -884,8 +1101,10 @@ def cancel_incident(
         user_id=None,
         incident_id=incident.id,
         title=f"⚠️ Incident Cancelled: {incident.incident_code}",
-        message=f"Reporter cancelled {incident.incident_code} (Reason: {reason}). Please confirm safe resource release.",
+        message=f"Citizen cancelled {incident.incident_code} (Reason: {reason}). Please confirm safe resource release.",
         type="warning",
+        target_role="admin",
+        action_url=f"/admin/cancellations?code={incident.incident_code}",
     ))
 
     # Safe release if admin cancels directly
@@ -1252,6 +1471,17 @@ def submit_feedback(
         comments=comments,
     )
     db.add(feedback)
+
+    # Notify admin coordinators of feedback
+    db.add(Notification(
+        user_id=None,
+        incident_id=incident_id,
+        title=f"⭐ New Citizen Feedback ({rating}★)",
+        message=f"Feedback submitted for {incident.incident_code}: {rating} stars. {comments or ''}".strip(),
+        type="info",
+        target_role="admin",
+        action_url=f"/admin/analytics",
+    ))
     db.commit()
     db.refresh(feedback)
     return feedback
@@ -1268,12 +1498,33 @@ def get_user_notifications(db: Session, user_id: Optional[int] = None) -> List[N
     if user_id:
         return (
             db.query(Notification)
-            .filter(or_(Notification.user_id == user_id, Notification.user_id == None))
+            .filter(
+                or_(
+                    Notification.user_id == user_id,
+                    and_(
+                        Notification.user_id == None,
+                        Notification.target_role != "admin",
+                        ~Notification.title.like("%Verification Code%"),
+                    ),
+                )
+            )
             .order_by(Notification.created_at.desc())
             .limit(50)
             .all()
         )
-    return db.query(Notification).order_by(Notification.created_at.desc()).limit(50).all()
+    return (
+        db.query(Notification)
+        .filter(
+            and_(
+                Notification.user_id == None,
+                Notification.target_role != "admin",
+                ~Notification.title.like("%Verification Code%"),
+            )
+        )
+        .order_by(Notification.created_at.desc())
+        .limit(50)
+        .all()
+    )
 
 
 def mark_notification_read(db: Session, notif_id: int) -> bool:
@@ -1283,6 +1534,46 @@ def mark_notification_read(db: Session, notif_id: int) -> bool:
     notif.is_read = True
     db.commit()
     return True
+
+
+def get_admin_notifications(db: Session, unread_only: bool = False, limit: int = 50) -> List[Notification]:
+    q = db.query(Notification).filter(Notification.target_role == "admin")
+    if unread_only:
+        q = q.filter(Notification.is_read == False)
+    return q.order_by(Notification.created_at.desc()).limit(limit).all()
+
+
+def mark_all_admin_notifications_read(db: Session) -> int:
+    unread = db.query(Notification).filter(Notification.target_role == "admin", Notification.is_read == False).all()
+    count = len(unread)
+    for n in unread:
+        n.is_read = True
+    db.commit()
+    return count
+
+
+def create_admin_notification(
+    db: Session,
+    incident_id: Optional[int],
+    title: str,
+    message: str,
+    type: str = "alert",
+    action_url: Optional[str] = None,
+) -> Notification:
+    admin_notif = Notification(
+        user_id=None,
+        incident_id=incident_id,
+        title=title,
+        message=message,
+        type=type,
+        target_role="admin",
+        action_url=action_url,
+        is_read=False,
+    )
+    db.add(admin_notif)
+    db.commit()
+    db.refresh(admin_notif)
+    return admin_notif
 
 
 # ==============================================================================

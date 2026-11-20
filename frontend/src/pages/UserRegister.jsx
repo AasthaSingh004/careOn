@@ -76,31 +76,32 @@ export default function UserRegister({ lang = 'en', onRegisterSuccess, onNavigat
 
   return (
     <div style={{ maxWidth: 480, margin: '2rem auto', padding: '0 1rem' }}>
-      <div className="card" style={{ padding: '2rem', borderRadius: 16, border: '1px solid #e2e8f0', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.06)' }}>
+      <div className="card" style={{ backgroundColor: '#FFFFFF', padding: '2.25rem', borderRadius: 16, border: '1px solid #DCE5EB', boxShadow: '0 4px 16px rgba(0, 0, 0, 0.04)' }}>
         <div style={{ textAlign: 'center', marginBottom: '1.75rem' }}>
           <div style={{ display: 'inline-flex', marginBottom: '0.75rem' }}>
-            <CareOnLogo size={52} />
+            <CareOnLogo size={52} color="#F04438" />
           </div>
-          <h2 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#134e4a', margin: '0 0 0.5rem 0' }}>
+          <h2 style={{ fontSize: '1.6rem', fontWeight: 800, color: '#171C24', margin: '0 0 0.4rem 0' }}>
             {t('user_register_title')}
           </h2>
-          <p style={{ color: '#64748b', fontSize: '0.9rem', margin: 0 }}>
+          <p style={{ color: '#344252', fontSize: '0.9rem', margin: 0 }}>
             {t('user_register_subtitle')}
           </p>
         </div>
 
         {error && (
           <div style={{
-            background: '#fef2f2',
-            border: '1px solid #fecaca',
-            color: '#991b1b',
+            background: '#FEE4E2',
+            border: '1px solid #FECDCA',
+            color: '#B42318',
             padding: '0.75rem 1rem',
             borderRadius: 8,
             marginBottom: '1.25rem',
             display: 'flex',
             alignItems: 'center',
             gap: 8,
-            fontSize: '0.875rem'
+            fontSize: '0.875rem',
+            fontWeight: 600
           }}>
             <AlertCircle size={18} style={{ flexShrink: 0 }} />
             <span>{error}</span>
@@ -109,16 +110,17 @@ export default function UserRegister({ lang = 'en', onRegisterSuccess, onNavigat
 
         {success && (
           <div style={{
-            background: '#f0fdf4',
-            border: '1px solid #bbf7d0',
-            color: '#166534',
+            background: '#ECFDF3',
+            border: '1px solid #A6F4C5',
+            color: '#027A48',
             padding: '0.75rem 1rem',
             borderRadius: 8,
             marginBottom: '1.25rem',
             display: 'flex',
             alignItems: 'center',
             gap: 8,
-            fontSize: '0.875rem'
+            fontSize: '0.875rem',
+            fontWeight: 700
           }}>
             <CheckCircle2 size={18} style={{ flexShrink: 0 }} />
             <span>{success}</span>
@@ -128,16 +130,16 @@ export default function UserRegister({ lang = 'en', onRegisterSuccess, onNavigat
         <form onSubmit={handleSubmit}>
           {/* Full Name */}
           <div className="form-group" style={{ marginBottom: '1rem' }}>
-            <label style={{ display: 'block', fontWeight: 600, fontSize: '0.875rem', marginBottom: '0.35rem', color: '#334155' }}>
+            <label style={{ display: 'block', fontWeight: 700, fontSize: '0.9rem', marginBottom: '0.4rem', color: '#171C24' }}>
               {t('full_name_label')}
             </label>
             <div style={{ position: 'relative' }}>
-              <User size={18} style={{ position: 'absolute', left: 12, top: 12, color: '#94a3b8' }} />
+              <User size={18} style={{ position: 'absolute', left: 12, top: 12, color: '#667085' }} />
               <input
                 type="text"
                 name="name"
                 className="input-field"
-                style={{ width: '100%', paddingLeft: '2.5rem', boxSizing: 'border-box' }}
+                style={{ width: '100%', paddingLeft: '2.5rem', boxSizing: 'border-box', border: '1px solid #DCE5EB', borderRadius: 8, padding: '0.75rem 0.75rem 0.75rem 2.5rem', backgroundColor: '#FFFFFF', color: '#171C24' }}
                 placeholder={t('full_name_placeholder') || 'Enter your full name'}
                 value={formData.name}
                 onChange={handleChange}
@@ -148,16 +150,16 @@ export default function UserRegister({ lang = 'en', onRegisterSuccess, onNavigat
 
           {/* Email */}
           <div className="form-group" style={{ marginBottom: '1rem' }}>
-            <label style={{ display: 'block', fontWeight: 600, fontSize: '0.875rem', marginBottom: '0.35rem', color: '#334155' }}>
+            <label style={{ display: 'block', fontWeight: 700, fontSize: '0.9rem', marginBottom: '0.4rem', color: '#171C24' }}>
               {t('email_label')}
             </label>
             <div style={{ position: 'relative' }}>
-              <Mail size={18} style={{ position: 'absolute', left: 12, top: 12, color: '#94a3b8' }} />
+              <Mail size={18} style={{ position: 'absolute', left: 12, top: 12, color: '#667085' }} />
               <input
                 type="email"
                 name="email"
                 className="input-field"
-                style={{ width: '100%', paddingLeft: '2.5rem', boxSizing: 'border-box' }}
+                style={{ width: '100%', paddingLeft: '2.5rem', boxSizing: 'border-box', border: '1px solid #DCE5EB', borderRadius: 8, padding: '0.75rem 0.75rem 0.75rem 2.5rem', backgroundColor: '#FFFFFF', color: '#171C24' }}
                 placeholder={t('email_placeholder')}
                 value={formData.email}
                 onChange={handleChange}
@@ -168,16 +170,16 @@ export default function UserRegister({ lang = 'en', onRegisterSuccess, onNavigat
 
           {/* Phone */}
           <div className="form-group" style={{ marginBottom: '1rem' }}>
-            <label style={{ display: 'block', fontWeight: 600, fontSize: '0.875rem', marginBottom: '0.35rem', color: '#334155' }}>
+            <label style={{ display: 'block', fontWeight: 700, fontSize: '0.9rem', marginBottom: '0.4rem', color: '#171C24' }}>
               {t('phone_label')}
             </label>
             <div style={{ position: 'relative' }}>
-              <Phone size={18} style={{ position: 'absolute', left: 12, top: 12, color: '#94a3b8' }} />
+              <Phone size={18} style={{ position: 'absolute', left: 12, top: 12, color: '#667085' }} />
               <input
                 type="tel"
                 name="phone"
                 className="input-field"
-                style={{ width: '100%', paddingLeft: '2.5rem', boxSizing: 'border-box' }}
+                style={{ width: '100%', paddingLeft: '2.5rem', boxSizing: 'border-box', border: '1px solid #DCE5EB', borderRadius: 8, padding: '0.75rem 0.75rem 0.75rem 2.5rem', backgroundColor: '#FFFFFF', color: '#171C24' }}
                 placeholder={t('phone_placeholder')}
                 value={formData.phone}
                 onChange={handleChange}
@@ -188,16 +190,16 @@ export default function UserRegister({ lang = 'en', onRegisterSuccess, onNavigat
 
           {/* Password */}
           <div className="form-group" style={{ marginBottom: '1rem' }}>
-            <label style={{ display: 'block', fontWeight: 600, fontSize: '0.875rem', marginBottom: '0.35rem', color: '#334155' }}>
+            <label style={{ display: 'block', fontWeight: 700, fontSize: '0.9rem', marginBottom: '0.4rem', color: '#171C24' }}>
               {t('password_label')}
             </label>
             <div style={{ position: 'relative' }}>
-              <Lock size={18} style={{ position: 'absolute', left: 12, top: 12, color: '#94a3b8' }} />
+              <Lock size={18} style={{ position: 'absolute', left: 12, top: 12, color: '#667085' }} />
               <input
                 type="password"
                 name="password"
                 className="input-field"
-                style={{ width: '100%', paddingLeft: '2.5rem', boxSizing: 'border-box' }}
+                style={{ width: '100%', paddingLeft: '2.5rem', boxSizing: 'border-box', border: '1px solid #DCE5EB', borderRadius: 8, padding: '0.75rem 0.75rem 0.75rem 2.5rem', backgroundColor: '#FFFFFF', color: '#171C24' }}
                 placeholder={t('password_placeholder')}
                 value={formData.password}
                 onChange={handleChange}
@@ -209,16 +211,16 @@ export default function UserRegister({ lang = 'en', onRegisterSuccess, onNavigat
 
           {/* Confirm Password */}
           <div className="form-group" style={{ marginBottom: '1.5rem' }}>
-            <label style={{ display: 'block', fontWeight: 600, fontSize: '0.875rem', marginBottom: '0.35rem', color: '#334155' }}>
+            <label style={{ display: 'block', fontWeight: 700, fontSize: '0.9rem', marginBottom: '0.4rem', color: '#171C24' }}>
               {t('confirm_password_label')}
             </label>
             <div style={{ position: 'relative' }}>
-              <Lock size={18} style={{ position: 'absolute', left: 12, top: 12, color: '#94a3b8' }} />
+              <Lock size={18} style={{ position: 'absolute', left: 12, top: 12, color: '#667085' }} />
               <input
                 type="password"
                 name="confirm_password"
                 className="input-field"
-                style={{ width: '100%', paddingLeft: '2.5rem', boxSizing: 'border-box' }}
+                style={{ width: '100%', paddingLeft: '2.5rem', boxSizing: 'border-box', border: '1px solid #DCE5EB', borderRadius: 8, padding: '0.75rem 0.75rem 0.75rem 2.5rem', backgroundColor: '#FFFFFF', color: '#171C24' }}
                 placeholder={t('confirm_password_placeholder')}
                 value={formData.confirm_password}
                 onChange={handleChange}
@@ -231,7 +233,7 @@ export default function UserRegister({ lang = 'en', onRegisterSuccess, onNavigat
           <button
             type="submit"
             className="btn btn-primary"
-            style={{ width: '100%', padding: '0.75rem', fontSize: '1rem', fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
+            style={{ width: '100%', padding: '0.85rem', fontSize: '1rem', fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: '#171C24', color: '#FFFFFF', borderRadius: 8, border: 'none', cursor: 'pointer' }}
             disabled={loading}
           >
             {loading ? t('loading') : (
@@ -243,12 +245,12 @@ export default function UserRegister({ lang = 'en', onRegisterSuccess, onNavigat
           </button>
         </form>
 
-        <div style={{ marginTop: '1.5rem', textAlign: 'center', fontSize: '0.875rem', color: '#64748b' }}>
+        <div style={{ marginTop: '1.5rem', textAlign: 'center', fontSize: '0.875rem', color: '#344252' }}>
           <span>{t('already_have_account')} </span>
           <button
             type="button"
             onClick={() => onNavigate('user_login')}
-            style={{ background: 'none', border: 'none', color: '#0d9488', fontWeight: 600, cursor: 'pointer', padding: 0 }}
+            style={{ background: 'none', border: 'none', color: '#F04438', fontWeight: 700, cursor: 'pointer', padding: 0 }}
           >
             {t('login_link')}
           </button>

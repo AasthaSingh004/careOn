@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from '../translations';
+import { formatISTTime, formatISTDateTime } from '../utils/date';
 import {
   fetchIncidents,
   fetchNotifications,
@@ -33,6 +34,8 @@ export default function UserDashboard({ lang = 'en', currentUser, onNavigate, on
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState(null);
+  const [refreshStatus, setRefreshStatus] = useState({ type: null, message: '' });
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const [feedbackIncidentId, setFeedbackIncidentId] = useState(null);
   const [rating, setRating] = useState(5);
@@ -40,16 +43,32 @@ export default function UserDashboard({ lang = 'en', currentUser, onNavigate, on
   const [feedbackSuccess, setFeedbackSuccess] = useState(false);
 
   const loadUserData = useCallback(async (isRefresh = false) => {
-    if (isRefresh) setRefreshing(true);
+    if (isRefresh) {
+      setRefreshing(true);
+      setRefreshStatus({ type: null, message: '' });
+    }
     try {
       const [incList, notifList] = await Promise.all([
-        fetchIncidents({ my_requests_only: true }, 'user').catch(() => []),
-        fetchNotifications('user').catch(() => []),
+        fetchIncidents({ my_requests_only: true }, 'user'),
+        fetchNotifications('user'),
       ]);
-      setIncidents(incList);
-      setNotifications(notifList);
+      setIncidents(incList || []);
+      setNotifications(notifList || []);
+      setLastUpdated(new Date());
+      if (isRefresh) {
+        setRefreshStatus({
+          type: 'success',
+          message: t('feed_refreshed') || 'Feed refreshed successfully with live incident data.'
+        });
+      }
     } catch (err) {
       console.error('Error fetching user dashboard data:', err);
+      if (isRefresh) {
+        setRefreshStatus({
+          type: 'error',
+          message: t('refresh_failed') || 'Failed to refresh live data from server.'
+        });
+      }
     } finally {
       setLoading(false);
       if (isRefresh) setRefreshing(false);
@@ -120,12 +139,13 @@ export default function UserDashboard({ lang = 'en', currentUser, onNavigate, on
     <div style={{ maxWidth: 1200, margin: '1.5rem auto', padding: '0 1rem' }}>
       {/* Top Greeting & Profile Header */}
       <div style={{
-        background: 'linear-gradient(135deg, #0d9488 0%, #115e59 100%)',
-        color: '#ffffff',
+        background: '#FFFFFF',
+        color: '#171C24',
         borderRadius: 16,
         padding: '2rem',
         marginBottom: '2rem',
-        boxShadow: '0 10px 20px -5px rgba(13, 148, 136, 0.3)',
+        border: '1px solid #DCE5EB',
+        boxShadow: '0 4px 16px rgba(0, 0, 0, 0.04)',
         display: 'flex',
         flexWrap: 'wrap',
         justifyContent: 'space-between',
@@ -133,14 +153,14 @@ export default function UserDashboard({ lang = 'en', currentUser, onNavigate, on
         gap: '1.5rem'
       }}>
         <div>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,0.18)', padding: '4px 12px', borderRadius: 20, fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.75rem' }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#ECFDF3', border: '1px solid #A6F4C5', color: '#027A48', padding: '4px 12px', borderRadius: 20, fontSize: '0.8rem', fontWeight: 700, marginBottom: '0.75rem' }}>
             <Shield size={14} />
             <span>{t('authenticated_citizen_badge') || 'Verified Citizen Account'}</span>
           </div>
-          <h1 style={{ fontSize: '1.85rem', fontWeight: 800, margin: '0 0 0.5rem 0', letterSpacing: '-0.02em' }}>
-            {t('welcome_back') || 'Welcome,'} {currentUser?.name || 'Citizen'}
+          <h1 style={{ fontSize: '1.85rem', fontWeight: 800, margin: '0 0 0.5rem 0', letterSpacing: '-0.02em', color: '#171C24' }}>
+            {t('welcome_back') || 'Welcome,'} {currentUser?.name || currentUser?.full_name || 'Citizen'}
           </h1>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.25rem', fontSize: '0.9rem', opacity: 0.9 }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.25rem', fontSize: '0.9rem', color: '#344252' }}>
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
               <Mail size={16} />
               {currentUser?.email || 'aastha@example.com'}
@@ -158,41 +178,57 @@ export default function UserDashboard({ lang = 'en', currentUser, onNavigate, on
           </div>
         </div>
 
-        <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
+          {lastUpdated && (
+            <span style={{ fontSize: '0.8rem', color: '#027A48', fontWeight: 700, whiteSpace: 'nowrap' }}>
+              {t('updated_just_now', 'Updated just now')}
+            </span>
+          )}
+          {refreshStatus.type === 'error' && (
+            <span style={{ fontSize: '0.8rem', color: '#B42318', background: '#FEE4E2', border: '1px solid #FECDCA', padding: '3px 8px', borderRadius: 4, whiteSpace: 'nowrap', fontWeight: 600 }}>
+              {refreshStatus.message}
+            </span>
+          )}
+          {refreshStatus.type === 'success' && (
+            <span style={{ fontSize: '0.8rem', color: '#027A48', background: '#ECFDF3', border: '1px solid #A6F4C5', padding: '3px 8px', borderRadius: 4, whiteSpace: 'nowrap', fontWeight: 600 }}>
+              {refreshStatus.message}
+            </span>
+          )}
           <button
             onClick={() => loadUserData(true)}
-            className="btn"
+            className="btn btn-outline"
+            disabled={refreshing}
             style={{
-              background: 'rgba(255,255,255,0.2)',
-              color: '#ffffff',
-              border: 'none',
+              background: '#FFFFFF',
+              color: '#171C24',
+              border: '1px solid #DCE5EB',
               borderRadius: 8,
               padding: '0.6rem 1rem',
               display: 'inline-flex',
               alignItems: 'center',
               gap: 6,
-              cursor: 'pointer',
-              fontWeight: 600
+              cursor: refreshing ? 'not-allowed' : 'pointer',
+              fontWeight: 700
             }}
             title={t('refresh_feed')}
           >
             <RefreshCw size={16} className={refreshing ? 'spin' : ''} />
-            <span>{t('refresh')}</span>
+            <span>{refreshing ? t('refreshing', 'Refreshing...') : t('refresh', 'Refresh')}</span>
           </button>
           <button
             onClick={handleLogout}
-            className="btn"
+            className="btn btn-outline"
             style={{
-              background: '#ffffff',
-              color: '#0f766e',
-              border: 'none',
+              background: '#F5F6F7',
+              color: '#171C24',
+              border: '1px solid #DCE5EB',
               borderRadius: 8,
               padding: '0.6rem 1rem',
               display: 'inline-flex',
               alignItems: 'center',
               gap: 6,
               cursor: 'pointer',
-              fontWeight: 600
+              fontWeight: 700
             }}
           >
             <LogOut size={16} />
@@ -212,8 +248,8 @@ export default function UserDashboard({ lang = 'en', currentUser, onNavigate, on
         <div
           onClick={() => onNavigate('user_report')}
           style={{
-            background: 'linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%)',
-            border: '2px solid #fecdd3',
+            background: '#FEE4E2',
+            border: '1px solid #FECDCA',
             borderRadius: 14,
             padding: '1.5rem',
             cursor: 'pointer',
@@ -222,17 +258,17 @@ export default function UserDashboard({ lang = 'en', currentUser, onNavigate, on
           className="hover-card"
         >
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
-            <div style={{ width: 44, height: 44, borderRadius: 10, background: '#e11d48', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ width: 44, height: 44, borderRadius: 10, background: '#F04438', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <AlertTriangle size={24} />
             </div>
-            <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#e11d48', background: '#ffe4e6', padding: '3px 8px', borderRadius: 12, border: '1px solid #f43f5e' }}>
-              URGENT
+            <span style={{ fontSize: '0.75rem', fontWeight: 800, color: '#B42318', background: '#FFFFFF', padding: '3px 8px', borderRadius: 12, border: '1px solid #FECDCA' }}>
+              {t('urgent_badge', 'URGENT')}
             </span>
           </div>
-          <h3 style={{ margin: '0 0 0.4rem 0', color: '#9f1239', fontSize: '1.15rem', fontWeight: 700 }}>
+          <h3 style={{ margin: '0 0 0.4rem 0', color: '#171C24', fontSize: '1.15rem', fontWeight: 800 }}>
             {t('nav_report')}
           </h3>
-          <p style={{ margin: 0, color: '#881337', fontSize: '0.875rem' }}>
+          <p style={{ margin: 0, color: '#344252', fontSize: '0.875rem' }}>
             {t('user_action_report_desc') || 'Submit an urgent medical, fire, or accident emergency with GPS.'}
           </p>
         </div>
@@ -241,8 +277,8 @@ export default function UserDashboard({ lang = 'en', currentUser, onNavigate, on
         <div
           onClick={() => onNavigate('user_track')}
           style={{
-            background: '#ffffff',
-            border: '1px solid #cbd5e1',
+            background: '#FFFFFF',
+            border: '1px solid #DCE5EB',
             borderRadius: 14,
             padding: '1.5rem',
             cursor: 'pointer',
@@ -251,17 +287,17 @@ export default function UserDashboard({ lang = 'en', currentUser, onNavigate, on
           className="hover-card"
         >
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
-            <div style={{ width: 44, height: 44, borderRadius: 10, background: '#0284c7', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ width: 44, height: 44, borderRadius: 10, background: '#171C24', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <Eye size={24} />
             </div>
-            <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#0369a1', background: '#e0f2fe', padding: '3px 8px', borderRadius: 12 }}>
-              LIVE
+            <span style={{ fontSize: '0.75rem', fontWeight: 800, color: '#175CD3', background: '#EFF8FF', padding: '3px 8px', borderRadius: 12, border: '1px solid #B2DDFF' }}>
+              {t('live_badge', 'LIVE')}
             </span>
           </div>
-          <h3 style={{ margin: '0 0 0.4rem 0', color: '#0f172a', fontSize: '1.15rem', fontWeight: 700 }}>
+          <h3 style={{ margin: '0 0 0.4rem 0', color: '#171C24', fontSize: '1.15rem', fontWeight: 800 }}>
             {t('nav_track')}
           </h3>
-          <p style={{ margin: 0, color: '#64748b', fontSize: '0.875rem' }}>
+          <p style={{ margin: 0, color: '#344252', fontSize: '0.875rem' }}>
             {t('user_action_track_desc') || 'View real-time dispatch progress, responder ETA, and notes.'}
           </p>
         </div>
@@ -273,8 +309,8 @@ export default function UserDashboard({ lang = 'en', currentUser, onNavigate, on
             if (chatBtn) chatBtn.click();
           }}
           style={{
-            background: '#ffffff',
-            border: '1px solid #cbd5e1',
+            background: '#FFFFFF',
+            border: '1px solid #DCE5EB',
             borderRadius: 14,
             padding: '1.5rem',
             cursor: 'pointer',
@@ -283,17 +319,17 @@ export default function UserDashboard({ lang = 'en', currentUser, onNavigate, on
           className="hover-card"
         >
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
-            <div style={{ width: 44, height: 44, borderRadius: 10, background: '#0d9488', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ width: 44, height: 44, borderRadius: 10, background: '#F5F6F7', border: '1px solid #DCE5EB', color: '#171C24', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <MessageSquare size={24} />
             </div>
-            <span style={{ fontSize: '0.75rem', fontWeight: 700, color: '#0f766e', background: '#ccfbf1', padding: '3px 8px', borderRadius: 12 }}>
-              24/7 AI
+            <span style={{ fontSize: '0.75rem', fontWeight: 800, color: '#171C24', background: '#F5F6F7', padding: '3px 8px', borderRadius: 12, border: '1px solid #DCE5EB' }}>
+              {t('ai_badge', '24/7 AI')}
             </span>
           </div>
-          <h3 style={{ margin: '0 0 0.4rem 0', color: '#0f172a', fontSize: '1.15rem', fontWeight: 700 }}>
+          <h3 style={{ margin: '0 0 0.4rem 0', color: '#171C24', fontSize: '1.15rem', fontWeight: 800 }}>
             {t('hero_sahara_btn')}
           </h3>
-          <p style={{ margin: 0, color: '#64748b', fontSize: '0.875rem' }}>
+          <p style={{ margin: 0, color: '#344252', fontSize: '0.875rem' }}>
             {t('user_action_sahara_desc') || 'Ask Sahara for emergency guidance, triage steps, or helpline assistance.'}
           </p>
         </div>
@@ -304,14 +340,14 @@ export default function UserDashboard({ lang = 'en', currentUser, onNavigate, on
         {/* Left Column: My Emergency Requests */}
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-            <h2 style={{ fontSize: '1.35rem', fontWeight: 700, color: '#0f172a', margin: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
-              <FileText size={20} color="#0d9488" />
+            <h2 style={{ fontSize: '1.35rem', fontWeight: 800, color: '#171C24', margin: 0, display: 'flex', alignItems: 'center', gap: 8 }}>
+              <FileText size={20} color="#F04438" />
               <span>{t('my_requests_title') || 'My Emergency Incidents'}</span>
             </h2>
             <button
               onClick={() => onNavigate('user_report')}
               className="btn btn-primary"
-              style={{ padding: '0.45rem 0.9rem', fontSize: '0.85rem', display: 'inline-flex', alignItems: 'center', gap: 6 }}
+              style={{ background: '#F04438', color: '#FFFFFF', border: 'none', borderRadius: 8, padding: '0.5rem 1rem', fontSize: '0.85rem', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 6, cursor: 'pointer' }}
             >
               <PlusCircle size={15} />
               <span>{t('btn_report_new') || 'Report New Emergency'}</span>
@@ -319,25 +355,25 @@ export default function UserDashboard({ lang = 'en', currentUser, onNavigate, on
           </div>
 
           {loading ? (
-            <div className="card" style={{ padding: '3rem', textAlign: 'center', color: '#64748b' }}>
-              <RefreshCw size={28} className="spin" style={{ margin: '0 auto 1rem auto', display: 'block', color: '#0d9488' }} />
+            <div className="card" style={{ padding: '3rem', textAlign: 'center', color: '#344252', backgroundColor: '#FFFFFF', border: '1px solid #DCE5EB', borderRadius: 14 }}>
+              <RefreshCw size={28} className="spin" style={{ margin: '0 auto 1rem auto', display: 'block', color: '#171C24' }} />
               <p>{t('loading')}</p>
             </div>
           ) : incidents.length === 0 ? (
-            <div className="card" style={{ padding: '3rem 2rem', textAlign: 'center', borderRadius: 14 }}>
-              <div style={{ width: 60, height: 60, borderRadius: '50%', background: '#f0fdf4', color: '#16a34a', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1rem' }}>
+            <div className="card" style={{ padding: '3rem 2rem', textAlign: 'center', borderRadius: 14, backgroundColor: '#FFFFFF', border: '1px solid #DCE5EB' }}>
+              <div style={{ width: 60, height: 60, borderRadius: '50%', background: '#ECFDF3', color: '#027A48', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1rem' }}>
                 <CheckCircle2 size={32} />
               </div>
-              <h3 style={{ margin: '0 0 0.5rem 0', color: '#1e293b' }}>
+              <h3 style={{ margin: '0 0 0.5rem 0', color: '#171C24', fontWeight: 800 }}>
                 {t('no_incidents_title') || 'No Active Emergency Incidents'}
               </h3>
-              <p style={{ color: '#64748b', fontSize: '0.9rem', maxWidth: 420, margin: '0 auto 1.5rem auto' }}>
+              <p style={{ color: '#344252', fontSize: '0.9rem', maxWidth: 420, margin: '0 auto 1.5rem auto' }}>
                 {t('no_incidents_desc') || 'You have not submitted any emergency requests yet. If you require medical, fire or rescue assistance, report an incident anytime.'}
               </p>
               <button
                 onClick={() => onNavigate('user_report')}
                 className="btn btn-primary"
-                style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}
+                style={{ background: '#F04438', color: '#FFFFFF', border: 'none', borderRadius: 8, padding: '0.65rem 1.25rem', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}
               >
                 <PlusCircle size={16} />
                 <span>{t('hero_report_btn')}</span>
@@ -350,16 +386,17 @@ export default function UserDashboard({ lang = 'en', currentUser, onNavigate, on
                   key={inc.id}
                   className="card"
                   style={{
+                    backgroundColor: '#FFFFFF',
                     padding: '1.25rem',
                     borderRadius: 12,
-                    border: '1px solid #e2e8f0',
+                    border: '1px solid #DCE5EB',
                     boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
                   }}
                 >
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 8, marginBottom: '0.75rem' }}>
                     <div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                        <span style={{ fontWeight: 700, color: '#0f172a', fontSize: '1.05rem', fontFamily: 'monospace' }}>
+                        <span style={{ fontWeight: 800, color: '#171C24', fontSize: '1.05rem', fontFamily: 'monospace' }}>
                           {inc.incident_code}
                         </span>
                         <span className={`badge ${getStatusBadgeClass(inc.status)}`}>
@@ -371,7 +408,7 @@ export default function UserDashboard({ lang = 'en', currentUser, onNavigate, on
                           </span>
                         )}
                       </div>
-                      <p style={{ margin: 0, fontWeight: 600, color: '#334155', fontSize: '0.95rem' }}>
+                      <p style={{ margin: 0, fontWeight: 700, color: '#171C24', fontSize: '0.95rem' }}>
                         {t(`cat_${inc.category?.toLowerCase()}`) || inc.category}: {inc.description}
                       </p>
                     </div>
@@ -380,7 +417,7 @@ export default function UserDashboard({ lang = 'en', currentUser, onNavigate, on
                       <button
                         onClick={() => handleTrackIncident(inc.incident_code)}
                         className="btn btn-outline"
-                        style={{ padding: '0.4rem 0.85rem', fontSize: '0.85rem', display: 'inline-flex', alignItems: 'center', gap: 6 }}
+                        style={{ padding: '0.45rem 0.95rem', fontSize: '0.85rem', display: 'inline-flex', alignItems: 'center', gap: 6, borderColor: '#DCE5EB', color: '#171C24', background: '#FFFFFF', fontWeight: 700, borderRadius: 8 }}
                       >
                         <Eye size={15} />
                         <span>{t('track_incident_btn') || 'Track Live'}</span>
@@ -389,26 +426,26 @@ export default function UserDashboard({ lang = 'en', currentUser, onNavigate, on
                         <button
                           onClick={() => handleOpenFeedback(inc.id)}
                           className="btn"
-                          style={{ padding: '0.4rem 0.85rem', fontSize: '0.85rem', background: '#f8fafc', border: '1px solid #cbd5e1', color: '#475569', display: 'inline-flex', alignItems: 'center', gap: 6 }}
+                          style={{ padding: '0.45rem 0.95rem', fontSize: '0.85rem', background: '#F5F6F7', border: '1px solid #DCE5EB', color: '#171C24', display: 'inline-flex', alignItems: 'center', gap: 6, fontWeight: 700, borderRadius: 8 }}
                         >
-                          <Star size={14} color="#f59e0b" fill="#f59e0b" />
+                          <Star size={14} color="#F59E0B" fill="#F59E0B" />
                           <span>{t('feedback') || 'Feedback'}</span>
                         </button>
                       )}
                     </div>
                   </div>
 
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.5rem', fontSize: '0.825rem', color: '#64748b', borderTop: '1px solid #f1f5f9', paddingTop: '0.75rem' }}>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.5rem', fontSize: '0.825rem', color: '#344252', borderTop: '1px solid #DCE5EB', paddingTop: '0.75rem' }}>
                     <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                      <MapPin size={14} />
+                      <MapPin size={14} color="#F04438" />
                       {inc.location_name || 'Mysuru, Karnataka'}
                     </span>
                     <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
                       <Clock size={14} />
-                      {new Date(inc.created_at).toLocaleString()}
+                      {formatISTDateTime(inc.created_at)}
                     </span>
                     {inc.assigned_resource_id && (
-                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, color: '#0f766e', fontWeight: 600 }}>
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, color: '#027A48', fontWeight: 700 }}>
                         <Shield size={14} />
                         {t('resource_dispatched') || 'Response Team Assigned'}
                       </span>
@@ -423,10 +460,10 @@ export default function UserDashboard({ lang = 'en', currentUser, onNavigate, on
         {/* Right Column: User Notifications & Helpline Card */}
         <div>
           {/* Notifications List */}
-          <div className="card" style={{ padding: '1.25rem', borderRadius: 14, marginBottom: '1.5rem' }}>
+          <div className="card" style={{ backgroundColor: '#FFFFFF', padding: '1.5rem', borderRadius: 14, border: '1px solid #DCE5EB', marginBottom: '1.5rem', boxShadow: '0 4px 16px rgba(0, 0, 0, 0.04)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-              <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700, color: '#0f172a', display: 'flex', alignItems: 'center', gap: 6 }}>
-                <Bell size={18} color="#0d9488" />
+              <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800, color: '#171C24', display: 'flex', alignItems: 'center', gap: 6 }}>
+                <Bell size={18} color="#F04438" />
                 <span>{t('recent_notifications') || 'My Notifications'}</span>
               </h3>
               <span className="badge badge-info" style={{ fontSize: '0.75rem' }}>
@@ -435,7 +472,7 @@ export default function UserDashboard({ lang = 'en', currentUser, onNavigate, on
             </div>
 
             {notifications.length === 0 ? (
-              <p style={{ color: '#94a3b8', fontSize: '0.875rem', textAlign: 'center', margin: '1.5rem 0' }}>
+              <p style={{ color: '#667085', fontSize: '0.875rem', textAlign: 'center', margin: '1.5rem 0' }}>
                 {t('no_notifications') || 'No new notifications.'}
               </p>
             ) : (
@@ -446,19 +483,20 @@ export default function UserDashboard({ lang = 'en', currentUser, onNavigate, on
                     style={{
                       padding: '0.75rem',
                       borderRadius: 8,
-                      background: n.is_read ? '#f8fafc' : '#f0fdfa',
-                      borderLeft: `3px solid ${n.is_read ? '#cbd5e1' : '#0d9488'}`,
+                      background: n.is_read ? '#FFFFFF' : '#F5F6F7',
+                      border: '1px solid #DCE5EB',
+                      borderLeft: `3px solid ${n.is_read ? '#DCE5EB' : '#F04438'}`,
                       fontSize: '0.85rem'
                     }}
                   >
-                    <p style={{ margin: '0 0 4px 0', fontWeight: 600, color: '#1e293b' }}>
-                      {n.title}
+                    <p style={{ margin: '0 0 4px 0', fontWeight: 700, color: '#171C24' }}>
+                      {t(n.title)}
                     </p>
-                    <p style={{ margin: '0 0 4px 0', color: '#475569', fontSize: '0.8rem' }}>
-                      {n.message}
+                    <p style={{ margin: '0 0 4px 0', color: '#344252', fontSize: '0.8rem' }}>
+                      {t(n.message)}
                     </p>
-                    <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>
-                      {new Date(n.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    <span style={{ fontSize: '0.75rem', color: '#667085' }}>
+                      {formatISTTime(n.created_at)}
                     </span>
                   </div>
                 ))}
@@ -468,17 +506,17 @@ export default function UserDashboard({ lang = 'en', currentUser, onNavigate, on
 
           {/* Emergency 112 Advisory Card */}
           <div style={{
-            background: 'linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%)',
-            border: '1px solid #fca5a5',
+            background: '#FEE4E2',
+            border: '1px solid #FECDCA',
             borderRadius: 14,
             padding: '1.25rem',
-            color: '#991b1b'
+            color: '#B42318'
           }}>
-            <h4 style={{ margin: '0 0 0.5rem 0', display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.95rem', fontWeight: 700 }}>
+            <h4 style={{ margin: '0 0 0.5rem 0', display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.95rem', fontWeight: 800 }}>
               <Phone size={16} />
               <span>{t('helpline_alert_title') || 'National Emergency Helpline'}</span>
             </h4>
-            <p style={{ margin: '0 0 0.75rem 0', fontSize: '0.825rem', lineHeight: 1.4 }}>
+            <p style={{ margin: '0 0 0.75rem 0', fontSize: '0.85rem', lineHeight: 1.4, color: '#7A271A' }}>
               {t('helpline_alert_desc') || 'For life-threatening emergencies, dial 112 directly. CareOn is a decision-support and dispatch coordination platform.'}
             </p>
             <a
@@ -486,16 +524,17 @@ export default function UserDashboard({ lang = 'en', currentUser, onNavigate, on
               className="btn"
               style={{
                 width: '100%',
-                background: '#dc2626',
+                background: '#F04438',
                 color: '#fff',
                 textAlign: 'center',
                 textDecoration: 'none',
-                padding: '0.5rem',
-                fontSize: '0.85rem',
+                padding: '0.55rem',
+                fontSize: '0.875rem',
                 fontWeight: 700,
                 borderRadius: 8,
                 display: 'block',
-                boxSizing: 'border-box'
+                boxSizing: 'border-box',
+                boxShadow: '0 2px 6px rgba(240, 68, 56, 0.3)'
               }}
             >
               {t('dial_112_btn') || 'Call 112 Now'}
@@ -507,23 +546,23 @@ export default function UserDashboard({ lang = 'en', currentUser, onNavigate, on
       {/* Feedback Modal */}
       {showFeedbackModal && (
         <div className="modal-backdrop">
-          <div className="modal-content" style={{ maxWidth: 450 }}>
-            <h3 style={{ margin: '0 0 0.5rem 0', color: '#0f172a' }}>
+          <div className="modal-content" style={{ maxWidth: 460, backgroundColor: '#FFFFFF', borderRadius: 16, border: '1px solid #DCE5EB', padding: '1.75rem' }}>
+            <h3 style={{ margin: '0 0 0.5rem 0', color: '#171C24', fontWeight: 800, fontSize: '1.25rem' }}>
               {t('submit_feedback_title') || 'Rate Response Coordination'}
             </h3>
-            <p style={{ color: '#64748b', fontSize: '0.875rem', margin: '0 0 1.25rem 0' }}>
+            <p style={{ color: '#344252', fontSize: '0.875rem', margin: '0 0 1.25rem 0' }}>
               {t('feedback_intro') || 'Your feedback helps improve emergency dispatch times and coordinator accuracy.'}
             </p>
 
             {feedbackSuccess ? (
-              <div style={{ textAlign: 'center', padding: '1.5rem', color: '#16a34a' }}>
+              <div style={{ textAlign: 'center', padding: '1.5rem', color: '#027A48', backgroundColor: '#ECFDF3', borderRadius: 10, border: '1px solid #A6F4C5' }}>
                 <CheckCircle2 size={36} style={{ margin: '0 auto 0.5rem auto' }} />
-                <p style={{ fontWeight: 600 }}>{t('feedback_thanks') || 'Thank you for your feedback!'}</p>
+                <p style={{ fontWeight: 800, margin: 0 }}>{t('feedback_thanks') || 'Thank you for your feedback!'}</p>
               </div>
             ) : (
               <form onSubmit={handleSendFeedback}>
                 <div style={{ marginBottom: '1rem' }}>
-                  <label style={{ display: 'block', fontWeight: 600, fontSize: '0.875rem', marginBottom: '0.5rem' }}>
+                  <label style={{ display: 'block', fontWeight: 700, fontSize: '0.9rem', marginBottom: '0.5rem', color: '#171C24' }}>
                     {t('rating_label') || 'Rating (1 - 5 stars)'}
                   </label>
                   <div style={{ display: 'flex', gap: 8 }}>
@@ -541,8 +580,8 @@ export default function UserDashboard({ lang = 'en', currentUser, onNavigate, on
                       >
                         <Star
                           size={28}
-                          color="#f59e0b"
-                          fill={star <= rating ? '#f59e0b' : 'transparent'}
+                          color="#F59E0B"
+                          fill={star <= rating ? '#F59E0B' : 'transparent'}
                         />
                       </button>
                     ))}
@@ -550,28 +589,29 @@ export default function UserDashboard({ lang = 'en', currentUser, onNavigate, on
                 </div>
 
                 <div style={{ marginBottom: '1.25rem' }}>
-                  <label style={{ display: 'block', fontWeight: 600, fontSize: '0.875rem', marginBottom: '0.35rem' }}>
+                  <label style={{ display: 'block', fontWeight: 700, fontSize: '0.9rem', marginBottom: '0.35rem', color: '#171C24' }}>
                     {t('comments_label') || 'Comments or Coordinator Notes'}
                   </label>
                   <textarea
                     rows={3}
                     className="input-field"
-                    style={{ width: '100%', boxSizing: 'border-box' }}
+                    style={{ width: '100%', boxSizing: 'border-box', border: '1px solid #DCE5EB', borderRadius: 8, padding: '0.75rem', fontSize: '0.95rem', color: '#171C24', backgroundColor: '#FFFFFF' }}
                     placeholder={t('feedback_comments_placeholder') || 'How was the responder arrival and communication?'}
                     value={comments}
                     onChange={(e) => setComments(e.target.value)}
                   />
                 </div>
 
-                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
+                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
                   <button
                     type="button"
                     className="btn btn-outline"
+                    style={{ borderColor: '#DCE5EB', color: '#171C24', background: '#FFFFFF', borderRadius: 8, fontWeight: 700 }}
                     onClick={() => setShowFeedbackModal(false)}
                   >
                     {t('cancel')}
                   </button>
-                  <button type="submit" className="btn btn-primary">
+                  <button type="submit" className="btn btn-primary" style={{ background: '#171C24', color: '#FFFFFF', border: 'none', borderRadius: 8, fontWeight: 700, padding: '0.65rem 1.4rem', cursor: 'pointer' }}>
                     {t('submit')}
                   </button>
                 </div>
